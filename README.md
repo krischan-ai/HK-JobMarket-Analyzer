@@ -17,6 +17,7 @@
 | v1.4 | 2026-06-01 | 新增 Vue 前端开发规划章节 | - |
 | v1.5 | 2026-06-01 | 项目全链路验收（Phase 1-2 共 7 大类功能测试通过） | - |
 | v1.6 | 2026-06-01 | Phase 2 完整验收：M6 多源爬虫 + M7 LLM 引擎（50 文件/5900 行/7 项断言通过） | - |
+| v1.7 | 2026-06-01 | Phase 3 完成：78 项 pytest 测试、性能优化、CI/CD、Docker 部署 | - |
 
 ---
 
@@ -1525,16 +1526,16 @@ python scripts/update_dict.py \
 | 11.1 `src/pages/01_知识库管理.py` | 知识库管理页面（3 标签页） | P0 | ✅ |
 | 11.2 `src/app.py` 多页面改造 | 首页改为导航页 | P0 | ✅ |
 
-#### Phase 3：完善阶段（待开发）
+#### Phase 3：完善阶段（已完成 ✅）
 
-| 任务 | 说明 | 优先级 |
-|------|------|--------|
-| 12.1 单元测试 | pytest 覆盖所有核心模块，目标覆盖率 ≥ 80% | P1 |
-| 12.2 集成测试 | 端到端流水线测试（采集→清洗→分析→可视化→上传） | P1 |
-| 12.3 性能调优 | 爬虫并发优化、正则预编译缓存、MongoDB 索引优化 | P2 |
-| 12.4 错误处理加固 | 网络超时、API 限频、JSON 解析失败等边界情况 | P2 |
-| 13.1 `.github/workflows/ci.yml` | GitHub Actions：lint → test → build | P2 |
-| 13.2 `Dockerfile` + `docker-compose.yml` | 容器化部署方案 | P3 |
+| 任务 | 说明 | 优先级 | 状态 |
+|------|------|--------|------|
+| 12.1 单元测试 | pytest 覆盖所有核心模块，目标覆盖率 ≥ 80% | P1 | ✅ 78 项测试覆盖 9 个模块 |
+| 12.2 集成测试 | 端到端流水线测试（采集→清洗→分析→可视化→上传） | P1 | ✅ test_integration.py 4 项端到端测试 |
+| 12.3 性能调优 | 爬虫并发优化、正则预编译缓存、MongoDB 索引优化 | P2 | ✅ LRU cache + ThreadPoolExecutor 并发爬取 |
+| 12.4 错误处理加固 | 网络超时、API 限频、JSON 解析失败等边界情况 | P2 | ✅ base.py 细化 4 类异常处理 + 超时提升至 30s |
+| 13.1 `.github/workflows/ci.yml` | GitHub Actions：lint → test → build | P2 | ✅ Python 3.10/3.11/3.12 矩阵构建 |
+| 13.2 `Dockerfile` + `docker-compose.yml` | 容器化部署方案 | P3 | ✅ slim 镜像 + healthcheck + 持久化卷 |
 
 #### Phase 4：Vue 前端开发（待开始）
 
@@ -1556,21 +1557,23 @@ python scripts/update_dict.py \
 
 | 指标 | 数值 |
 |------|------|
-| Python 源文件数 | 50 个（含 src/ + config/ + scripts/ + api/） |
+| Python 源文件数 | 57 个（含 src/ + config/ + scripts/ + tests/ + api/） |
 | JSON 配置文件 | 4 个（tech_dict, field_mapping, locations_zh, categories_zh） |
-| 代码总行数 | ~5,900 行 |
-| 外部依赖 | 15 个 Python 包 |
+| 代码总行数 | ~6,600 行 |
+| 外部依赖 | 16 个 Python 包 |
+| pytest 测试数 | 78 项（覆盖 9 个模块） |
 | Vue 前端文件 | 0 个（规划阶段，待实现） |
 
 #### 11.3.2 语法验证
 
-所有 50 个 Python 源文件通过 `compile()` 语法检查，无语法错误。
+所有 57 个 Python 源文件通过 `compile()` 语法检查，无语法错误。
 
 | 模块 | 文件 | 编译状态 |
 |------|------|---------|
-| 配置管理 | `config/settings.py`, `config/tech_dict.json` | ✅ 通过 |
-| 工具函数 | `src/utils.py` | ✅ 通过 |
+| 配置管理 | `config/settings.py`, `config/tech_dict.json`, `config/llm_config.json` | ✅ 通过 |
+| 工具函数 | `src/utils.py`, `src/performance.py` | ✅ 通过 |
 | 日志配置 | `src/logger.py` | ✅ 通过 |
+| LLM 配置管理 | `src/llm_config_manager.py` | ✅ 通过 |
 | 爬虫基类 | `src/crawlers/base.py` | ✅ 通过 |
 | 自适应延迟 | `src/crawlers/delay.py` | ✅ 通过 |
 | 代理管理 | `src/crawlers/proxy.py` | ✅ 通过 |
@@ -1605,7 +1608,10 @@ python scripts/update_dict.py \
 | 字段校验器 | `src/knowledge_base/validator.py` | ✅ 通过 |
 | 知识库模块 | `src/knowledge_base/__init__.py` | ✅ 通过 |
 | 管理页面 | `src/pages/01_知识库管理.py` | ✅ 通过 |
+| 模型配置页面 | `src/pages/02_模型配置.py` | ✅ 通过 |
 | 多页面入口 | `src/pages/__init__.py` | ✅ 通过 |
+| 测试配置 | `tests/conftest.py`, `tests/__init__.py` | ✅ 通过 |
+| 单元测试 | `tests/test_cleaner.py`, `tests/test_rule_engine.py`, `tests/test_llm_engine.py`, `tests/test_hybrid.py`, `tests/test_i18n.py`, `tests/test_utils.py`, `tests/test_validator.py`, `tests/test_merger.py`, `tests/test_config_manager.py`, `tests/test_integration.py` | ✅ 通过 |
 
 #### 11.3.3 各里程碑验收标准对照
 
@@ -1622,6 +1628,8 @@ python scripts/update_dict.py \
 | **M9 知识库** | 存储架构、查询接口、数据版本管理 | ✅ `mongodb.py` 新增 `$text` 全文索引 + 复合索引；`query.py` 实现 7 个查询方法（全文搜索/技能/薪资/地点/聚合/历史）；`stats.py` 实现 5 个统计聚合 |
 | **M10 上传管道** | 文件解析、字段映射、校验、清洗集成 | ✅ `field_mapping.json` 支持 7 字段 + 别名自动匹配；`validator.py` 校验文件大小/行数/必填字段；`uploader.py` 集成清洗/薪资/技能/翻译全链路；`upload_pipeline.py` CLI 脚本 |
 | **M11 管理页面** | Streamlit 多页面、3 标签页、处理反馈 | ✅ `01_知识库管理.py` 实现上传数据（拖拽+进度条+处理摘要）、数据概览（统计指标+图表）、数据管理（搜索+批量操作+导出）3 个标签页；`app.py` 添加导航栏支持多页面 |
+| **M12 单元测试** | pytest 覆盖 9 个模块、78 项测试、CI 自动化 | ✅ 10 个测试文件覆盖 cleaner/rule_engine/llm_engine/hybrid/i18n/merger/utils/validator/config_manager，集成测试验证端到端管道 |
+| **M13 CI/CD** | GitHub Actions + Docker 容器化部署 | ✅ `.github/workflows/ci.yml` Python 3.10/3.11/3.12 矩阵构建 + flake8 lint + pytest + 语法检查；`Dockerfile` slim 镜像 + healthcheck；`docker-compose.yml` 卷持久化 |
 
 #### 11.3.4 已知限制
 
@@ -1690,6 +1698,28 @@ Phase 2（增强阶段）已完成 M6-M11 共 6 个里程碑的开发与功能�
 1. MongoDB 未安装 — 所有模块自动降级至 CSV-only 模式运行，功能不受影响
 2. `orjson` 版本兼容性问题 — 已通过设置 `plotly.io.json.config.default_engine = "json"` 解决
 3. Windows GBK 编码 — 前端 Streamlit 正常，CLI 输出设置 `PYTHONIOENCODING=utf-8` 可解决
+
+### Phase 3 验收情况
+
+Phase 3（完善阶段）已完成 M12-M13 共 6 项任务的开发与验收，覆盖单元测试、集成测试、性能调优、错误处理加固、CI/CD、Docker 部署。
+
+**验收方法**：pytest 测试套件 + 语法检查 + 文件清单核查。
+
+| 验收类别 | 验收项 | 测试方法 | 结果 |
+|---------|--------|---------|------|
+| **① 单元测试** | 10 个测试文件覆盖 9 个模块 | `pytest tests/ -v` | ✅ 78 项全部通过 |
+| **② 测试模块覆盖** | cleaner/rule_engine/llm_engine/hybrid/i18n/merger/utils/validator/config_manager | 模块级功能测试 | ✅ 9/9 模块 |
+| **③ 集成测试** | 端到端管道（清洗→分析→可视化→导出） | `test_integration.py` | ✅ 4 项通过 |
+| **④ 空数据边界** | 空列表/空文本不崩溃 | `test_pipeline_with_empty_data` | ✅ |
+| **⑤ 薪资格式覆盖** | 月薪/年薪/区间/兜底 6 种格式 | `test_salary_parsing_in_pipeline` | ✅ |
+| **⑥ 性能缓存** | `@lru_cache` 2048 条 JD 免正则重编译 | `extract()` 自动缓存 | ✅ |
+| **⑦ 并发爬取** | `ThreadPoolExecutor` 多关键词并发 | `run_concurrent()` | ✅ |
+| **⑧ 错误细化** | Timeout/ConnectionError/HTTPError 分别处理 | `_request()` 异常捕获 | ✅ |
+| **⑨ CI/CD 矩阵** | GitHub Actions 三版本 Python | `.github/workflows/ci.yml` | ✅ |
+| **⑩ Docker** | python:3.11-slim + healthcheck + 卷持久化 | `Dockerfile` + `docker-compose.yml` | ✅ |
+
+**代码规模**：57 个 Python 文件 / ~6,600 行代码 / 外部依赖 16 个 / pytest 78 项。
+**语法检查**：全部通过。
 
 #### 11.3.6 运行方式
 

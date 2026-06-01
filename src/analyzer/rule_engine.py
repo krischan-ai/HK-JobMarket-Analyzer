@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+from functools import lru_cache
 from pathlib import Path
 from typing import Optional
 
@@ -13,6 +14,7 @@ class RuleBasedSkillExtractor:
 
     def __init__(self, dict_path: str | Path = "config/tech_dict.json"):
         self.logger = get_logger(self.__class__.__name__)
+        self.dict_path = str(dict_path)
         with open(dict_path, "r", encoding="utf-8") as f:
             self.tech_dict = json.load(f)
         self._compiled = self._compile_patterns()
@@ -26,9 +28,10 @@ class RuleBasedSkillExtractor:
                 compiled[category].append((kw, pattern))
         return compiled
 
+    @lru_cache(maxsize=2048)
     def extract(self, text: str) -> dict:
         if not text:
-            return {cat: [] for cat in self.tech_dict}
+            return {cat: () for cat in self.tech_dict}
 
         result = {}
         for category, patterns in self._compiled.items():
@@ -46,9 +49,12 @@ class RuleBasedSkillExtractor:
                     if display.lower() == display:
                         display = display.capitalize()
                     found.add(display)
-            result[category] = sorted(found)
+            result[category] = tuple(sorted(found))
 
         return result
+
+    def clear_cache(self):
+        self.extract.cache_clear()
 
     def extract_flat(self, text: str) -> list[str]:
         nested = self.extract(text)
@@ -60,5 +66,6 @@ class RuleBasedSkillExtractor:
     def analyze_batch(self, jobs: list[dict], text_field: str = "jd_text") -> list[dict]:
         for job in jobs:
             text = job.get(text_field, "")
-            job["skills"] = self.extract(text)
+            raw = self.extract(text)
+            job["skills"] = {k: list(v) for k, v in raw.items()}
         return jobs
