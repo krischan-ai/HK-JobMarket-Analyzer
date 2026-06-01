@@ -13,6 +13,7 @@ import plotly.io as pio
 pio.json.config.default_engine = "json"
 
 from src.i18n import get_translator
+from src.llm_config_manager import LLMConfigManager
 
 st.set_page_config(
     page_title="HK Job Market Analyzer",
@@ -29,6 +30,7 @@ st.markdown(
     <div style="text-align: center; padding: 1rem;">
         <a href="/" target="_self" style="margin: 0 1rem; font-size: 1.1rem;">📊 分析看板</a>
         <a href="/01_%E7%9F%A5%E8%AF%86%E5%BA%93%E7%AE%A1%E7%90%86" target="_self" style="margin: 0 1rem; font-size: 1.1rem;">📂 知识库管理</a>
+        <a href="/02_%E6%A8%A1%E5%9E%8B%E9%85%8D%E7%BD%AE" target="_self" style="margin: 0 1rem; font-size: 1.1rem;">⚙️ 模型配置</a>
     </div>
     <hr style="margin: 0.5rem 0;">
     """,
@@ -85,6 +87,15 @@ with st.sidebar:
 
     st.markdown("---")
     st.caption(f"总数据量: {len(df)} 条岗位")
+
+    st.markdown("---")
+    _llm_config = LLMConfigManager()
+    if _llm_config.configured:
+        st.success(f"🤖 LLM: {_llm_config.load().get('model', '-')}")
+    else:
+        st.warning("⚙️ LLM 未配置")
+        if st.button("前往配置 ➔", key="goto_llm_config"):
+            st.switch_page("pages/02_模型配置.py")
 
 filtered_df = df.copy()
 if selected_locations:
