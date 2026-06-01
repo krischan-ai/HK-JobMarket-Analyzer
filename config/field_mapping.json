@@ -1,0 +1,11 @@
+{
+  "user_field_mappings": {
+    "job_id": ["job_id", "id", "职位编号", "岗位ID", "编号"],
+    "title": ["title", "职位名称", "职位", "岗位", "职位名"],
+    "company": ["company", "公司名称", "公司", "企业", "雇主"],
+    "location": ["location", "工作地点", "地点", "區域", "地區"],
+    "salary_raw": ["salary_raw", "salary", "薪资", "薪酬", "月薪", "待遇", "工资"],
+    "jd_raw": ["jd_raw", "description", "职位描述", "JD", "岗位描述", "工作内容", "职责"],
+    "source": ["source", "来源", "数据来源", "平台", "網站"]
+  }
+}

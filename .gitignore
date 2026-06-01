@@ -24,8 +24,10 @@ Thumbs.db
 # Data
 data/raw/
 data/cleaned/
-output/charts/
-output/reports/
+
+# Output
+output/
 
 # Logs
+logs/
 *.log

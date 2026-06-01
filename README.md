@@ -11,6 +11,9 @@
 | 版本 | 日期 | 修订内容 | 修订人 |
 |------|------|---------|--------|
 | v1.0 | 2026-06-01 | 初始版本 | - |
+| v1.1 | 2026-06-01 | 新增开发进度与规划章节，更新附录 | - |
+| v1.2 | 2026-06-01 | 新增知识库建设、前端中文化、知识库管理页面章节，更新开发规划 | - |
+| v1.3 | 2026-06-01 | 执行 M8-M11 开发验收：前端中文化、知识库模块、上传管道、知识库管理页面 | - |
 
 ---
 
@@ -55,6 +58,27 @@
 10. [部署与运行指南](#10-部署与运行指南)
     - 10.1 [环境依赖](#101-环境依赖)
     - 10.2 [运行步骤](#102-运行步骤)
+11. [开发进度与规划](#11-开发进度与规划)
+    - 11.1 [总体里程碑](#111-总体里程碑)
+    - 11.2 [详细任务拆解](#112-详细任务拆解)
+    - 11.3 [Phase 1 验收情况](#113-phase-1-验收情况)
+12. [知识库建设](#12-知识库建设)
+    - 12.1 [存储架构设计](#121-存储架构设计)
+    - 12.2 [索引策略](#122-索引策略)
+    - 12.3 [数据版本管理](#123-数据版本管理)
+    - 12.4 [查询接口设计](#124-查询接口设计)
+13. [前端中文化](#13-前端中文化)
+    - 13.1 [中文映射表设计](#131-中文映射表设计)
+    - 13.2 [中文化工具模块](#132-中文化工具模块)
+    - 13.3 [前端显示规则](#133-前端显示规则)
+14. [知识库管理页面](#14-知识库管理页面)
+    - 14.1 [上传处理流程](#141-上传处理流程)
+    - 14.2 [支持的文件格式](#142-支持的文件格式)
+    - 14.3 [字段映射机制](#143-字段映射机制)
+    - 14.4 [校验规则](#144-校验规则)
+    - 14.5 [页面设计](#145-页面设计)
+    - 14.6 [上传管道设计](#146-上传管道设计)
+    - 14.7 [数据管理功能](#147-数据管理功能)
 
 ---
 
@@ -1417,3 +1441,725 @@ python scripts/update_dict.py \
 - [Playwright 文档](https://playwright.dev/)
 - [spaCy NLP 文档](https://spacy.io/)
 - [香港《个人资料（隐私）条例》](https://www.pcpd.org.hk/)
+
+---
+
+## 11. 开发进度与规划
+
+### 11.1 总体里程碑
+
+| 里程碑 | 内容 | 预估工时 | 交付物 | 状态 |
+|--------|------|---------|--------|------|
+| **M1** 项目骨架搭建 | 目录结构、配置管理、工具函数 | 1 天 | 可运行的空项目框架 | ✅ 已完成 |
+| **M2** 单源爬虫实现 | JobsDB 数据采集 | 3 天 | 可爬取 JobsDB 岗位数据 | ✅ 已完成 |
+| **M3** 数据清洗流水线 | 文本清洗 + 薪资解析 + MongoDB 存储 | 2 天 | 结构化数据入库 | ✅ 已完成 |
+| **M4** 规则引擎分析 | 词表匹配技能提取 | 2 天 | 技能标签产出 | ✅ 已完成 |
+| **M5** 可视化看板 | Streamlit 交互 + 静态图表 | 2 天 | 可浏览的数据看板 | ✅ 已完成 |
+| **M6** 多源扩展 | OfferToday、科学园、数码港、JIJIS | 3 天 | 多源数据聚合 | ⏳ 待开始 |
+| **M7** LLM 引擎集成 | 大模型技能提取 | 2 天 | 双引擎混合分析 | ⏳ 待开始 |
+| **M8** 前端中文化 | 中文化映射表 + Translator 工具 + 看板中文显示 | 0.5 天 | 中文化前端 | ✅ 已完成 |
+| **M9** 知识库模块 | 知识库存储架构 + 查询接口 + 数据版本管理 | 1 天 | 知识库查询模块 | ✅ 已完成 |
+| **M10** 上传管道 | 文件解析 + 字段映射 + 校验 + 集成清洗链路 | 1 天 | 用户上传处理管道 | ✅ 已完成 |
+| **M11** 知识库管理页面 | Streamlit 多页面 + 上传/概览/管理标签页 | 1 天 | 知识库管理交互页面 | ✅ 已完成 |
+| **M12** 测试与优化 | 单元测试、性能调优、文档完善 | 2 天 | 稳定版本发布 | ⏳ 待开始 |
+| **M13** CI/CD 与部署 | GitHub Actions 自动化 | 1 天 | 自动化流水线 | ⏳ 待开始 |
+
+### 11.2 详细任务拆解
+
+#### Phase 1：MVP 最小可用产品（已完成）
+
+| 模块 | 文件 | 核心能力 |
+|------|------|---------|
+| **M1 骨架** | `config/settings.py`, `src/utils.py`, `src/logger.py`, `config/tech_dict.json` | `.env` 配置加载、路径工具、日志双输出、80+ 技术栈词表 |
+| **M2 爬虫** | `src/crawlers/base.py`, `src/crawlers/jobsdb.py`, `src/crawlers/delay.py`, `src/crawlers/proxy.py`, `src/crawlers/__init__.py` | Session 自动重试、JobsDB API 爬取、自适应延迟控制器、代理轮换、爬虫工厂 |
+| **M3 清洗** | `src/cleaner/text.py`, `src/cleaner/salary.py`, `src/cleaner/pipeline.py`, `src/storage/mongodb.py`, `src/storage/csv_exporter.py` | HTML 剥离、6 种薪资格式解析、管道化编排、MongoDB upsert 持久化、CSV 导出 |
+| **M4 分析** | `src/analyzer/rule_engine.py` | 预编译正则、5 类别匹配、批量分析 |
+| **M5 可视化** | `src/visualization/charts.py`, `src/app.py`, `scripts/run_pipeline.py` | 4 种 Matplotlib 图表、Streamlit 交互看板、一键端到端流水线 |
+
+#### Phase 2：增强阶段（待开发）
+
+| 任务 | 说明 | 优先级 | 依赖 |
+|------|------|--------|------|
+| 6.1 `src/crawlers/jijis.py` | JIJIS 八大联校校招数据爬虫 | P1 | M2 爬虫基类 |
+| 6.2 `src/crawlers/offertoday.py` | OfferToday 毕业生岗位爬虫 | P2 | M2 爬虫基类 |
+| 6.3 `src/crawlers/hkstp.py` | 香港科学园招聘爬虫（Playwright） | P2 | Playwright Mixin |
+| 6.4 `src/crawlers/cyberport.py` | 数码港招聘爬虫（Playwright） | P2 | Playwright Mixin |
+| 6.5 `src/crawlers/indeed.py` | Indeed HK 补充数据爬虫 | P2 | Playwright Mixin |
+| 6.6 `src/storage/merger.py` | 多源数据合并去重器 | — | M3 存储模块 |
+| 7.1 `src/analyzer/llm_engine.py` | DeepSeek/GPT API 技能提取引擎 | P1 | API Key 配置 |
+| 7.2 `src/analyzer/prompt.py` | Prompt 模板管理 + 少样本示例 | P1 | 7.1 |
+| 7.3 `src/analyzer/hybrid.py` | 规则引擎初筛 → LLM 兜底 → 词表更新 | P1 | 4.1 + 7.1 |
+| 7.4 `scripts/update_dict.py` | 从 LLM 输出提取新词，增量更新词表 | P2 | 7.3 |
+| 8.1 `config/i18n/locations_zh.json` | 香港地名中英文映射表 (50+ 条) | P0 | — |
+| 8.2 `config/i18n/categories_zh.json` | 技能类别中英文映射表 | P0 | — |
+| 8.3 `src/i18n/translator.py` | 中文化翻译器 | P0 | 8.1, 8.2 |
+| 8.4 更新 `src/app.py` | 看板字段、图表标题、轴标签改为中文 | P0 | 8.3 |
+| 9.1 `src/knowledge_base/query.py` | 知识库查询接口 | P1 | M3 MongoDB |
+| 9.2 `src/storage/mongodb.py` 增强 | 添加 `$text` 全文索引 + 复合索引 | P1 | M3 |
+| 10.1 `config/field_mapping.json` | 用户字段→标准字段映射表 | P0 | — |
+| 10.2 `src/knowledge_base/uploader.py` | 文件解析 + 字段映射 + 校验 | P0 | M3 + M4 + 8.3 |
+| 10.3 `src/knowledge_base/validator.py` | 字段校验规则 | P1 | 10.2 |
+| 10.4 `scripts/upload_pipeline.py` | CLI 版上传处理脚本 | P1 | 10.2 |
+| 11.1 `src/pages/01_知识库管理.py` | 知识库管理页面（3 标签页） | P0 | 10.2 |
+| 11.2 `src/app.py` 多页面改造 | 首页改为导航页 | P0 | 11.1 |
+
+#### Phase 3：完善阶段（待开发）
+
+| 任务 | 说明 | 优先级 |
+|------|------|--------|
+| 12.1 单元测试 | pytest 覆盖所有核心模块，目标覆盖率 ≥ 80% | P1 |
+| 12.2 集成测试 | 端到端流水线测试（采集→清洗→分析→可视化→上传） | P1 |
+| 12.3 性能调优 | 爬虫并发优化、正则预编译缓存、MongoDB 索引优化 | P2 |
+| 12.4 错误处理加固 | 网络超时、API 限频、JSON 解析失败等边界情况 | P2 |
+| 13.1 `.github/workflows/ci.yml` | GitHub Actions：lint → test → build | P2 |
+| 13.2 `Dockerfile` + `docker-compose.yml` | 容器化部署方案 | P3 |
+
+### 11.3 Phase 1 验收情况
+
+#### 11.3.1 代码规模
+
+| 指标 | 数值 |
+|------|------|
+| Python 源文件数 | 17 个 |
+| 配置文件数 | 4 个（settings, tech_dict, .env.example, .gitignore） |
+| 代码总行数 | ~1200 行 |
+| 外部依赖 | 12 个 Python 包 |
+
+#### 11.3.2 语法验证
+
+所有 27 个 Python 源文件通过 `compile()` 语法检查，无语法错误。
+
+| 模块 | 文件 | 编译状态 |
+|------|------|---------|
+| 配置管理 | `config/settings.py` | ✅ 通过 |
+| 工具函数 | `src/utils.py` | ✅ 通过 |
+| 日志配置 | `src/logger.py` | ✅ 通过 |
+| 爬虫基类 | `src/crawlers/base.py` | ✅ 通过 |
+| 自适应延迟 | `src/crawlers/delay.py` | ✅ 通过 |
+| 代理管理 | `src/crawlers/proxy.py` | ✅ 通过 |
+| JobsDB 爬虫 | `src/crawlers/jobsdb.py` | ✅ 通过 |
+| 爬虫工厂 | `src/crawlers/__init__.py` | ✅ 通过 |
+| 文本清洗 | `src/cleaner/text.py` | ✅ 通过 |
+| 薪资解析 | `src/cleaner/salary.py` | ✅ 通过 |
+| 清洗管道 | `src/cleaner/pipeline.py` | ✅ 通过 |
+| MongoDB 存储 | `src/storage/mongodb.py` | ✅ 通过 |
+| CSV 导出 | `src/storage/csv_exporter.py` | ✅ 通过 |
+| 规则引擎 | `src/analyzer/rule_engine.py` | ✅ 通过 |
+| 图表模块 | `src/visualization/charts.py` | ✅ 通过 |
+| Streamlit 看板 | `src/app.py` | ✅ 通过 |
+| 一键流水线 | `scripts/run_pipeline.py` | ✅ 通过 |
+| **中文化翻译器** | `src/i18n/translator.py` | ✅ 通过 |
+| **中文化模块** | `src/i18n/__init__.py` | ✅ 通过 |
+| **知识库查询** | `src/knowledge_base/query.py` | ✅ 通过 |
+| **知识库统计** | `src/knowledge_base/stats.py` | ✅ 通过 |
+| **上传管道** | `src/knowledge_base/uploader.py` | ✅ 通过 |
+| **字段校验器** | `src/knowledge_base/validator.py` | ✅ 通过 |
+| **知识库模块** | `src/knowledge_base/__init__.py` | ✅ 通过 |
+| **管理页面** | `src/pages/01_知识库管理.py` | ✅ 通过 |
+| **多页面入口** | `src/pages/__init__.py` | ✅ 通过 |
+| **CLI 上传脚本** | `scripts/upload_pipeline.py` | ✅ 通过 |
+
+#### 11.3.3 各里程碑验收标准对照
+
+| 里程碑 | 验收标准 | 完成情况 |
+|--------|---------|---------|
+| **M1 骨架** | 目录结构完整、配置可加载、日志可输出 | ✅ `settings.py` 支持 `.env` + 默认值双模式；`utils.py` 提供 7 个工具函数；`logger.py` 支持控制台 + 文件双输出 |
+| **M2 爬虫** | Session 自动重试、API 请求、频率控制 | ✅ `base.py` 实现 Retry 策略；`jobsdb.py` 完成 API 封装；`delay.py` 实现成功率自适应延迟；`proxy.py` 支持多代理轮换 |
+| **M3 清洗** | HTML 剥离、薪资标准化、MongoDB 存储 | ✅ `text.py` 5 步清洗管道；`salary.py` 支持 6 种薪资格式（月薪/年薪自动转换）；`mongodb.py` 支持 upsert 去重 + 索引 |
+| **M4 分析** | 规则引擎 < 5ms/条、5 类别匹配 | ✅ `rule_engine.py` 预编译正则 + 5 类别（Languages/Frameworks/Cloud/Databases/Soft Skills）80+ 关键词 |
+| **M5 可视化** | 4 种图表 + Streamlit 看板 | ✅ `charts.py` 实现热度图/饼图/箱线图/区域分布图；`app.py` 实现 4 标签页交互看板；`run_pipeline.py` 实现一键端到端流水线 |
+| **M8 中文化** | 地点/类别映射表、Translator 工具、看板中文显示 | ✅ `locations_zh.json` 52 条香港地名映射；`categories_zh.json` 5 类别映射；`translator.py` 实现单条/批量翻译；`app.py` 图表标题/轴标签/标签页均为中文，技术框架名保持英文 |
+| **M9 知识库** | 存储架构、查询接口、数据版本管理 | ✅ `mongodb.py` 新增 `$text` 全文索引 + 复合索引；`query.py` 实现 7 个查询方法（全文搜索/技能/薪资/地点/聚合/历史）；`stats.py` 实现 5 个统计聚合 |
+| **M10 上传管道** | 文件解析、字段映射、校验、清洗集成 | ✅ `field_mapping.json` 支持 7 字段 + 别名自动匹配；`validator.py` 校验文件大小/行数/必填字段；`uploader.py` 集成清洗/薪资/技能/翻译全链路；`upload_pipeline.py` CLI 脚本 |
+| **M11 管理页面** | Streamlit 多页面、3 标签页、处理反馈 | ✅ `01_知识库管理.py` 实现上传数据（拖拽+进度条+处理摘要）、数据概览（统计指标+图表）、数据管理（搜索+批量操作+导出）3 个标签页；`app.py` 添加导航栏支持多页面 |
+
+#### 11.3.4 已知限制
+
+| 项目 | 说明 | 计划解决阶段 | 当前状态 |
+|------|------|------------|---------|
+| 数据源单一 | 仅实现 JobsDB 单源爬虫 | Phase 2 (M6) | ⏳ 待开发 |
+| 分析引擎单一 | 仅实现规则引擎，未集成 LLM | Phase 2 (M7) | ⏳ 待开发 |
+| 前端未中文化 | 看板字段、图表标签均为英文 | Phase 2 (M8) | ✅ 已解决 |
+| 无知识库模块 | 缺少查询接口与版本管理 | Phase 2 (M9) | ✅ 已解决 |
+| 无上传管道 | 用户无法上传自定义数据 | Phase 2 (M10-M11) | ✅ 已解决 |
+| 无单元测试 | 尚未编写 pytest 测试用例 | Phase 3 (M12) | ⏳ 待开发 |
+| 无 CI/CD | 尚未配置 GitHub Actions | Phase 3 (M13) | ⏳ 待开发 |
+
+#### 11.3.5 运行方式
+
+```bash
+# 安装依赖
+pip install -r requirements.txt
+
+# 端到端流水线
+python scripts/run_pipeline.py --keywords "software engineer,data scientist,frontend,backend" --pages 5
+
+# 启动交互看板
+streamlit run src/app.py
+
+# 跳过爬取，仅使用已有数据生成图表
+python scripts/run_pipeline.py --skip-crawl
+```
+
+#### 11.3.6 项目目录结构
+
+```
+HK-JobMarket-Analyzer/
+├── config/
+│   ├── __init__.py
+│   ├── settings.py              # 配置管理
+│   ├── tech_dict.json           # 技术栈词表（80+ 关键词）
+│   ├── field_mapping.json       # 📝 用户字段映射表
+│   └── i18n/
+│       ├── locations_zh.json    # 📝 香港地名中英文映射（50+ 条）
+│       └── categories_zh.json   # 📝 技能类别中英文映射
+├── src/
+│   ├── __init__.py
+│   ├── app.py                   # Streamlit 交互看板（首页）
+│   ├── utils.py                 # 通用工具函数
+│   ├── logger.py                # 日志配置
+│   ├── crawlers/
+│   │   ├── __init__.py          # 爬虫工厂
+│   │   ├── base.py              # 抽象基类
+│   │   ├── jobsdb.py            # JobsDB 爬虫
+│   │   ├── delay.py             # 自适应延迟
+│   │   └── proxy.py             # 代理管理
+│   ├── cleaner/
+│   │   ├── __init__.py
+│   │   ├── text.py              # 文本清洗
+│   │   ├── salary.py            # 薪资解析
+│   │   └── pipeline.py          # 清洗管道
+│   ├── storage/
+│   │   ├── __init__.py
+│   │   ├── mongodb.py           # MongoDB 持久化
+│   │   └── csv_exporter.py      # CSV 导出
+│   ├── analyzer/
+│   │   ├── __init__.py
+│   │   └── rule_engine.py       # 规则引擎
+│   ├── visualization/
+│   │   ├── __init__.py
+│   │   └── charts.py            # 图表生成
+│   ├── i18n/
+│   │   ├── __init__.py          # 📝 中文化模块
+│   │   └── translator.py        # 📝 中文化翻译器
+│   ├── knowledge_base/
+│   │   ├── __init__.py          # 📝 知识库模块
+│   │   ├── uploader.py          # 📝 上传管道
+│   │   ├── validator.py         # 📝 字段校验
+│   │   ├── query.py             # 📝 查询接口
+│   │   └── stats.py             # 📝 统计聚合
+│   └── pages/
+│       ├── __init__.py          # 📝 Streamlit 多页面
+│       └── 01_知识库管理.py      # 📝 知识库管理页面
+├── scripts/
+│   ├── run_pipeline.py          # 一键端到端流水线
+│   └── upload_pipeline.py       # 📝 CLI 上传处理脚本
+├── data/                        # 数据目录（gitignore）
+├── output/                      # 输出目录（gitignore）
+├── .env.example                 # 环境变量模板
+├── .gitignore
+├── requirements.txt
+└── 技术文档.md
+
+---
+
+## 12. 知识库建设
+
+### 12.1 存储架构设计
+
+知识库作为系统的数据中枢，采用分层存储架构：
+
+```
+                    ┌──────────────────┐
+                    │   MongoDB (主存储) │  ← 结构化文档，支持全文检索
+                    └────────┬─────────┘
+                             │
+              ┌──────────────┼──────────────┐
+              ▼              ▼              ▼
+       ┌──────────┐  ┌──────────┐  ┌──────────┐
+       │ CSV 快照  │  │ JSON 备份 │  │ 向量嵌入  │
+       └──────────┘  └──────────┘  └──────────┘  (Phase 7 实现)
+```
+
+| 存储层 | 用途 | 读写频率 | 数据格式 |
+|--------|------|---------|---------|
+| MongoDB | 主存储，支持查询与聚合 | 高频读写 | BSON 文档 |
+| CSV 快照 | 快速导出与数据分析 | 低频读 | CSV (UTF-8-SIG) |
+| JSON 备份 | 数据归档与版本管理 | 低频写 | JSON |
+| 向量嵌入 | 语义搜索（后续阶段） | 低频读 | Numpy/Pickle |
+
+### 12.2 索引策略
+
+#### 12.2.1 MongoDB 索引设计
+
+```json
+[
+  { "job_id": 1, "source": 1 },          // 唯一键，支持去重
+  { "source": 1, "crawled_at": -1 },     // 按来源与时间排序
+  { "location": 1, "salary_min": 1 },    // 地点与薪资复合查询
+  { "skills.programming_languages": 1 }, // 技能标签检索
+  { "jd_text": "text", "title": "text" } // 全文索引，支持 JD 内容搜索
+]
+```
+
+#### 12.2.2 索引说明
+
+| 索引 | 作用 | 优先级 |
+|------|------|--------|
+| `job_id + source` 唯一复合索引 | 去重、upsert | P0 |
+| `$text` 全文索引 | JD 内容搜索 | P1 |
+| `location + salary_min` 复合索引 | 看板筛选加速 | P1 |
+| `skills.*` 单字段索引 | 技能标签筛选 | P2 |
+
+### 12.3 数据版本管理
+
+每次爬取生成一个数据版本快照，便于历史对比与回溯。
+
+```
+data/
+├── raw/                    # 原始 API 响应 JSON
+│   └── 2026-06-01/
+│       └── jobsdb_software_engineer_page1.json
+├── cleaned/                # 清洗后结构化数据
+│   ├── jobs.csv            # 当前最新版本
+│   ├── jobs.json
+│   └── snapshots/          # 历史版本归档
+│       ├── jobs_2026-06-01.csv
+│       └── jobs_2026-06-15.csv
+├── embeddings/             # 向量嵌入文件（Phase 7）
+└── uploads/                # 用户上传数据临时目录
+    └── 2026-06-01_14-30-00_original.csv
+```
+
+### 12.4 查询接口设计
+
+```python
+# src/knowledge_base/query.py（概念设计）
+class KnowledgeBase:
+    """知识库查询接口"""
+
+    def search_by_keyword(self, keyword: str, fields: list = None) -> list[dict]:
+        """全文搜索 JD 内容"""
+
+    def filter_by_skills(self, skills: list[str], match_all: bool = False) -> list[dict]:
+        """按技能标签筛选"""
+
+    def filter_by_salary(self, min_sal: float = None, max_sal: float = None) -> list[dict]:
+        """按薪资范围筛选"""
+
+    def filter_by_location(self, locations: list[str]) -> list[dict]:
+        """按地点筛选"""
+
+    def aggregate_skill_frequency(self, top_n: int = 20) -> pd.Series:
+        """技能出现频率统计"""
+
+    def aggregate_salary_stats(self, group_by: str = "location") -> pd.DataFrame:
+        """薪资统计聚合"""
+
+    def get_version_history(self) -> list[dict]:
+        """获取数据版本历史"""
+```
+
+---
+
+## 13. 前端中文化
+
+### 13.1 中文映射表设计
+
+前端显示规则要求：除技术框架名称（如 React、AWS、Python）保持英文外，所有 UI 文本均使用中文显示。
+
+#### 13.1.1 地点映射表
+
+香港常见招聘地点中英文映射（约 50+ 条）：
+
+```json
+// config/i18n/locations_zh.json
+{
+  "Central": "中環",
+  "Admiralty": "金鐘",
+  "Wan Chai": "灣仔",
+  "Causeway Bay": "銅鑼灣",
+  "Quarry Bay": "鰂魚涌",
+  "North Point": "北角",
+  "Sheung Wan": "上環",
+  "Sai Wan": "西環",
+  "Happy Valley": "跑馬地",
+  "Tsim Sha Tsui": "尖沙咀",
+  "Mong Kok": "旺角",
+  "Yau Ma Tei": "油麻地",
+  "Kowloon Bay": "九龍灣",
+  "Kwun Tong": "觀塘",
+  "Kwai Chung": "葵涌",
+  "Tsuen Wan": "荃灣",
+  "Sha Tin": "沙田",
+  "Shatin": "沙田",
+  "Tai Po": "大埔",
+  "Fanling": "粉嶺",
+  "Sheung Shui": "上水",
+  "Tuen Mun": "屯門",
+  "Yuen Long": "元朗",
+  "Tung Chung": "東涌",
+  "Sai Kung": "西貢",
+  "Pok Fu Lam": "薄扶林",
+  "Aberdeen": "香港仔",
+  "Wong Chuk Hang": "黃竹坑",
+  "Chai Wan": "柴灣",
+  "Shau Kei Wan": "筲箕灣",
+  "Kennedy Town": "堅尼地域",
+  "Hung Hom": "紅磡",
+  "Lai Chi Kok": "荔枝角",
+  "Cheung Sha Wan": "長沙灣",
+  "Sham Shui Po": "深水埗",
+  "Prince Edward": "太子",
+  "Science Park": "科學園",
+  "Cyberport": "數碼港",
+  "Hong Kong International Airport": "香港國際機場",
+  "Hong Kong Science Park": "香港科學園",
+  "Kowloon Tong": "九龍塘",
+  "Diamond Hill": "鑽石山",
+  "Ngau Tau Kok": "牛頭角",
+  "Kwun Tong": "觀塘",
+  "Sau Mau Ping": "秀茂坪",
+  "Lam Tin": "藍田",
+  "Hong Kong": "香港",
+  "Kowloon": "九龍",
+  "New Territories": "新界"
+}
+```
+
+#### 13.1.2 技能类别映射表
+
+```json
+// config/i18n/categories_zh.json
+{
+  "programming_languages": "编程语言",
+  "frameworks_libraries": "框架与库",
+  "cloud_devops": "云服务与运维",
+  "databases": "数据库与中间件",
+  "soft_skills": "软技能"
+}
+```
+
+### 13.2 中文化工具模块
+
+```python
+# src/i18n/translator.py（概念设计）
+import json
+from pathlib import Path
+
+
+class Translator:
+    """前端中文化翻译器，支持地点、类别、公司的中文转换"""
+
+    def __init__(self):
+        i18n_dir = Path(__file__).resolve().parent.parent.parent / "config" / "i18n"
+        with open(i18n_dir / "locations_zh.json", "r", encoding="utf-8") as f:
+            self.location_map = json.load(f)
+        with open(i18n_dir / "categories_zh.json", "r", encoding="utf-8") as f:
+            self.category_map = json.load(f)
+
+    def location_en_to_zh(self, en: str) -> str:
+        """英文地点 → 中文地点，无映射则返回原文"""
+        return self.location_map.get(en.strip(), en)
+
+    def category_en_to_zh(self, en: str) -> str:
+        """英文类别 key → 中文类别名"""
+        return self.category_map.get(en, en)
+
+    def translate_df(self, df: pd.DataFrame) -> pd.DataFrame:
+        """批量翻译 DataFrame 中的地点列"""
+        if "location" in df.columns:
+            df["location"] = df["location"].apply(self.location_en_to_zh)
+        return df
+
+    def translate_skills(self, skills: dict) -> dict:
+        """将技能字典中的类别 key 转为中文"""
+        return {self.category_en_to_zh(k): v for k, v in skills.items()}
+```
+
+### 13.3 前端显示规则
+
+| 字段 | 当前（英文） | 中文化后 |
+|------|-------------|---------|
+| 职位标题 | `"Senior Python Developer"` | 保留英文 |
+| 公司名称 | `"HK Fintech Ltd"` | 优先查映射表，无映射保留原文 |
+| 工作地点 | `"Central"` | → `"中環"` |
+| 技能类别标签 | `"programming_languages"` | → `"编程语言"` |
+| 技术框架名称 | `"React"`, `"AWS"` | **保持英文** |
+| 图表标题 | `"Top 15 In-Demand..."` | → `"香港 IT 技术栈需求排行 Top 15"` |
+| 图表轴标签 | `"Number of Job Postings"` | → `"岗位数量"` |
+| 图表轴标签 | `"Monthly Salary (HKD)"` | → `"月薪 (HKD)"` |
+| 看板标签 | `"Technical Trends"` | → `"技术热度"` |
+
+---
+
+## 14. 知识库管理页面
+
+### 14.1 上传处理流程
+
+用户可通过页面或 CLI 上传自己搜集的招聘数据，系统按技术文档中定义的清洗管道自动处理。
+
+```
+用户上传文件 (CSV/JSON)
+       │
+       ▼
+  文件格式校验 ───→ 格式错误 → 报错提示
+       │ 通过
+       ▼
+  字段映射 (用户字段 → 系统标准字段)
+       │
+       ▼
+  字段校验 (必填、类型、值域)
+       │
+       ▼
+  ┌─── 清洗管道（复用现有模块）───┐
+  │ ① HTML 标签剥离 (JDTextCleaner) │
+  │ ② 薪资标准化 (SalaryParser)    │
+  │ ③ 技能提取 (RuleBasedSkillExt) │
+  │ ④ 地点/类别中文化 (Translator) │
+  └────────────────────────────┘
+       │
+       ▼
+  ┌─── 去重与入库 ─────────────┐
+  │ ① 按 source + job_id 去重    │
+  │ ② 写入 MongoDB              │
+  │ ③ 追加到 CSV 快照            │
+  └────────────────────────────┘
+       │
+       ▼
+  完成页：展示处理统计摘要
+```
+
+### 14.2 支持的文件格式
+
+| 格式 | 文件头要求 | 处理方式 |
+|------|-----------|---------|
+| **CSV (UTF-8 / UTF-8-SIG)** | 首行为列名 | `pandas.read_csv()` 自动解析 |
+| **JSON (数组)** | `[{...}, {...}]` | `json.load()` 按数组处理 |
+| **JSON (逐行/NDJSON)** | `{...}\n{...}` | 逐行解析 |
+| **Excel (.xlsx)** | 首行为列名 | `pandas.read_excel()` 解析 |
+
+### 14.3 字段映射机制
+
+用户上传文件的列名可能与系统标准字段名不一致，需通过映射表自动匹配。
+
+```json
+// config/field_mapping.json
+{
+  "user_field_mappings": {
+    "job_id": ["job_id", "id", "职位编号", "岗位ID", "编号"],
+    "title": ["title", "职位名称", "职位", "岗位", "职位名"],
+    "company": ["company", "公司名称", "公司", "企业", "雇主"],
+    "location": ["location", "工作地点", "地点", "區域", "地區"],
+    "salary_raw": ["salary_raw", "salary", "薪资", "薪酬", "月薪", "待遇", "工资"],
+    "jd_raw": ["jd_raw", "description", "职位描述", "JD", "岗位描述", "工作内容", "职责"],
+    "source": ["source", "来源", "数据来源", "平台", "網站"]
+  }
+}
+```
+
+匹配逻辑：
+1. 对用户上传的每个列名，遍历 `user_field_mappings` 所有别名列表
+2. 完全匹配（忽略大小写）则映射到标准字段
+3. 未匹配的列名作为自定义字段保留在 `extra_fields` 中
+4. 匹配结果展示给用户确认，允许手动调整
+
+### 14.4 校验规则
+
+| 校验项 | 规则 | 处理方式 |
+|--------|------|---------|
+| 必填字段 | `jd_raw` 必须存在且有内容 | 缺失则拒绝该条记录并报错 |
+| 推荐字段 | `title`, `company`, `location` | 缺失则警告但继续处理 |
+| 空值处理 | `jd_raw` 为空字符串/Null | 跳过该条记录 |
+| 薪资格式 | 不匹配正则则 `salary_min=Null` | 保留 `salary_raw` 原文，标注"解析失败" |
+| 重复检测 | `source + job_id` 已存在 | 跳过（upsert 模式） |
+| 最大行数 | 单次上传 ≤ 10,000 行 | 超出则拦截并提示分批上传 |
+| 文件大小 | 单文件 ≤ 50 MB | 超出则拦截 |
+
+### 14.5 页面设计
+
+#### 14.5.1 页面结构
+
+Streamlit 多页面应用结构：
+
+```
+src/
+├── app.py                     ← 首页（分析看板）
+└── pages/
+    ├── __init__.py
+    ├── 01_知识库管理.py         ← 知识库管理（上传 + 概览 + 管理）
+    └── 02_数据探索.py           ← 可选：知识库浏览与探索
+```
+
+#### 14.5.2 知识库管理页面布局
+
+```
+┌─────────────────────────────────────────────────┐
+│  知识库管理                                        │
+│  ───────────────────────────────────────────────  │
+│                                                   │
+│  ┌─ Tab: 上传数据 ──────────────────────────────┐ │
+│  │                                               │ │
+│  │  上传区域 (拖拽 or 点击选择)                   │ │
+│  │  ┌─────────────────────────────────────────┐  │ │
+│  │  │  拖拽 CSV/JSON/Excel 文件到此处            │  │ │
+│  │  │  或点击浏览                                │  │ │
+│  │  └─────────────────────────────────────────┘  │ │
+│  │                                               │ │
+│  │  ▼ 展开: 高级选项                             │ │
+│  │    数据来源标签: [自定义]                      │ │
+│  │    是否检测去重: [✅ 是]                       │ │
+│  │    是否执行清洗: [✅ 是]                       │ │
+│  │    是否执行技能提取: [✅ 是]                   │ │
+│  │                                               │ │
+│  │  [开始处理]                                    │ │
+│  │                                               │ │
+│  │  处理进度: ████████████░░░░░░ 70%             │ │
+│  │  ✅ 文件解析完成  ✅ 字段映射完成               │ │
+│  │  ✅ 数据清洗完成  ✅ 薪资解析完成               │ │
+│  │  ✅ 技能提取完成  ⏳ 入库中...                 │ │
+│  │                                               │ │
+│  └───────────────────────────────────────────────┘ │
+│                                                   │
+│  ┌─ Tab: 数据概览 ──────────────────────────────┐ │
+│  │                                               │ │
+│  │  知识库统计:                                   │ │
+│  │  总记录数: 1,234   数据来源: 3   最新更新: ... │ │
+│  │                                               │ │
+│  │  ┌────────────┐  ┌────────────┐               │ │
+│  │  │  来源分布    │  │  技能热度    │              │ │
+│  │  │  [柱状图]   │  │  [柱状图]   │              │ │
+│  │  └────────────┘  └────────────┘               │ │
+│  │                                               │ │
+│  └───────────────────────────────────────────────┘ │
+│                                                   │
+│  ┌─ Tab: 数据管理 ──────────────────────────────┐ │
+│  │                                               │ │
+│  │  筛选: [来源 ▼] [地点 ▼] [薪资范围] [关键词]   │ │
+│  │                                               │ │
+│  │  数据预览表格 (可多选)                         │ │
+│  │  [导出选中] [删除选中] [导出全部] [导出Excel]  │ │
+│  │                                               │ │
+│  └───────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────┘
+```
+
+#### 14.5.3 处理反馈设计
+
+实时展示处理进度与统计摘要：
+
+```
+处理进度: ████████████░░░░░░ 70%
+
+处理摘要:
+  总记录数:        15
+  成功入库:        12 (3 条因缺失 JD 跳过)
+  新增记录:        10
+  更新记录:        2
+  清洗耗时:        0.3s
+  入库耗时:        0.2s
+  总计耗时:        1.2s
+```
+
+### 14.6 上传管道设计
+
+#### 14.6.1 Uploader 核心类
+
+```python
+# src/knowledge_base/uploader.py（概念设计）
+from dataclasses import dataclass, field
+from typing import Optional
+
+
+@dataclass
+class ProcessResult:
+    total: int = 0
+    success: int = 0
+    skipped: int = 0
+    new_records: int = 0
+    updated_records: int = 0
+    errors: list[str] = field(default_factory=list)
+    duration_ms: float = 0.0
+
+
+class Uploader:
+    """用户上传数据处理管道"""
+
+    def __init__(self, file_path: str, source_tag: str = "user_upload",
+                 detect_duplicates: bool = True, run_cleaning: bool = True,
+                 run_extraction: bool = True):
+        self.file_path = file_path
+        self.source_tag = source_tag
+        self.detect_duplicates = detect_duplicates
+        self.run_cleaning = run_cleaning
+        self.run_extraction = run_extraction
+
+    def validate_format(self) -> bool:
+        """检测文件格式是否为 CSV/JSON/Excel，返回是否合法"""
+
+    def detect_mapping(self) -> dict:
+        """自动匹配用户列名 → 系统标准字段名"""
+
+    def validate_records(self, records: list[dict]) -> list[dict]:
+        """逐条校验必填字段、类型、值域，返回有效记录"""
+
+    def process(self) -> ProcessResult:
+        """执行完整清洗管道：clean → parse_salary → extract_skills → translate"""
+
+    def save(self, records: list[dict]) -> int:
+        """去重后入库，返回实际写入条数"""
+```
+
+#### 14.6.2 与现有模块的集成
+
+```python
+# 上传管道中直接复用现有模块
+from src.cleaner import CleaningPipeline       # 文本清洗 + 薪资解析
+from src.analyzer import RuleBasedSkillExtractor  # 技能提取
+from src.storage.mongodb import JobDatabase    # MongoDB 入库
+from src.storage.csv_exporter import CSVExporter  # CSV 快照
+from src.i18n.translator import Translator     # 中文化
+```
+
+上传管道不做重复实现，所有清洗逻辑直接调用已有模块。
+
+### 14.7 数据管理功能
+
+#### 14.7.1 数据探索
+
+| 功能 | 实现方式 |
+|------|---------|
+| 数据筛选 | 按来源、地点、日期范围、技能类别过滤 |
+| 关键词搜索 | MongoDB `$text` 全文索引搜索 JD 内容 |
+| 批量导出 | 按筛选结果导出 CSV / JSON / Excel |
+| 批量删除 | 多选记录后批量删除（软删除或物理删除） |
+| 单条编辑 | 点击展开行内编辑（后续迭代） |
+
+#### 14.7.2 数据统计面板
+
+| 指标 | 计算方式 |
+|------|---------|
+| 总记录数 | `db.count()` |
+| 数据来源分布 | `db.aggregate(group by source)` |
+| 技能出现频率 | 从 `skills` 字段反序列化后统计 |
+| 薪资范围分布 | `salary_min` / `salary_max` 聚合 |
+| 地点分布 | `location` 分组计数 |
+| 数据时间趋势 | `crawled_at` 按天聚合 |
+
+#### 14.7.3 文件清单
+
+| 文件 | 用途 | 状态 |
+|------|------|------|
+| `src/knowledge_base/__init__.py` | 模块入口 | 📝 待新建 |
+| `src/knowledge_base/uploader.py` | 文件解析 + 字段映射 + 校验 | 📝 待新建 |
+| `src/knowledge_base/validator.py` | 字段校验规则 | 📝 待新建 |
+| `src/knowledge_base/query.py` | 知识库查询接口 | 📝 待新建 |
+| `src/knowledge_base/stats.py` | 知识库统计聚合 | 📝 待新建 |
+| `config/field_mapping.json` | 用户字段→标准字段映射表 | 📝 待新建 |
+| `src/i18n/__init__.py` | 中文化模块入口 | 📝 待新建 |
+| `src/i18n/translator.py` | 中文化翻译器 | 📝 待新建 |
+| `config/i18n/locations_zh.json` | 香港地名中英文映射 | 📝 待新建 |
+| `config/i18n/categories_zh.json` | 技能类别中英文映射 | 📝 待新建 |
+| `src/pages/__init__.py` | Streamlit 多页面入口 | 📝 待新建 |
+| `src/pages/01_知识库管理.py` | 知识库管理页面 | 📝 待新建 |
+| `scripts/upload_pipeline.py` | CLI 版上传处理脚本 | 📝 待新建 |

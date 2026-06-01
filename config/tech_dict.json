@@ -1,0 +1,50 @@
+{
+  "programming_languages": [
+    "python", "java", "typescript", "javascript", "golang", "go",
+    "c\\+\\+", "cpp", "c#", "csharp", "php", "ruby", "swift",
+    "kotlin", "scala", "rust", "r\\s+language", "matlab",
+    "perl", "shell", "bash", "powershell", "sql", "pl/sql",
+    "solidity", "vyper", "dart", "lua"
+  ],
+  "frameworks_libraries": [
+    "react", "vue", "angular", "svelte", "next\\.js", "nuxt",
+    "django", "flask", "fastapi", "spring\\s+boot", "spring",
+    "express", "nest\\.js", "asp\\.net", "laravel",
+    "tensorflow", "pytorch", "keras", "scikit-learn",
+    "hadoop", "spark", "flink", "kafka",
+    "node\\.js", "deno", "bun",
+    "react native", "flutter", "ionic",
+    "jquery", "bootstrap", "tailwind",
+    "graphql", "restful", "grpc",
+    "selenium", "cypress", "jest", "pytest",
+    "unity", "unreal", "opencv"
+  ],
+  "cloud_devops": [
+    "aws", "azure", "gcp", "google\\s+cloud", "aliyun", "tencent\\s+cloud",
+    "docker", "kubernetes", "k8s", "jenkins", "gitlab\\s+ci",
+    "github\\s+actions", "circleci", "travis\\s+ci",
+    "terraform", "ansible", "pulumi", "helm",
+    "prometheus", "grafana", "elasticsearch", "datadog",
+    "cloudflare", "nginx", "apache",
+    "ci/cd", "cicd", "devops", "mlops",
+    "serverless", "lambda", "ecs", "eks", "ec2",
+    "s3", "rds", "dynamodb", "cloudfront"
+  ],
+  "databases": [
+    "mysql", "postgresql", "postgres", "mongodb", "redis",
+    "oracle", "dynamodb", "cassandra", "neo4j",
+    "elasticsearch", "kafka", "rabbitmq", "snowflake",
+    "bigquery", "redshift", "sqlite", "mariadb",
+    "sql\\s+server", "mssql", "cockroachdb",
+    "clickhouse", "druid", "influxdb", "timescaledb"
+  ],
+  "soft_skills": [
+    "communication", "teamwork", "team\\s+work", "leadership",
+    "problem.solving", "analytical", "critical\\s+thinking",
+    "agile", "scrum", "cross.functional",
+    "stakeholder\\s+management", "mentoring",
+    "project\\s+management", "time\\s+management",
+    "presentation", "negotiation", "collaboration",
+    "self.motivated", "independent"
+  ]
+}
