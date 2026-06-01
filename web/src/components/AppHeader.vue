@@ -14,6 +14,8 @@
     </el-menu>
 
     <div style="display: flex; align-items: center; gap: 12px">
+      <el-tag v-if="llmStore.configured" type="warning" size="small" effect="dark">LLM 已配置</el-tag>
+      <el-tag v-else type="info" size="small" effect="dark" @click="$router.push('/settings')" style="cursor: pointer">LLM 未配置</el-tag>
       <el-tag v-if="systemStore.healthy" type="success" size="small" effect="dark">API 已連接</el-tag>
       <el-tag v-else type="danger" size="small" effect="dark">API 離線</el-tag>
       <el-badge :value="systemStore.dataCount" type="primary">
@@ -27,10 +29,15 @@
 import { onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useSystemStore } from '@/stores/system'
+import { useLLMStore } from '@/stores/llm'
 import { DataAnalysis, Folder } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const systemStore = useSystemStore()
+const llmStore = useLLMStore()
 
-onMounted(() => systemStore.checkHealth())
+onMounted(() => {
+  systemStore.checkHealth()
+  llmStore.fetchStatus()
+})
 </script>

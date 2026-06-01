@@ -19,6 +19,7 @@
 | v1.6 | 2026-06-01 | Phase 2 完整验收：M6 多源爬虫 + M7 LLM 引擎（50 文件/5900 行/7 项断言通过） | - |
 | v1.7 | 2026-06-01 | Phase 3 完成：78 项 pytest 测试、性能优化、CI/CD、Docker 部署 | - |
 | v1.8 | 2026-06-01 | Phase 4 完成：Vue 3 前端 + FastAPI 22 端点 + Nginx 统一部署 | - |
+| v1.9 | 2026-06-01 | LLM 配置迁移至 Vue 前端，弃用 Streamlit 面板方案；新增 5 个 LLM API 端点 + Pinia store | - |
 
 ---
 
@@ -1476,17 +1477,17 @@ python scripts/update_dict.py \
 | **M9** 知识库模块 | 知识库存储架构 + 查询接口 + 数据版本管理 | 1 天 | 知识库查询模块 | ✅ 已完成 |
 | **M10** 上传管道 | 文件解析 + 字段映射 + 校验 + 集成清洗链路 | 1 天 | 用户上传处理管道 | ✅ 已完成 |
 | **M11** 知识库管理页面 | Streamlit 多页面 + 上传/概览/管理标签页 | 1 天 | 知识库管理交互页面 | ✅ 已完成 |
-| **M12** 测试与优化 | 单元测试、性能调优、文档完善 | 2 天 | 稳定版本发布 | ⏳ 待开始 |
-| **M13** CI/CD 与部署 | GitHub Actions 自动化 | 1 天 | 自动化流水线 | ⏳ 待开始 |
-| **V1** Vue 项目初始化 | Vite + Vue 3 + TypeScript 脚手架搭建，Element Plus 集成，路由框架 | 0.5 天 | Vue 前端项目骨架 | ⏳ 待开始 |
-| **V2** FastAPI 网关 | API 路由搭建，CORS 配置，与现有 Python 后端模块集成 | 1 天 | REST API 网关 | ⏳ 待开始 |
-| **V3** 布局与导航 | AppHeader、AppSidebar、AppFooter 布局组件，路由守卫，全局状态管理 | 0.5 天 | 前端布局框架 | ⏳ 待开始 |
-| **V4** 仪表盘页面 | DashboardPage + StatCards + SourcePieChart + SkillTrendChart + 薪资概览 | 1 天 | 仪表盘页面 | ⏳ 待开始 |
-| **V5** 分析页面 | TechTrendsPage + SalaryAnalysisPage + LocationPage（含全部图表组件） | 1 天 | 分析页面组 | ⏳ 待开始 |
-| **V6** 知识库管理 | KnowledgeBasePage + UploadPage + ManagePage（含上传管道前端集成） | 1.5 天 | 知识库管理页面 | ⏳ 待开始 |
-| **V7** 数据探索与设置 | DataExplorePage + SettingsPage | 0.5 天 | 探索与设置页面 | ⏳ 待开始 |
-| **V8** 联调与优化 | 前后端联调，响应式适配，加载状态优化，错误边界处理 | 1 天 | 全功能前端 | ⏳ 待开始 |
-| **V9** 生产部署 | Docker 容器化，Nginx 反向代理，环境变量分离 | 0.5 天 | 生产部署方案 | ⏳ 待开始 |
+| **M12** 测试与优化 | 单元测试、性能调优、文档完善 | 2 天 | 稳定版本发布 | ✅ 已完成 |
+| **M13** CI/CD 与部署 | GitHub Actions 自动化 | 1 天 | 自动化流水线 | ✅ 已完成 |
+| **V1** Vue 项目初始化 | Vite + Vue 3 + TypeScript 脚手架搭建，Element Plus 集成，路由框架 | 0.5 天 | Vue 前端项目骨架 | ✅ 已完成 |
+| **V2** FastAPI 网关 | API 路由搭建，CORS 配置，与现有 Python 后端模块集成 | 1 天 | REST API 网关 | ✅ 已完成 |
+| **V3** 布局与导航 | AppHeader、AppSidebar、AppFooter 布局组件，路由守卫，全局状态管理 | 0.5 天 | 前端布局框架 | ✅ 已完成 |
+| **V4** 仪表盘页面 | DashboardPage + StatCards + SourcePieChart + SkillTrendChart + 薪资概览 | 1 天 | 仪表盘页面 | ✅ 已完成 |
+| **V5** 分析页面 | TechTrendsPage + SalaryAnalysisPage + LocationPage（含全部图表组件） | 1 天 | 分析页面组 | ✅ 已完成 |
+| **V6** 知识库管理 | KnowledgeBasePage + UploadPage + ManagePage（含上传管道前端集成） | 1.5 天 | 知识库管理页面 | ✅ 已完成 |
+| **V7** 数据探索与设置 | DataExplorePage + SettingsPage（LLM 配置表单） | 0.5 天 | 探索与设置页面 | ✅ 已完成 |
+| **V8** 联调与优化 | 前后端联调，响应式适配，加载状态优化，错误边界处理 | 1 天 | 全功能前端 | ✅ 已完成 |
+| **V9** 生产部署 | Docker 容器化，Nginx 反向代理，环境变量分离 | 0.5 天 | 生产部署方案 | ✅ 已完成 |
 
 ### 11.2 详细任务拆解
 
@@ -1557,17 +1558,17 @@ python scripts/update_dict.py \
 
 | 指标 | 数值 |
 |------|------|
-| Python 源文件数 | 77 个（src + config + scripts + tests + api） |
+| Python 源文件数 | 78 个（src + config + scripts + tests + api） |
 | JSON 配置文件 | 5 个 |
-| 代码总行数 | ~8,200 行 |
+| 代码总行数 | ~8,400 行 |
 | 外部依赖 | 20 个 Python 包 |
 | pytest 测试数 | 78 项（覆盖 9 个模块） |
-| Vue 前端文件 | 24 个（web/） |
-| API 端点 | 22 个（stats/jobs/upload/knowledge/system） |
+| Vue 前端文件 | 26 个（web/） |
+| API 端点 | 21 个（stats/jobs/upload/knowledge/system/llm） |
 
 #### 11.3.2 语法验证
 
-所有 77 个 Python 源文件通过 `compile()` 语法检查，无语法错误。
+所有 79 个 Python 源文件通过 `compile()` 语法检查，无语法错误。
 
 | 模块 | 文件 | 编译状态 |
 |------|------|---------|
@@ -1609,7 +1610,9 @@ python scripts/update_dict.py \
 | 字段校验器 | `src/knowledge_base/validator.py` | ✅ 通过 |
 | 知识库模块 | `src/knowledge_base/__init__.py` | ✅ 通过 |
 | 管理页面 | `src/pages/01_知识库管理.py` | ✅ 通过 |
-| 模型配置页面 | `src/pages/02_模型配置.py` | ✅ 通过 |
+| 模型配置页面 | `src/pages/02_模型配置.py` | ✅ 通过（已弃用，功能迁移至 Vue SettingsPage） |
+| LLM 配置 API | `api/routers/llm.py` | ✅ 通过 |
+| LLM 配置 Store | `web/src/stores/llm.ts` | （TypeScript，不参与 Python 编译） |
 | 多页面入口 | `src/pages/__init__.py` | ✅ 通过 |
 | 测试配置 | `tests/conftest.py`, `tests/__init__.py` | ✅ 通过 |
 | 单元测试 | `tests/test_cleaner.py`, `tests/test_rule_engine.py`, `tests/test_llm_engine.py`, `tests/test_hybrid.py`, `tests/test_i18n.py`, `tests/test_utils.py`, `tests/test_validator.py`, `tests/test_merger.py`, `tests/test_config_manager.py`, `tests/test_integration.py` | ✅ 通过 |
@@ -1724,20 +1727,22 @@ Phase 3（完善阶段）已完成 M12-M13 共 6 项任务的开发与验收，�
 
 ### Phase 4 验收情况
 
-Phase 4（Vue 前端 + REST API）已完成 V1-V9 全部任务，覆盖前后端分离架构、22 个 API 端点、9 个 Vue 页面、Docker Nginx 生产部署。
+Phase 4（Vue 前端 + REST API）已完成 V1-V9 全部任务，覆盖前后端分离架构、21 个 API 端点（含 5 个 LLM 配置端点）、9 个 Vue 页面、Docker Nginx 生产部署。
 
 | 验收类别 | 验收项 | 测试方法 | 结果 |
 |---------|--------|---------|------|
-| **① FastAPI 网关** | 22 个端点注册（stats/jobs/upload/knowledge/system） | `len(app.routes)` | ✅ |
-| **② API Schema** | 3 组 Pydantic 模型（jobs/stats/upload） | import 检查 | ✅ |
-| **③ Vue 脚手架** | Vite 5 + Vue 3 + TS + Element Plus + Pinia + Router | `package.json` 依赖 | ✅ |
-| **④ 路由系统** | 10 条路由（Dashboard/Tech/Salary/Location/KB/Upload/Manage/Explore/Settings） | `router/index.ts` | ✅ |
-| **⑤ Vue 页面** | 9 个视图页面（全部含 ECharts 图表） | 文件清单 | ✅ |
-| **⑥ Pinia 状态** | 4 个 store（jobs/stats/upload/system） | 文件清单 | ✅ |
-| **⑦ Layout 布局** | AppHeader + AppSidebar + 三栏布局 + API 状态指示器 | Layout.vue | ✅ |
-| **⑧ Docker 多阶段** | Node 20 → Python 3.11 → Nginx | `Dockerfile` | ✅ |
-| **⑨ Nginx 反向代理** | `:80` → Vue SPA / `/api/` → FastAPI / `/streamlit/` → Streamlit | `nginx.conf` | ✅ |
-| **⑩ 语法检查** | 77 个 .py 文件全部通过 | `compile()` | ✅ |
+| **① FastAPI 网关** | 21 个端点注册（stats/jobs/upload/knowledge/system/llm） | `len(app.routes)` / OpenAPI paths | ✅ |
+| **② LLM 配置 API** | 5 个端点: GET/PUT/DELETE config + POST test + GET status | LLM 配置通过 Vue 前端直接读写 `config/llm_config.json` | ✅ |
+| **③ API Schema** | 3 组 Pydantic 模型（jobs/stats/upload） | import 检查 | ✅ |
+| **④ Vue 脚手架** | Vite 5 + Vue 3 + TS + Element Plus + Pinia + Router | `package.json` 依赖 | ✅ |
+| **⑤ 路由系统** | 10 条路由（Dashboard/Tech/Salary/Location/KB/Upload/Manage/Explore/Settings） | `router/index.ts` | ✅ |
+| **⑥ Vue 页面** | 9 个视图页面（全部含 ECharts 图表）+ LLM 配置表单（API Key 密码掩码/测试连接/快速入门表格） | 文件清单 | ✅ |
+| **⑦ Pinia 状态** | 5 个 store（jobs/stats/upload/system/llm） | 文件清单 | ✅ |
+| **⑧ Layout 布局** | AppHeader（API 状态 + LLM 状态/可点击跳转设置）+ AppSidebar + 三栏布局 | Layout.vue | ✅ |
+| **⑨ Docker 多阶段** | Node 20 → Python 3.11 → Nginx | `Dockerfile` | ✅ |
+| **⑩ Nginx 反向代理** | `:80` → Vue SPA / `/api/` → FastAPI / `/streamlit/` → Streamlit（可选） | `nginx.conf` | ✅ |
+| **⑪ 语法检查** | 78 个 .py 文件全部通过 | `compile()` | ✅ |
+| **⑫ Streamlit 面板方案弃用** | `src/pages/02_模型配置.py` 标记为已弃用，LLM 配置功能完全由 Vue SettingsPage 替代 | 功能对比 | ✅ |
 
 **运行方式**：
 ```bash
@@ -1747,7 +1752,7 @@ uvicorn api.main:app --reload --port 8000
 # 前端开发
 cd web && npm install && npm run dev
 
-# 生产部署
+# 生产部署（Nginx :80 → Vue SPA + FastAPI）
 docker-compose up -d
 ```
 
@@ -1757,15 +1762,17 @@ docker-compose up -d
 # 安装依赖
 pip install -r requirements.txt
 
-# 端到端流水线
-python scripts/run_pipeline.py --keywords "software engineer,data scientist,frontend,backend" --pages 5
+# 启动后端 API
+uvicorn api.main:app --reload --port 8000
 
-# 启动交互看板
-streamlit run src/app.py
+# 启动前端开发服务器
+cd web && npm install && npm run dev
 
-# 跳过爬取，仅使用已有数据生成图表
-python scripts/run_pipeline.py --skip-crawl
+# 生产部署（Nginx :80 统一入口）
+docker-compose up -d
 ```
+
+> **注意**：LLM 配置现已迁移至 Vue 前端 SettingsPage，不再依赖 Streamlit 面板。Streamlit 看板 (`streamlit run src/app.py`) 仍可作为数据可视化备选方案运行。
 
 #### 11.3.7 项目目录结构
 

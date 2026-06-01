@@ -18,6 +18,12 @@ config/llm_config.json
 .vscode/
 .idea/
 *.swp
+
+# Node
+node_modules/
+web/node_modules/
+web/dist/
+web/package-lock.json
 *.swo
 
 # OS
