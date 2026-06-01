@@ -1,8 +1,9 @@
 services:
-  streamlit:
+  app:
     build: .
     container_name: hk-job-analyzer
     ports:
+      - "80:80"
       - "8501:8501"
     volumes:
       - ./data:/app/data
@@ -13,8 +14,8 @@ services:
       - PYTHONUNBUFFERED=1
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8501', timeout=5)"]
+      test: ["CMD", "curl", "-f", "http://localhost/api/system/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 10s
+      start_period: 15s

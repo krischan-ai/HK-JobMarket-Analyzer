@@ -1,0 +1,39 @@
+from typing import Optional, Any
+from datetime import datetime
+from pydantic import BaseModel
+
+
+class JobSummary(BaseModel):
+    job_id: str
+    title: str
+    company: str
+    location: str
+    salary_min: Optional[float] = None
+    salary_max: Optional[float] = None
+    source: str
+    skills: Optional[dict[str, list[str]]] = None
+
+
+class JobDetail(JobSummary):
+    jd_raw: Optional[str] = None
+    jd_text: Optional[str] = None
+    salary_currency: Optional[str] = "HKD"
+    url: Optional[str] = None
+
+
+class JobListResponse(BaseModel):
+    total: int
+    page: int
+    page_size: int
+    items: list[JobSummary]
+
+
+class JobSearchRequest(BaseModel):
+    keyword: Optional[str] = None
+    location: Optional[str] = None
+    source: Optional[str] = None
+    skills: Optional[list[str]] = None
+    salary_min: Optional[float] = None
+    salary_max: Optional[float] = None
+    page: int = 1
+    page_size: int = 20

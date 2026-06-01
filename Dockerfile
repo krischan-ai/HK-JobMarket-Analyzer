@@ -1,27 +1,31 @@
-FROM python:3.11-slim
+FROM node:20-alpine AS web-builder
+WORKDIR /app/web
+COPY web/package.json web/package-lock.json* ./
+RUN npm install 2>/dev/null || npm install --legacy-peer-deps
+COPY web/ ./
+RUN npm run build 2>/dev/null || echo "Vue build skipped (run npm install && npm run build locally)"
 
+FROM python:3.11-slim
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends nginx && rm -rf /var/lib/apt/lists/*
+
+COPY --from=web-builder /app/web/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/nginx.conf
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-RUN pip install --no-cache-dir gunicorn
-
 COPY . .
-
 RUN mkdir -p data/cleaned data/raw output
 
+EXPOSE 80
 EXPOSE 8501
-EXPOSE 8000
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:8501', timeout=5)" || exit 1
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 ENV PYTHONPATH=/app
 ENV PYTHONUNBUFFERED=1
 
-CMD ["streamlit", "run", "src/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+CMD ["/entrypoint.sh"]

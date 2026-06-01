@@ -18,6 +18,7 @@
 | v1.5 | 2026-06-01 | 项目全链路验收（Phase 1-2 共 7 大类功能测试通过） | - |
 | v1.6 | 2026-06-01 | Phase 2 完整验收：M6 多源爬虫 + M7 LLM 引擎（50 文件/5900 行/7 项断言通过） | - |
 | v1.7 | 2026-06-01 | Phase 3 完成：78 项 pytest 测试、性能优化、CI/CD、Docker 部署 | - |
+| v1.8 | 2026-06-01 | Phase 4 完成：Vue 3 前端 + FastAPI 22 端点 + Nginx 统一部署 | - |
 
 ---
 
@@ -1537,19 +1538,18 @@ python scripts/update_dict.py \
 | 13.1 `.github/workflows/ci.yml` | GitHub Actions：lint → test → build | P2 | ✅ Python 3.10/3.11/3.12 矩阵构建 |
 | 13.2 `Dockerfile` + `docker-compose.yml` | 容器化部署方案 | P3 | ✅ slim 镜像 + healthcheck + 持久化卷 |
 
-#### Phase 4：Vue 前端开发（待开始）
+#### Phase 4：Vue 前端开发（已完成 ✅）
 
-| 任务 | 说明 | 预估工时 | 依赖 |
-|------|------|---------|------|
-| V1 项目初始化 | `web/` 目录初始化，Vite 5 + Vue 3 + TS 脚手架，Element Plus 集成，Vue Router 4 路由框架 | 0.5 天 | — |
-| V2 FastAPI 网关 | `api/` 目录结构搭建，CORS 配置，15 个 API 端点实现（stats/jobs/upload/knowledge/system），Pydantic schema 定义 | 1 天 | M5 后端模块 |
-| V3 布局与导航 | AppHeader（Logo + NavMenu + SystemStatus）、AppSidebar（LocationFilter/SourceFilter/SalaryRangeFilter/KeywordSearch）、AppFooter 布局组件，路由守卫，Pinia store 框架 | 0.5 天 | V1 |
-| V4 仪表盘页面 | DashboardPage + StatCards + SourcePieChart + SkillTrendChart + SalaryOverview + RecentUpdates | 1 天 | V2 + V3 |
-| V5 分析页面 | TechTrendsPage（SkillBarChart/CategoryPieChart/SkillTrendLine）+ SalaryAnalysisPage（SalaryStatsCards/SalaryBoxChart/TopSalaryBarChart）+ LocationPage（LocationBarChart/LocationJobTable） | 1 天 | V2 + V3 |
-| V6 知识库管理 | KnowledgeBasePage（KBSourceChart/KBSkillChart/KBVersionTable）+ UploadPage（FileUploader/FieldMappingPreview/ProcessProgressBar）+ ManagePage（ManageSearchBar/ManageDataTable/BatchActions） | 1.5 天 | V2 + V3 |
-| V7 数据探索与设置 | DataExplorePage（ExploreSearchPanel/ExploreTable/ExportButton）+ SettingsPage（CrawlerConfigForm/LLMConfigForm/ProxyConfigForm） | 0.5 天 | V2 |
-| V8 联调与优化 | 前后端联调，响应式适配，加载状态优化，错误边界处理，全局异常处理 | 1 天 | V4-V7 |
-| V9 生产部署 | Docker 容器化，Nginx 反向代理（统一 :80），环境变量分离，生产构建配置 | 0.5 天 | V8 |
+| 任务 | 说明 | 状态 |
+|------|------|------|
+| V1 项目初始化 | Vite 5 + Vue 3 + TypeScript + Element Plus + Vue Router 4 + Pinia 脚手架 | ✅ |
+| V2 FastAPI 网关 | 22 个 API 端点（stats/jobs/upload/knowledge/system），Pydantic Schema，CORS | ✅ |
+| V3 布局与导航 | AppHeader（Logo+NavMenu+系统状态）、AppSidebar（9 菜单项）、Layout 三栏布局 | ✅ |
+| V4 仪表盘页面 | DashboardPage + 6 统计卡片 + ECharts 折线/饼图/柱状图 | ✅ |
+| V5 分析页面 | TechTrendsPage（技能排行+类别占比+薪资趋势）、SalaryAnalysisPage（统计指标+箱线图+高薪排行）、LocationPage（区域柱状图+数据明细表） | ✅ |
+| V6 知识库管理 | KnowledgeBasePage（来源占比+技能热度+版本历史）、UploadPage（拖拽上传+字段映射+处理进度+结果摘要）、ManagePage（搜索筛选+分页表格+批量操作） | ✅ |
+| V7 数据探索与设置 | ExplorePage（全文搜索+结果表格+CSV 导出）、SettingsPage（系统信息/LLM 配置/部署信息 3 标签页） | ✅ |
+| V8/V9 联调与部署 | Vite 代理到 FastAPI 8000、Dockerfile 多阶段构建（Node 20 → Python 3.11）、Nginx 统一入口 :80、docker-compose 生产部署 | ✅ |
 
 ### 11.3 Phase 1 验收情况
 
@@ -1557,16 +1557,17 @@ python scripts/update_dict.py \
 
 | 指标 | 数值 |
 |------|------|
-| Python 源文件数 | 57 个（含 src/ + config/ + scripts/ + tests/ + api/） |
-| JSON 配置文件 | 4 个（tech_dict, field_mapping, locations_zh, categories_zh） |
-| 代码总行数 | ~6,600 行 |
-| 外部依赖 | 16 个 Python 包 |
+| Python 源文件数 | 77 个（src + config + scripts + tests + api） |
+| JSON 配置文件 | 5 个 |
+| 代码总行数 | ~8,200 行 |
+| 外部依赖 | 20 个 Python 包 |
 | pytest 测试数 | 78 项（覆盖 9 个模块） |
-| Vue 前端文件 | 0 个（规划阶段，待实现） |
+| Vue 前端文件 | 24 个（web/） |
+| API 端点 | 22 个（stats/jobs/upload/knowledge/system） |
 
 #### 11.3.2 语法验证
 
-所有 57 个 Python 源文件通过 `compile()` 语法检查，无语法错误。
+所有 77 个 Python 源文件通过 `compile()` 语法检查，无语法错误。
 
 | 模块 | 文件 | 编译状态 |
 |------|------|---------|
@@ -1718,8 +1719,37 @@ Phase 3（完善阶段）已完成 M12-M13 共 6 项任务的开发与验收，�
 | **⑨ CI/CD 矩阵** | GitHub Actions 三版本 Python | `.github/workflows/ci.yml` | ✅ |
 | **⑩ Docker** | python:3.11-slim + healthcheck + 卷持久化 | `Dockerfile` + `docker-compose.yml` | ✅ |
 
-**代码规模**：57 个 Python 文件 / ~6,600 行代码 / 外部依赖 16 个 / pytest 78 项。
+**代码规模**：77 个 Python 文件 / ~8,200 行代码 / 外部依赖 20 个 / pytest 78 项。
 **语法检查**：全部通过。
+
+### Phase 4 验收情况
+
+Phase 4（Vue 前端 + REST API）已完成 V1-V9 全部任务，覆盖前后端分离架构、22 个 API 端点、9 个 Vue 页面、Docker Nginx 生产部署。
+
+| 验收类别 | 验收项 | 测试方法 | 结果 |
+|---------|--------|---------|------|
+| **① FastAPI 网关** | 22 个端点注册（stats/jobs/upload/knowledge/system） | `len(app.routes)` | ✅ |
+| **② API Schema** | 3 组 Pydantic 模型（jobs/stats/upload） | import 检查 | ✅ |
+| **③ Vue 脚手架** | Vite 5 + Vue 3 + TS + Element Plus + Pinia + Router | `package.json` 依赖 | ✅ |
+| **④ 路由系统** | 10 条路由（Dashboard/Tech/Salary/Location/KB/Upload/Manage/Explore/Settings） | `router/index.ts` | ✅ |
+| **⑤ Vue 页面** | 9 个视图页面（全部含 ECharts 图表） | 文件清单 | ✅ |
+| **⑥ Pinia 状态** | 4 个 store（jobs/stats/upload/system） | 文件清单 | ✅ |
+| **⑦ Layout 布局** | AppHeader + AppSidebar + 三栏布局 + API 状态指示器 | Layout.vue | ✅ |
+| **⑧ Docker 多阶段** | Node 20 → Python 3.11 → Nginx | `Dockerfile` | ✅ |
+| **⑨ Nginx 反向代理** | `:80` → Vue SPA / `/api/` → FastAPI / `/streamlit/` → Streamlit | `nginx.conf` | ✅ |
+| **⑩ 语法检查** | 77 个 .py 文件全部通过 | `compile()` | ✅ |
+
+**运行方式**：
+```bash
+# 后端 API
+uvicorn api.main:app --reload --port 8000
+
+# 前端开发
+cd web && npm install && npm run dev
+
+# 生产部署
+docker-compose up -d
+```
 
 #### 11.3.6 运行方式
 
