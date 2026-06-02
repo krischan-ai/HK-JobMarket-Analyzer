@@ -359,21 +359,7 @@ pnpm build
 # 构建产物输出到 web/dist/，由 Nginx 或 FastAPI 静态文件服务承载
 ```
 
-#### 步骤七：启动可视化看板（过渡保留）
-
-```bash
-# Streamlit 交互式看板
-streamlit run src/app.py \
-    --server.port 8501 \
-    --server.address 0.0.0.0
-
-# 或生成静态图表
-python src/visualize.py \
-    --input data/analysis/ \
-    --output output/charts/
-```
-
-#### 步骤八：一键工作流
+#### 步骤七：一键工作流
 
 ```python
 # run_pipeline.py — 一键执行完整数据流水线
@@ -475,7 +461,7 @@ docker-compose down
 +--------------------------------------------------------------------+
 |               前端展示层 (Frontend Layer)                            |
 |  Vue 3 + TypeScript + Vite 5 / Pinia 状态管理 / Element Plus UI     |
-|  ECharts 5 图表 / Streamlit 看板（过渡保留）                          |
+|  ECharts 5 图表 / 爬虫仪表盘 / 数据导出                             |
 +--------------------------------------------------------------------+
 ```
 
@@ -489,7 +475,7 @@ docker-compose down
 | 文本挖掘 | re, spaCy, OpenAI SDK (DeepSeek/GPT) | re 高性能规则匹配；spaCy 英文 NLP 管道；OpenAI SDK 对接大模型实现 LLM 智能提取与岗位分类 |
 | 后端 API | FastAPI, Uvicorn, Pydantic | FastAPI 高性能异步框架，原生支持 Pydantic 数据校验，自动生成 OpenAPI 文档 |
 | 前端框架 | Vue 3 + TypeScript + Vite 5, Pinia, Vue Router 4, Element Plus, ECharts 5, Axios | 组合式 API + 类型安全 + 极速 HMR；Pinia 官方推荐状态管理；Element Plus 全面中文化支持 |
-| 数据可视化 | Streamlit, Matplotlib, Seaborn (v1)；ECharts 5 (v2) | Streamlit 快速原型验证；ECharts 5 复杂图表交互性能优异，支持中文化 |
+| 数据可视化 | ECharts 5 (vue-echarts), Matplotlib, Seaborn | ECharts 5 复杂图表交互性能优异，支持中文化；Matplotlib/Seaborn 用于静态图表生成 |
 | 向量语义搜索 | ChromaDB, text-embedding-ada-002 | ChromaDB 轻量嵌入式向量数据库，支持持久化与余弦相似度搜索 |
 | 爬虫任务调度 | asyncio, APScheduler | 异步协程支持多源并发爬取；APScheduler 支持定时任务与持久化调度 |
 | 部署运维 | Docker, Docker Compose, Nginx | 容器化部署保证环境一致；Nginx 反向代理统一前端静态资源与 API 路由 |
@@ -536,14 +522,18 @@ docker-compose down
                     ┌─────────────────────────────┐
                     │    FastAPI 网关 (RESTful API) │
                     │  统计/岗位/上传/向量/爬虫控制   │
-                    └──────┬────────────────┬─────┘
-                           │                │
-              ┌────────────┤                ├────────────┐
-              ▼            ▼                ▼            ▼
-      ┌────────────┐ ┌──────────┐ ┌────────────┐ ┌──────────┐
-      │ Streamlit  │ │ Vue 3    │ │ 爬虫仪表盘  │ │ 数据导出  │
-      │  看板(v1)  │ │ 前端(v2) │ │ (v2.0)     │ │ CSV/JSON │
-      └────────────┘ └──────────┘ └────────────┘ └──────────┘
+                    └─────────────┬───────────────┘
+                                  │ JSON API (Axios)
+                                  ▼
+                    ┌─────────────────────────────┐
+                    │     Vue 3 前端 (Web 应用)      │
+                    │  ┌───────────────────────┐  │
+                    │  │ · 仪表盘 & 数据可视化   │  │
+                    │  │ · 爬虫任务管理与监控    │  │
+                    │  │ · 知识库管理 & 数据导入  │  │
+                    │  │ · 数据导出 (CSV/JSON)   │  │
+                    │  └───────────────────────┘  │
+                    └─────────────────────────────┘
 ```
 
 ---
@@ -3753,6 +3743,7 @@ HK-JobMarket-Analyzer/
 ├── .gitignore
 ├── requirements.txt
 └── 技术文档.md
+```
 
 ---
 
@@ -3836,4 +3827,4 @@ python scripts/update_dict.py \
 - [香港《个人资料（隐私）条例》](https://www.pcpd.org.hk/)
 
 ---
----
+
