@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2 style="margin-top: 0">🗃️ 數據管理</h2>
+    <h2 style="margin-top: 0">數據管理</h2>
     <el-card>
       <el-form :inline="true" style="margin-bottom: 16px">
         <el-form-item label="搜索">
@@ -19,7 +19,16 @@
         </el-form-item>
       </el-form>
 
-      <el-table :data="jobs" v-loading="loading" stripe max-height="500">
+      <DataTable
+        :data="jobs"
+        :loading="loading"
+        :show-pagination="true"
+        :page="currentPage"
+        :size="pageSize"
+        :total="total"
+        max-height="500"
+        @page-change="onPageChange"
+      >
         <el-table-column prop="job_id" label="Job ID" width="150" />
         <el-table-column prop="title" label="崗位名稱" min-width="180" />
         <el-table-column prop="company" label="公司" width="150" />
@@ -30,18 +39,7 @@
         <el-table-column label="月薪" width="150">
           <template #default="{ row }">{{ row.salary_min ? `HK$${row.salary_min.toLocaleString()}` : '-' }}</template>
         </el-table-column>
-      </el-table>
-
-      <div style="margin-top: 16px; display: flex; justify-content: center">
-        <el-pagination
-          v-model:current-page="currentPage"
-          v-model:page-size="pageSize"
-          :total="total"
-          :page-sizes="[10, 20, 50]"
-          layout="total, sizes, prev, pager, next"
-          @change="search"
-        />
-      </div>
+      </DataTable>
     </el-card>
   </div>
 </template>
@@ -49,6 +47,7 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import api from '@/api'
+import DataTable from '@/components/common/DataTable.vue'
 import type { JobItem } from '@/types'
 
 const jobs = ref<JobItem[]>([])
@@ -87,6 +86,12 @@ function reset() {
   location.value = ''
   source.value = ''
   currentPage.value = 1
+  search()
+}
+
+function onPageChange(page: number, size: number) {
+  currentPage.value = page
+  pageSize.value = size
   search()
 }
 </script>

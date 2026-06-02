@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2 style="margin-top: 0">🔍 數據探索</h2>
+    <h2 style="margin-top: 0">數據探索</h2>
     <el-card>
       <el-form :inline="true" style="margin-bottom: 16px">
         <el-form-item>
@@ -16,14 +16,14 @@
         </el-form-item>
       </el-form>
 
-      <el-table :data="results" stripe max-height="500" v-loading="searching" empty-text="輸入關鍵詞開始搜索">
+      <DataTable :data="results" :loading="searching" max-height="500" empty-text="輸入關鍵詞開始搜索">
         <el-table-column prop="job_id" label="Job ID" width="150" />
         <el-table-column prop="title" label="崗位名稱" min-width="200">
           <template #default="{ row }"><el-link type="primary">{{ row.title }}</el-link></template>
         </el-table-column>
         <el-table-column prop="company" label="公司" width="150" />
         <el-table-column prop="location" label="地點" width="110" />
-      </el-table>
+      </DataTable>
     </el-card>
   </div>
 </template>
@@ -31,6 +31,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import api from '@/api'
+import DataTable from '@/components/common/DataTable.vue'
 
 const searchText = ref('')
 const results = ref<{ job_id: string; title: string; company: string; location: string }[]>([])

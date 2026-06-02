@@ -1,9 +1,9 @@
-import axios from 'axios'
-
-const api = axios.create({
-  baseURL: '/api',
-  timeout: 15000,
-  headers: { 'Content-Type': 'application/json' },
-})
+import api from './client'
 
 export default api
+
+export { statsApi } from './stats'
+export { jobsApi } from './jobs'
+export { uploadApi } from './upload'
+export { knowledgeApi } from './knowledge'
+export { systemApi } from './system'

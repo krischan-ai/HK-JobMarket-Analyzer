@@ -1,31 +1,20 @@
 <template>
   <div>
-    <h2 style="margin-top: 0">📊 儀表盤</h2>
+    <h2 style="margin-top: 0">儀表盤</h2>
 
-    <el-row :gutter="16" style="margin-bottom: 16px">
-      <el-col :span="4" v-for="card in statCards" :key="card.label">
-        <el-card shadow="hover">
-          <div style="text-align: center">
-            <div style="font-size: 28px; font-weight: 700; color: #409EFF">{{ card.value }}</div>
-            <div style="font-size: 13px; color: #909399; margin-top: 4px">{{ card.label }}</div>
-          </div>
-        </el-card>
-      </el-col>
-    </el-row>
+    <StatCards :cards="statCards" />
 
     <el-row :gutter="16" style="margin-bottom: 16px">
       <el-col :span="12">
         <el-card>
           <template #header><strong>技術棧需求排行 Top 15</strong></template>
-          <v-chart :option="skillsChartOption" autoresize style="height: 400px" v-if="skillsChartOption" />
-          <el-skeleton :rows="6" animated v-else />
+          <SkillBarChart :data="store.dashboard?.top_skills || []" />
         </el-card>
       </el-col>
       <el-col :span="12">
         <el-card>
           <template #header><strong>薪資分佈概覽</strong></template>
-          <v-chart :option="salaryChartOption" autoresize style="height: 400px" v-if="salaryChartOption" />
-          <el-skeleton :rows="6" animated v-else />
+          <SalaryBoxChart :data="store.dashboard?.salary_by_location || []" />
         </el-card>
       </el-col>
     </el-row>
@@ -34,35 +23,65 @@
       <el-col :span="12">
         <el-card>
           <template #header><strong>數據來源佔比</strong></template>
-          <v-chart :option="sourceChartOption" autoresize style="height: 350px" v-if="sourceChartOption" />
-          <el-skeleton :rows="6" animated v-else />
+          <SourcePieChart :data="store.dashboard?.source_distribution || []" />
         </el-card>
       </el-col>
       <el-col :span="12">
         <el-card>
           <template #header><strong>技能類別分佈</strong></template>
-          <v-chart :option="categoryChartOption" autoresize style="height: 350px" v-if="categoryChartOption" />
-          <el-skeleton :rows="6" animated v-else />
+          <CategoryPieChart :data="store.dashboard?.category_distribution || []" />
         </el-card>
+      </el-col>
+    </el-row>
+
+    <el-divider style="margin: 24px 0 16px" />
+    <h3 style="margin: 0 0 12px">角色分類分析</h3>
+
+    <el-row :gutter="16" style="margin-bottom: 16px">
+      <el-col :span="6">
+        <LLMStatusCard
+          :status="statsStore.llmStatus!"
+          :classifying="statsStore.classifying"
+          @run="handleRunClassification"
+          v-if="statsStore.llmStatus"
+        />
+        <el-card v-else>
+          <el-empty description="無法獲取 LLM 狀態" :image-size="60" />
+        </el-card>
+      </el-col>
+      <el-col :span="9">
+        <RoleDistributionChart :data="statsStore.roleDistribution" />
+      </el-col>
+      <el-col :span="9">
+        <RoleSalaryChart :data="statsStore.roleSalary" />
       </el-col>
     </el-row>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useJobsStore } from '@/stores/jobs'
-import VChart from 'vue-echarts'
-import { use } from 'echarts/core'
-import { CanvasRenderer } from 'echarts/renderers'
-import { BarChart, PieChart, BoxplotChart } from 'echarts/charts'
-import { GridComponent, TitleComponent, TooltipComponent, LegendComponent, DatasetComponent } from 'echarts/components'
-
-use([CanvasRenderer, BarChart, PieChart, BoxplotChart, GridComponent, TitleComponent, TooltipComponent, LegendComponent, DatasetComponent])
+import { useStatsStore } from '@/stores/stats'
+import { ElMessage } from 'element-plus'
+import StatCards from '@/components/common/StatCards.vue'
+import SkillBarChart from '@/components/charts/SkillBarChart.vue'
+import SalaryBoxChart from '@/components/charts/SalaryBoxChart.vue'
+import SourcePieChart from '@/components/charts/SourcePieChart.vue'
+import CategoryPieChart from '@/components/charts/CategoryPieChart.vue'
+import RoleDistributionChart from '@/components/RoleDistributionChart.vue'
+import RoleSalaryChart from '@/components/RoleSalaryChart.vue'
+import LLMStatusCard from '@/components/LLMStatusCard.vue'
 
 const store = useJobsStore()
+const statsStore = useStatsStore()
 
-onMounted(() => store.fetchDashboard())
+onMounted(() => {
+  store.fetchDashboard()
+  statsStore.fetchRoleDistribution()
+  statsStore.fetchRoleSalary()
+  statsStore.fetchLLMStatus()
+})
 
 const statCards = computed(() => {
   const d = store.dashboard?.overview
@@ -77,49 +96,15 @@ const statCards = computed(() => {
   ]
 })
 
-const skillsChartOption = computed(() => {
-  const skills = store.dashboard?.top_skills || []
-  if (!skills.length) return null
-  return {
-    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-    grid: { left: 140, right: 20, top: 10, bottom: 20 },
-    xAxis: { type: 'value' },
-    yAxis: { type: 'category', data: skills.map(s => s.skill).reverse(), axisLabel: { fontSize: 12 } },
-    series: [{ type: 'bar', data: skills.map(s => s.count).reverse(), color: '#409EFF', barMaxWidth: 24 }],
+async function handleRunClassification() {
+  const result = await statsStore.runClassification()
+  if (result) {
+    ElMessage.success(result.message)
+    await Promise.all([
+      statsStore.fetchRoleDistribution(),
+      statsStore.fetchRoleSalary(),
+      statsStore.fetchLLMStatus(),
+    ])
   }
-})
-
-const salaryChartOption = computed(() => {
-  const data = store.dashboard?.salary_by_location || []
-  if (!data.length) return null
-  return {
-    tooltip: { trigger: 'axis' },
-    grid: { left: 80, right: 20, top: 10, bottom: 30 },
-    xAxis: { type: 'category', data: data.map(d => d.location), axisLabel: { fontSize: 10, rotate: 30 } },
-    yAxis: { type: 'value', name: 'HKD' },
-    series: [
-      { type: 'bar', name: '最低', data: data.map(d => d.min), color: '#91cc75' },
-      { type: 'bar', name: '平均', data: data.map(d => d.avg), color: '#409EFF' },
-      { type: 'bar', name: '最高', data: data.map(d => d.max), color: '#ee6666' },
-    ],
-  }
-})
-
-const sourceChartOption = computed(() => {
-  const sources = store.dashboard?.source_distribution || []
-  if (!sources.length) return null
-  return {
-    tooltip: { trigger: 'item' },
-    series: [{ type: 'pie', radius: ['40%', '70%'], data: sources.map(s => ({ name: s.source, value: s.count })), label: { formatter: '{b}: {d}%' } }],
-  }
-})
-
-const categoryChartOption = computed(() => {
-  const cats = store.dashboard?.category_distribution || []
-  if (!cats.length) return null
-  return {
-    tooltip: { trigger: 'item' },
-    series: [{ type: 'pie', radius: '65%', data: cats.map(c => ({ name: c.category, value: c.count })), label: { formatter: '{b}: {c}' } }],
-  }
-})
+}
 </script>

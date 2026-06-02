@@ -1,0 +1,32 @@
+{
+  "511fb311f530d7d069e0b917a472103d": {
+    "role_id": "frontend",
+    "role_name": "前端开发",
+    "confidence": "low"
+  },
+  "214d74f8ec0b0c85cbc123d67739f68c": {
+    "role_id": "backend",
+    "role_name": "后端开发",
+    "confidence": "low"
+  },
+  "84eee81c41cb2d607f7d7139ccc4b370": {
+    "role_id": "frontend",
+    "role_name": "前端开发",
+    "confidence": "low"
+  },
+  "03e382d164491c051a50ba178464a047": {
+    "role_id": "backend",
+    "role_name": "后端开发",
+    "confidence": "high"
+  },
+  "8ae7be3b0bbd3503034d71ffa4ab6977": {
+    "role_id": "other",
+    "role_name": "其他",
+    "confidence": "low"
+  },
+  "4e24e441948e5facb159e118fa244625": {
+    "role_id": "frontend",
+    "role_name": "前端开发",
+    "confidence": "medium"
+  }
+}

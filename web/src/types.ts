@@ -82,3 +82,35 @@ export interface LocationItem {
   name: string
   count: number
 }
+
+export interface RoleDistribution {
+  role_id: string
+  role_name: string
+  count: number
+  percentage: number
+}
+
+export interface RoleSalaryStats {
+  role_id: string
+  role_name: string
+  salary_avg: number
+  salary_min: number
+  salary_max: number
+  count: number
+}
+
+export interface LLMClassificationStatus {
+  total_jobs: number
+  classified: number
+  coverage_rate: number
+  last_analysis: string | null
+  llm_available: boolean
+}
+
+export interface ClassificationResult {
+  success: boolean
+  total: number
+  classified: number
+  duration_ms: number
+  message: string
+}

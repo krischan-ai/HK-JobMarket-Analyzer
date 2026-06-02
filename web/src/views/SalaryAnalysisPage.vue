@@ -1,19 +1,19 @@
 <template>
   <div>
-    <h2 style="margin-top: 0">💰 薪資分析</h2>
+    <h2 style="margin-top: 0">薪資分析</h2>
 
     <el-row :gutter="16" style="margin-bottom: 16px">
       <el-col :span="6">
-        <el-card shadow="hover"><div style="text-align:center"><div style="font-size:24px;font-weight:700;color:#409EFF">{{ stats.avg }}</div><div style="color:#909399">平均月薪 (HKD)</div></div></el-card>
+        <StatCard label="平均月薪 (HKD)" :value="stats.avg" color="#409EFF" />
       </el-col>
       <el-col :span="6">
-        <el-card shadow="hover"><div style="text-align:center"><div style="font-size:24px;font-weight:700;color:#67C23A">{{ stats.min }}</div><div style="color:#909399">最低月薪 (HKD)</div></div></el-card>
+        <StatCard label="最低月薪 (HKD)" :value="stats.min" color="#67C23A" />
       </el-col>
       <el-col :span="6">
-        <el-card shadow="hover"><div style="text-align:center"><div style="font-size:24px;font-weight:700;color:#E6A23C">{{ stats.max }}</div><div style="color:#909399">最高月薪 (HKD)</div></div></el-card>
+        <StatCard label="最高月薪 (HKD)" :value="stats.max" color="#E6A23C" />
       </el-col>
       <el-col :span="6">
-        <el-card shadow="hover"><div style="text-align:center"><div style="font-size:24px;font-weight:700;color:#909399">{{ stats.median }}</div><div style="color:#909399">中位月薪 (HKD)</div></div></el-card>
+        <StatCard label="中位月薪 (HKD)" :value="stats.median" color="#909399" />
       </el-col>
     </el-row>
 
@@ -21,8 +21,7 @@
       <el-col :span="12">
         <el-card>
           <template #header><strong>各區域薪資區間</strong></template>
-          <v-chart :option="boxOption" autoresize style="height: 400px" v-if="boxOption" />
-          <el-skeleton :rows="6" animated v-else />
+          <SalaryBoxChart :data="salaryData" />
         </el-card>
       </el-col>
       <el-col :span="12">
@@ -41,14 +40,16 @@ import { computed, onMounted, ref, reactive } from 'vue'
 import VChart from 'vue-echarts'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
-import { BarChart, BoxplotChart } from 'echarts/charts'
+import { BarChart } from 'echarts/charts'
 import { GridComponent, TooltipComponent } from 'echarts/components'
 import api from '@/api'
+import StatCard from '@/components/common/StatCard.vue'
+import SalaryBoxChart from '@/components/charts/SalaryBoxChart.vue'
+import type { SalaryDistribution } from '@/types'
 
-use([CanvasRenderer, BarChart, BoxplotChart, GridComponent, TooltipComponent])
+use([CanvasRenderer, BarChart, GridComponent, TooltipComponent])
 
 const stats = reactive({ avg: '-', min: '-', max: '-', median: '-' })
-import type { SalaryDistribution } from '@/types'
 const salaryData = ref<SalaryDistribution[]>([])
 
 onMounted(async () => {
@@ -64,25 +65,16 @@ onMounted(async () => {
   }
 })
 
-const boxOption = computed(() => {
-  const d = salaryData.value
-  if (!d.length) return null
-  return {
-    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-    grid: { left: 80, right: 20, top: 10, bottom: 30 },
-    xAxis: { type: 'category', data: d.map(i => i.location), axisLabel: { fontSize: 10, rotate: 30 } },
-    yAxis: { type: 'value', name: 'HKD' },
-    series: [
-      { type: 'bar', name: '最低', data: d.map(i => i.min), color: '#91cc75' },
-      { type: 'bar', name: '平均', data: d.map(i => i.avg), color: '#409EFF' },
-      { type: 'bar', name: '最高', data: d.map(i => i.max), color: '#ee6666' },
-    ],
-  }
-})
-
 const topJobOption = computed(() => {
   const d = salaryData.value
   if (!d.length) return null
-  return { tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } }, grid: { left: 80, right: 20, top: 10, bottom: 30 }, xAxis: { type: 'value' }, yAxis: { type: 'category', data: d.map(i => i.location), axisLabel: { fontSize: 11 } }, series: [{ type: 'bar', data: d.map(i => i.avg), color: '#67C23A', barMaxWidth: 20 }] }
+  const sorted = [...d].sort((a, b) => b.avg - a.avg).slice(0, 15)
+  return {
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+    grid: { left: 80, right: 20, top: 10, bottom: 30 },
+    xAxis: { type: 'value' },
+    yAxis: { type: 'category', data: sorted.map((i) => i.location), axisLabel: { fontSize: 11 } },
+    series: [{ type: 'bar', data: sorted.map((i) => i.avg), color: '#67C23A', barMaxWidth: 20 }],
+  }
 })
 </script>
