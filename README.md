@@ -153,10 +153,13 @@
 | 角色 | 关注重点 |
 |------|---------|
 | 系统架构师 | 整体架构设计、技术选型、模块划分 |
-| 后端开发工程师 | 爬虫实现、数据清洗、API 设计 |
-| 算法工程师 | NLP 文本挖掘、LLM 集成 |
+| 后端开发工程师 | 爬虫实现、数据清洗、FastAPI 网关、向量数据库集成 |
+| 前端开发工程师 | Vue 3 + TypeScript 前端开发、Element Plus 组件、ECharts 图表 |
+| 算法工程师 | NLP 文本挖掘、LLM 集成、岗位角色分类引擎、Embedding 生成 |
+| 大模型/AI 开发工程师 | 深度学习模型训练与微调、RAG 检索增强生成、Agent 智能体开发、模型部署与优化 |
 | 数据分析师 | 可视化报表设计、分析维度定义 |
-| 运维工程师 | 部署配置、代理管理、监控告警 |
+| 测试工程师 | 接口测试、组件测试、端到端测试 |
+| 运维工程师 | 部署配置、代理管理、Docker 容器化、Nginx 反向代理 |
 
 ---
 
@@ -164,44 +167,90 @@
 
 ### 2.1 环境依赖
 
-#### 10.1.1 Python 版本要求
+#### 2.1.1 Python 版本要求
 
 - Python >= 3.9
 
-#### 10.1.2 依赖管理
+#### 2.1.2 依赖管理
 
 ```plaintext
 # requirements.txt
+# ===== 数据采集 =====
 requests==2.31.0
-beautifulsoup4==4.12.3
 playwright==1.42.0
+playwright-stealth==1.0.6
+httpx==0.27.0
+lxml==5.1.0
+
+# ===== 数据处理 =====
+beautifulsoup4==4.12.3
 pandas==2.2.1
-openai==1.14.1
+openpyxl==3.1.2        # Excel 读写支持
+
+# ===== 数据存储 =====
 pymongo==4.6.1
-python-dotenv==1.0.1
+chromadb==0.5.0        # 向量数据库
+
+# ===== NLP 文本挖掘 =====
+spacy==3.7.4
+openai==1.14.1          # DeepSeek / GPT 接口
+
+# ===== 后端 API =====
+fastapi==0.110.0
+uvicorn[standard]==0.27.1
+pydantic==2.6.1
+python-multipart==0.0.9
+
+# ===== 任务调度 =====
+apscheduler==3.10.4
+
+# ===== 数据可视化 =====
 matplotlib==3.8.3
 seaborn==0.13.2
 streamlit==1.32.0
 plotly==5.19.0
+
+# ===== 工具 =====
+python-dotenv==1.0.1
 tenacity==8.2.3
+ruff==0.2.2             # Python 代码规范
 ```
 
-#### 10.1.3 安装步骤
+#### 2.1.3 安装步骤
 
 ```bash
+# ── 后端环境 ──
+
 # 1. 创建虚拟环境
 python -m venv venv
 venv\Scripts\activate    # Windows
 source venv/bin/activate # Linux/Mac
 
-# 2. 安装依赖
+# 2. 安装 Python 依赖
 pip install -r requirements.txt
 
-# 3. 安装 Playwright 浏览器内核（如需）
+# 3. 安装 Playwright 浏览器内核（爬虫需要）
 playwright install chromium
 
-# 4. 启动 MongoDB（如需本地存储）
+# 4. 下载 spaCy 英文模型
+python -m spacy download en_core_web_sm
+
+# 5. 启动 MongoDB（如需本地存储）
 # 确保 MongoDB 服务已启动，默认端口 27017
+
+# ── 前端环境 ──
+
+# 6. 安装 Node.js（>=18）与 pnpm
+# 下载：https://nodejs.org/
+npm install -g pnpm
+
+# 7. 安装前端依赖
+cd web
+pnpm install
+cd ..
+
+# ── 启动服务 ──
+# 详见下文 2.2 运行步骤
 ```
 
 ### 2.2 运行步骤
@@ -228,6 +277,10 @@ MONGODB_DB_NAME=hk_job_market
 CRAWL_DELAY_MIN=2.5
 CRAWL_DELAY_MAX=5.0
 CRAWL_MAX_PAGES=10
+
+# ChromaDB 向量数据库
+VECTOR_DB_PATH=data/chromadb
+EMBEDDING_MODEL=text-embedding-ada-002
 ```
 
 #### 步骤二：数据采集
@@ -280,7 +333,33 @@ python src/analyzer.py \
     --output data/analysis/
 ```
 
-#### 步骤五：启动可视化看板
+#### 步骤五：启动后端 API 网关
+
+```bash
+# 启动 FastAPI 服务（开发环境）
+uvicorn api.main:app --reload --port 8000
+
+# 启动 FastAPI 服务（生产环境）
+uvicorn api.main:app --host 0.0.0.0 --port 8000 --workers 4
+```
+
+API 文档自动生成：
+- Swagger UI：`http://localhost:8000/docs`
+- ReDoc：`http://localhost:8000/redoc`
+
+#### 步骤六：启动前端应用
+
+```bash
+# 开发环境（Vite HMR，默认 :5173）
+cd web
+pnpm dev
+
+# 生产构建
+pnpm build
+# 构建产物输出到 web/dist/，由 Nginx 或 FastAPI 静态文件服务承载
+```
+
+#### 步骤七：启动可视化看板（过渡保留）
 
 ```bash
 # Streamlit 交互式看板
@@ -294,7 +373,7 @@ python src/visualize.py \
     --output output/charts/
 ```
 
-#### 步骤六：一键工作流
+#### 步骤八：一键工作流
 
 ```python
 # run_pipeline.py — 一键执行完整数据流水线
@@ -334,95 +413,69 @@ if __name__ == "__main__":
     print(f"Pipeline completed. Collected {len(df)} jobs.")
 ```
 
----
-
-## 附录
-
-### A. 项目目录结构
-
-```
-HK-JobMarket-Analyzer/
-├── config/                    # 配置文件
-│   ├── tech_dict.json         # 技术栈词表
-│   └── crawler_settings.json  # 爬虫配置
-├── src/                       # 源代码
-│   ├── __init__.py
-│   ├── crawler.py             # 爬虫核心模块
-│   ├── cleaner.py             # 数据清洗与薪资标准化
-│   ├── analyzer.py            # 规则 + LLM 文本挖掘
-│   ├── visualize.py           # 图表生成
-│   ├── app.py                 # Streamlit 可视化看板
-│   ├── database.py            # MongoDB 持久化管理
-│   └── utils.py               # 工具函数
-├── data/                      # 数据目录
-│   ├── raw/                   # 原始数据
-│   └── cleaned/               # 清洗后数据
-├── output/                    # 输出目录
-│   ├── charts/                # 图表文件
-│   └── reports/               # 分析报告
-├── tests/                     # 单元测试
-│   ├── test_crawler.py
-│   ├── test_cleaner.py
-│   └── test_analyzer.py
-├── .env.example               # 环境变量模板
-├── requirements.txt           # Python 依赖
-└── README.md                  # 项目说明
-```
-
-### B. 词表维护说明
-
-规则引擎的准确度高度依赖词表质量。建议定期维护：
+#### Docker 部署（生产环境）
 
 ```bash
-# 从 LLM 分析结果中提取新词，补充到词表
-python scripts/update_dict.py \
-    --llm-output data/analysis/llm_results.json \
-    --dict-path config/tech_dict.json \
-    --min-frequency 3
+# 使用 Docker Compose 一键启动全部服务
+docker-compose up -d
+
+# 服务访问地址：
+# Vue 前端：        http://localhost:80
+# FastAPI 后端：     http://localhost:8000
+# API 文档 (Swagger)：http://localhost:8000/docs
+# MongoDB：         localhost:27017
+
+# 查看服务日志
+docker-compose logs -f
+
+# 停止服务
+docker-compose down
 ```
 
-### C. 参考资源
-
-- [JobsDB 官网](https://hk.jobsdb.com/)
-- [Indeed HK](https://hk.indeed.com/)
-- [SEEK Group API 文档](https://developer.seek.com/)
-- [Playwright 文档](https://playwright.dev/)
-- [spaCy NLP 文档](https://spacy.io/)
-- [香港《个人资料（隐私）条例》](https://www.pcpd.org.hk/)
-
----
 
 ## 3. 系统总体架构
 
 ### 3.1 架构分层设计
 
-本系统采用经典的四层架构设计，各层职责明确、接口清晰：
+本系统采用六层架构设计，各层职责明确、接口清晰：
 
 ```
 +--------------------------------------------------------------------+
-|                        数据采集层 (Crawler Layer)                    |
-|  Requests / Playwright / 代理IP池 / 频率控制器                       |
+|                 数据采集层 (Crawler Layer)                           |
+|  Python Requests / Playwright / 代理IP池 / 频率控制器                |
 +--------------------------------------------------------------------+
-         |                         |
-         |   原始 JSON / HTML       |
-         v                         v
+         |
+         |   原始 JSON / HTML
+         v
 +--------------------------------------------------------------------+
-|                      数据清洗与存储层 (Cleaning & Storage Layer)     |
-|  文本清洗 / 薪资标准化 / 去重 / MongoDB + CSV 持久化                |
+|               数据清洗与存储层 (Cleaning & Storage Layer)             |
+|  文本清洗 (BeautifulSoup/re/Pandas)                                  |
+|  薪资标准化 / 去重 / MongoDB + CSV + JSON 持久化                     |
+|  ChromaDB 向量数据库（语义搜索）                                      |
 +--------------------------------------------------------------------+
          |
          |   结构化数据
          v
 +--------------------------------------------------------------------+
-|                      算法与文本挖掘层 (Analysis Layer)               |
-|  规则匹配引擎 (Regex)  /  LLM 智能引擎 (DeepSeek/GPT)              |
+|               算法与文本挖掘层 (Analysis Layer)                       |
+|  规则匹配引擎 (Regex/spaCy)  /  LLM 智能引擎 (DeepSeek/GPT)          |
+|  岗位角色分类引擎 (Role Classifier)                                  |
 +--------------------------------------------------------------------+
          |
          |   技能标签 / 结构化 JSON
          v
 +--------------------------------------------------------------------+
-|                        数据可视化层 (Visualization Layer)            |
-|  Streamlit 看板 / Matplotlib 图表 / 数据导出                        |
+|               后端 API 网关层 (API Gateway)                          |
+|  FastAPI + Uvicorn / Pydantic 数据校验 / RESTful 接口                |
+|  爬虫任务调度 / 向量搜索 / 知识库管理                                |
++--------------------------------------------------------------------+
+         |
+         |   JSON API (Axios)
+         v
++--------------------------------------------------------------------+
+|               前端展示层 (Frontend Layer)                            |
+|  Vue 3 + TypeScript + Vite 5 / Pinia 状态管理 / Element Plus UI     |
+|  ECharts 5 图表 / Streamlit 看板（过渡保留）                          |
 +--------------------------------------------------------------------+
 ```
 
@@ -432,27 +485,65 @@ python scripts/update_dict.py \
 |------|-------|---------|
 | 数据采集 | Python Requests, Playwright | Requests 轻量高效；Playwright 支持动态渲染，可绕过复杂反爬 |
 | 文本清洗 | BeautifulSoup, re, Pandas | BeautifulSoup 解析 HTML；re 正则匹配清洗；Pandas 批量处理 |
-| 数据存储 | MongoDB, CSV | MongoDB 灵活支持 JSON 文档存储；CSV 便于快速导出分析 |
-| 文本挖掘 | re, spaCy, OpenAI SDK | re 高性能规则匹配；spaCy 英文 NLP 管道；OpenAI SDK 对接大模型 |
-| 数据可视化 | Streamlit, Matplotlib, Seaborn | Streamlit 交互式看板快速开发；Matplotlib/Seaborn 静态图表 |
-| 配置管理 | python-dotenv, JSON | .env 管理密钥；JSON 管理词表配置 |
+| 数据存储 | MongoDB, CSV, JSON, ChromaDB | MongoDB 灵活支持 JSON 文档存储；CSV/JSON 便于快速导出分析；ChromaDB 提供语义搜索能力 |
+| 文本挖掘 | re, spaCy, OpenAI SDK (DeepSeek/GPT) | re 高性能规则匹配；spaCy 英文 NLP 管道；OpenAI SDK 对接大模型实现 LLM 智能提取与岗位分类 |
+| 后端 API | FastAPI, Uvicorn, Pydantic | FastAPI 高性能异步框架，原生支持 Pydantic 数据校验，自动生成 OpenAPI 文档 |
+| 前端框架 | Vue 3 + TypeScript + Vite 5, Pinia, Vue Router 4, Element Plus, ECharts 5, Axios | 组合式 API + 类型安全 + 极速 HMR；Pinia 官方推荐状态管理；Element Plus 全面中文化支持 |
+| 数据可视化 | Streamlit, Matplotlib, Seaborn (v1)；ECharts 5 (v2) | Streamlit 快速原型验证；ECharts 5 复杂图表交互性能优异，支持中文化 |
+| 向量语义搜索 | ChromaDB, text-embedding-ada-002 | ChromaDB 轻量嵌入式向量数据库，支持持久化与余弦相似度搜索 |
+| 爬虫任务调度 | asyncio, APScheduler | 异步协程支持多源并发爬取；APScheduler 支持定时任务与持久化调度 |
+| 部署运维 | Docker, Docker Compose, Nginx | 容器化部署保证环境一致；Nginx 反向代理统一前端静态资源与 API 路由 |
+| 代码规范 | ESLint + Prettier, Ruff | ESLint/Prettier 统一前端代码风格；Ruff 保证 Python 代码质量 |
+| 测试 | Vitest + Vue Test Utils, pytest | Vitest 与 Vite 深度集成；pytest 驱动后端单元测试 |
+| 配置管理 | python-dotenv, JSON | .env 管理密钥；JSON 管理词表与映射配置 |
 
 ### 3.3 数据流设计
 
 ```
-[JobsDB/Indeed] --HTTP请求--> [代理IP池] --> [爬虫模块]
-                                                 |
-                                         清洗、去重、标准化
-                                                 |
-                                            [MongoDB]
-                                                 |
-                                    双引擎并行或串行分析
-                                                 |
-                              [技能标签]  [薪资数据]  [区域数据]
-                                                 |
-                                        可视化看板生成
-                                                 |
-                                    [HTML报表]  [PNG图表]  [CSV导出]
+                    ┌─────────────────────────────┐
+                    │     目标网站 (JobsDB/Indeed)  │
+                    └─────────────┬───────────────┘
+                                  │ HTTP 请求
+                                  ▼
+                    ┌─────────────────────────────┐
+                    │      代理 IP 池 / 频率控制器   │
+                    └─────────────┬───────────────┘
+                                  │
+                    ┌─────────────▼───────────────┐
+                    │ 爬虫模块 (Requests/Playwright) │
+                    │  多源并发 / 关键词驱动爬取      │
+                    └─────────────┬───────────────┘
+                                  │ 原始 JSON / HTML
+                                  ▼
+                    ┌─────────────────────────────┐
+                    │  清洗管道 (HTML剥离/去重/规范化) │
+                    │  薪资标准化 / 中文化映射         │
+                    └──────┬──────────────┬──────┘
+                           │              │
+                           ▼              ▼
+                    ┌──────────┐  ┌──────────────────┐
+                    │ MongoDB  │  │ ChromaDB 向量库   │
+                    │ CSV/JSON │  │ (语义搜索)        │
+                    └────┬─────┘  └────────┬─────────┘
+                         │                 │
+                         ▼                 ▼
+                    ┌─────────────────────────────┐
+                    │  双引擎分析 (规则匹配/LLM 提取) │
+                    │  岗位角色分类 (Role Classifier) │
+                    └─────────────┬───────────────┘
+                                  │ 技能标签 / 结构化 JSON
+                                  ▼
+                    ┌─────────────────────────────┐
+                    │    FastAPI 网关 (RESTful API) │
+                    │  统计/岗位/上传/向量/爬虫控制   │
+                    └──────┬────────────────┬─────┘
+                           │                │
+              ┌────────────┤                ├────────────┐
+              ▼            ▼                ▼            ▼
+      ┌────────────┐ ┌──────────┐ ┌────────────┐ ┌──────────┐
+      │ Streamlit  │ │ Vue 3    │ │ 爬虫仪表盘  │ │ 数据导出  │
+      │  看板(v1)  │ │ 前端(v2) │ │ (v2.0)     │ │ CSV/JSON │
+      └────────────┘ └──────────┘ └────────────┘ └──────────┘
 ```
 
 ---
@@ -515,7 +606,7 @@ python scripts/update_dict.py \
 | API Token 失效 | Token 过期 | 1. Token 自动刷新机制<br>2. 定期更新 Headers | P1 |
 | 账号风控 | 账号被限制 | 1. 模拟正常用户行为<br>2. 避免高频操作 | P2 |
 
-#### 8.1.1 Playwright Stealth 配置
+#### 5.1.1 Playwright Stealth 配置
 
 ```python
 from playwright_stealth import stealth_sync
@@ -562,7 +653,7 @@ def create_stealth_browser():
 
 ### 6.1 基于 RESTful API 的采集方案
 
-#### 4.1.1 接口分析
+#### 6.1.1 接口分析
 
 JobsDB 新版网站采用前后端分离架构，通过浏览器开发者工具（F12）抓包可发现其后端 API。典型的 API 特征：
 
@@ -570,7 +661,7 @@ JobsDB 新版网站采用前后端分离架构，通过浏览器开发者工具�
 - **请求方式**：GET / POST，参数含 keyword、location、page 等
 - **响应格式**：JSON，包含岗位列表、分页信息
 
-#### 4.1.2 核心爬虫实现
+#### 6.1.2 核心爬虫实现
 
 ```python
 import requests
@@ -644,7 +735,7 @@ class JobsDBCrawler:
         return all_jobs
 ```
 
-#### 4.1.3 配置管理
+#### 6.1.3 配置管理
 
 代理配置通过 `.env` 文件管理，避免硬编码：
 
@@ -703,7 +794,7 @@ class PlaywrightCrawler:
 
 ### 6.3 代理与请求头策略
 
-#### 4.3.1 代理 IP 选择
+#### 6.3.1 代理 IP 选择
 
 | 代理类型 | 适用场景 | 优点 | 缺点 |
 |---------|---------|------|------|
@@ -711,7 +802,7 @@ class PlaywrightCrawler:
 | 住宅代理 | 高反爬网站 | 匿名性高、成功率好 | 价格较高 |
 | 香港本地代理 | 香港网站优先推荐 | 区域匹配度高 | 资源有限 |
 
-#### 4.3.2 请求头伪造
+#### 6.3.2 请求头伪造
 
 ```python
 HEADERS_TEMPLATE = {
@@ -727,7 +818,7 @@ HEADERS_TEMPLATE = {
 
 ### 6.4 频率控制与异常处理
 
-#### 4.4.1 自适应延迟策略
+#### 6.4.1 自适应延迟策略
 
 ```python
 class AdaptiveDelayController:
@@ -754,7 +845,7 @@ class AdaptiveDelayController:
             self.success_window.pop(0)
 ```
 
-#### 4.4.2 异常处理与重试机制
+#### 6.4.2 异常处理与重试机制
 
 ```python
 from tenacity import retry, stop_after_attempt, wait_exponential
@@ -775,7 +866,7 @@ def robust_fetch(url: str, session: requests.Session) -> requests.Response:
 
 ### 7.1 数据模型与字段设计
 
-#### 5.1.1 核心数据结构
+#### 7.1.1 核心数据结构
 
 ```python
 from dataclasses import dataclass
@@ -800,7 +891,7 @@ class JobPosting:
     skills: dict = None                  # 提取的技能标签
 ```
 
-#### 5.1.2 MongoDB 文档结构
+#### 7.1.2 MongoDB 文档结构
 
 ```json
 {
@@ -828,7 +919,7 @@ class JobPosting:
 
 ### 7.2 文本清洗流程
 
-#### 5.2.1 清洗管道设计
+#### 7.2.1 清洗管道设计
 
 ```python
 import re
@@ -876,7 +967,7 @@ class JDTextCleaner:
         return text
 ```
 
-#### 5.2.2 清洗示例
+#### 7.2.2 清洗示例
 
 | 原始文本 | 清洗后文本 |
 |---------|-----------|
@@ -886,7 +977,7 @@ class JDTextCleaner:
 
 ### 7.3 薪资标准化处理
 
-#### 5.3.1 薪资解析策略
+#### 7.3.1 薪资解析策略
 
 ```python
 import re
@@ -951,7 +1042,7 @@ assert SalaryParser.parse("Negotiable") == (None, None)
 
 ### 7.4 数据存储方案
 
-#### 5.4.1 MongoDB 存储（主存储）
+#### 7.4.1 MongoDB 存储（主存储）
 
 ```python
 from pymongo import MongoClient, IndexModel, ASCENDING
@@ -997,7 +1088,7 @@ class JobDatabase:
         return count
 ```
 
-#### 5.4.2 CSV 导出（辅助分析）
+#### 7.4.2 CSV 导出（辅助分析）
 
 ```python
 import pandas as pd
@@ -1010,6 +1101,45 @@ def export_to_csv(mongo_uri: str, output_path: str):
     df = pd.DataFrame(list(cursor))
     df.to_csv(output_path, index=False, encoding="utf-8-sig")
     logging.info("Exported %d records to %s", len(df), output_path)
+```
+
+#### 7.4.3 ChromaDB 向量存储（语义搜索）
+
+```python
+import chromadb
+from chromadb.config import Settings
+
+class VectorStore:
+    """ChromaDB 向量数据库管理器"""
+
+    def __init__(self, path: str = "data/chromadb", collection_name: str = "job_postings"):
+        self.client = chromadb.PersistentClient(
+            path=path,
+            settings=Settings(anonymized_telemetry=False),
+        )
+        self.collection = self.client.get_or_create_collection(
+            name=collection_name,
+            metadata={"hnsw:space": "cosine"},
+        )
+
+    def add_job(self, job_id: str, embedding: list[float], metadata: dict):
+        """插入岗位向量"""
+        self.collection.add(
+            ids=[job_id],
+            embeddings=[embedding],
+            metadatas=[metadata],
+        )
+
+    def search(self, query_embedding: list[float], top_k: int = 10) -> list[dict]:
+        """语义搜索：返回最相似的 top_k 条结果"""
+        results = self.collection.query(
+            query_embeddings=[query_embedding],
+            n_results=top_k,
+        )
+        return [
+            {"id": results["ids"][0][i], "score": results["distances"][0][i]}
+            for i in range(len(results["ids"][0]))
+        ]
 ```
 
 ---
@@ -1027,9 +1157,10 @@ def export_to_csv(mongo_uri: str, output_path: str):
                              │
               ┌──────────────┼──────────────┐
               ▼              ▼              ▼
-       ┌──────────┐  ┌──────────┐  ┌──────────┐
-       │ CSV 快照  │  │ JSON 备份 │  │ 向量嵌入  │
-       └──────────┘  └──────────┘  └──────────┘  (Phase 7 实现)
+       ┌──────────┐  ┌──────────┐  ┌────────────┐
+       │ CSV 快照  │  │ JSON 备份 │  │ ChromaDB   │
+       └──────────┘  └──────────┘  │ 向量数据库   │
+                                    └────────────┘
 ```
 
 | 存储层 | 用途 | 读写频率 | 数据格式 |
@@ -1037,11 +1168,11 @@ def export_to_csv(mongo_uri: str, output_path: str):
 | MongoDB | 主存储，支持查询与聚合 | 高频读写 | BSON 文档 |
 | CSV 快照 | 快速导出与数据分析 | 低频读 | CSV (UTF-8-SIG) |
 | JSON 备份 | 数据归档与版本管理 | 低频写 | JSON |
-| 向量嵌入 | 语义搜索（后续阶段） | 低频读 | Numpy/Pickle |
+| ChromaDB | 语义搜索与向量召回 | 低频读 | 向量 + JSON 元数据 |
 
 ### 7.6 索引策略
 
-#### 12.2.1 MongoDB 索引设计
+#### 7.6.1 MongoDB 索引设计
 
 ```json
 [
@@ -1053,7 +1184,7 @@ def export_to_csv(mongo_uri: str, output_path: str):
 ]
 ```
 
-#### 12.2.2 索引说明
+#### 7.6.2 索引说明
 
 | 索引 | 作用 | 优先级 |
 |------|------|--------|
@@ -1101,6 +1232,9 @@ class KnowledgeBase:
     def filter_by_location(self, locations: list[str]) -> list[dict]:
         """按地点筛选"""
 
+    def search_semantic(self, query: str, top_k: int = 10) -> list[dict]:
+        """语义搜索：基于 ChromaDB 向量召回，支持自然语言查询"""
+
     def aggregate_skill_frequency(self, top_n: int = 20) -> pd.Series:
         """技能出现频率统计"""
 
@@ -1117,21 +1251,23 @@ class KnowledgeBase:
 
 ### 8.1 总体策略
 
-考虑到香港招聘 JD 以英文为主且技术词密集的特点，本系统采用**双引擎并行架构**：
+考虑到香港招聘 JD 以英文为主且技术词密集的特点，本系统采用**三引擎并行架构**：
 
 ```
-                          ┌──────────────────────┐
-  清洗后 JD 文本 ────────→│   规则匹配引擎（高性能）│ ← 适用于已知技术栈批量处理
-                          ├──────────────────────┤
-                          │   LLM 智能引擎（高精度）│ ← 适用于深度理解与隐含技能发现
-                          └──────────────────────┘
+                          ┌──────────────────────────┐
+  清洗后 JD 文本 ────────→│   规则匹配引擎（高性能）    │ ← 适用于已知技术栈批量处理
+                          ├──────────────────────────┤
+                          │   LLM 智能引擎（高精度）    │ ← 适用于深度理解与隐含技能发现
+                          ├──────────────────────────┤
+                          │   岗位角色分类引擎（LLM）   │ ← 将岗位归类为 14 种技术角色
+                          └──────────────────────────┘
                                       │
-                          结构化技能标签 JSON
+                          结构化技能标签 JSON + 角色分类
 ```
 
 ### 8.2 方案 A：基于关键词词表的规则匹配引擎
 
-#### 6.2.1 技术词表设计
+#### 8.2.1 技术词表设计
 
 ```python
 # config/tech_dict.json
@@ -1165,7 +1301,7 @@ class KnowledgeBase:
 }
 ```
 
-#### 6.2.2 规则匹配引擎实现
+#### 8.2.2 规则匹配引擎实现
 
 ```python
 import re
@@ -1225,7 +1361,7 @@ class RuleBasedSkillExtractor:
         return flat
 ```
 
-#### 6.2.3 性能指标
+#### 8.2.3 性能指标
 
 | 指标 | 数值 |
 |------|------|
@@ -1237,14 +1373,14 @@ class RuleBasedSkillExtractor:
 
 ### 8.3 方案 B：基于大语言模型的智能提取引擎
 
-#### 6.3.1 适用场景
+#### 8.3.1 适用场景
 
 - JD 中包含隐含技能描述（如 "design scalable microservices"）
 - 需要区分 "熟悉"、"精通"、"了解" 等熟练度等级
 - 需要提取软技能（沟通能力、团队协作等）
 - 词表中未覆盖的新型技术栈
 
-#### 6.3.2 LLM 提取实现
+#### 8.3.2 LLM 提取实现
 
 ```python
 import json
@@ -1322,7 +1458,7 @@ Job Description:
 """
 ```
 
-#### 6.3.3 提取结果示例
+#### 8.3.3 提取结果示例
 
 ```json
 {
@@ -1360,7 +1496,7 @@ Job Description:
 
 ### 9.1 技术热度分析
 
-#### 7.1.1 技术热度统计
+#### 9.1.1 技术热度统计
 
 ```python
 import pandas as pd
@@ -1411,7 +1547,7 @@ class TechTrendAnalyzer:
         plt.show()
 ```
 
-#### 7.1.2 技术分类对比分析
+#### 9.1.2 技术分类对比分析
 
 ```python
 def plot_category_distribution(df: pd.DataFrame, save_path: str = None):
@@ -1445,7 +1581,7 @@ def plot_category_distribution(df: pd.DataFrame, save_path: str = None):
 
 ### 9.2 薪资与技术关联分析
 
-#### 7.2.1 薪资-技能箱线图
+#### 9.2.1 薪资-技能箱线图
 
 ```python
 def plot_salary_by_skill(df: pd.DataFrame, top_skills: int = 10):
@@ -1478,7 +1614,7 @@ def plot_salary_by_skill(df: pd.DataFrame, top_skills: int = 10):
     plt.show()
 ```
 
-#### 7.2.2 高薪技能排行榜
+#### 9.2.2 高薪技能排行榜
 
 ```python
 def top_high_paying_skills(df: pd.DataFrame, top_n: int = 15) -> pd.DataFrame:
@@ -1506,7 +1642,7 @@ def top_high_paying_skills(df: pd.DataFrame, top_n: int = 15) -> pd.DataFrame:
 
 ### 9.3 行业与区域分布分析
 
-#### 7.3.1 工作地点热力图
+#### 9.3.1 工作地点热力图
 
 ```python
 def plot_location_heatmap(df: pd.DataFrame):
@@ -1528,7 +1664,7 @@ def plot_location_heatmap(df: pd.DataFrame):
     plt.show()
 ```
 
-#### 7.3.2 交互式看板 (Streamlit)
+#### 9.3.2 交互式看板 (Streamlit)
 
 ```python
 # src/app.py
@@ -1567,7 +1703,7 @@ st.plotly_chart(fig2, use_container_width=True)
 
 v2.1 引入基于 LLM 的岗位智能归类引擎，自动分析岗位 JD 的工作内容，将其归类到标准职位角色体系中。归类结果聚合到仪表盘，为用户提供"哪些职位类型最热门、各类型薪资如何分布"等高层次洞察。
 
-#### 8.4.1 核心能力
+#### 9.4.1 核心能力
 
 | 能力 | 说明 | 优先级 |
 |------|------|--------|
@@ -1578,7 +1714,7 @@ v2.1 引入基于 LLM 的岗位智能归类引擎，自动分析岗位 JD 的工
 
 ### 9.5 岗位角色分类体系
 
-#### 8.5.1 角色类别设计
+#### 9.5.1 角色类别设计
 
 | 角色 ID | 角色名称 | 说明 | 关键词示例 |
 |---------|---------|------|-----------|
@@ -1599,7 +1735,7 @@ v2.1 引入基于 LLM 的岗位智能归类引擎，自动分析岗位 JD 的工
 
 ### 9.6 LLM 分类引擎
 
-#### 8.6.1 RoleClassifier 类设计
+#### 9.6.1 RoleClassifier 类设计
 
 ```python
 # src/analyzer/role_classifier.py（v2.1 新增）
@@ -1618,7 +1754,7 @@ class RoleClassifier:
 
 ### 9.7 仪表盘增强设计
 
-#### 8.7.1 新增统计指标
+#### 9.7.1 新增统计指标
 
 在原有 6 个统计卡片（岗位总数/公司数/平均月薪/技能数/数据来源/地区数）基础上新增：
 
@@ -1627,7 +1763,7 @@ class RoleClassifier:
 | **已归类岗位数** | 统计卡片 | 第一行第 7 个卡片 |
 | **归类覆盖率** | 统计卡片 | 第一行第 7 个卡片（百分比） |
 
-#### 8.7.2 新增图表
+#### 9.7.2 新增图表
 
 | 图表 | 类型 | 位置 | 说明 |
 |------|------|------|------|
@@ -1647,7 +1783,7 @@ class RoleClassifier:
 
 ### 9.9 前端架构
 
-#### 8.9.1 组件增强
+#### 9.9.1 组件增强
 
 在仪表盘页面新增 4 个图表组件：
 
@@ -1658,7 +1794,7 @@ class RoleClassifier:
 | `LLMAnalysisCard.vue` | LLM 分析状态卡片 |
 | `RoleSkillHeatmap.vue` | 角色-技能热力图 |
 
-#### 8.9.2 TypeScript 类型
+#### 9.9.2 TypeScript 类型
 
 ```typescript
 export interface RoleDistribution {
@@ -1770,7 +1906,7 @@ export interface RoleSkillHeatmap {
 
 ### 10.3 后端 API 网关设计
 
-#### 15.3.1 FastAPI 项目结构
+#### 10.3.1 FastAPI 项目结构
 
 ```
 api/
@@ -1793,7 +1929,7 @@ api/
 └── config.py                # API 专用配置
 ```
 
-#### 15.3.2 API 端点清单
+#### 10.3.2 API 端点清单
 
 | 方法 | 路径 | 说明 | 请求参数 | 响应 |
 |------|------|------|---------|------|
@@ -1813,7 +1949,7 @@ api/
 | GET | `/api/v1/system/config` | 获取系统配置 | — | `{crawler, llm, proxy}` |
 | PUT | `/api/v1/system/config` | 更新系统配置 | `{...}` | `{status}` |
 
-#### 15.3.3 CORS 与跨域配置
+#### 10.3.3 CORS 与跨域配置
 
 ```python
 # api/main.py（概念设计）
@@ -1839,7 +1975,7 @@ app.include_router(system_router, prefix="/api/v1/system")
 
 ### 10.4 页面与路由设计
 
-#### 15.4.1 路由表
+#### 10.4.1 路由表
 
 ```
 /                          → DashboardPage     (仪表盘总览)
@@ -1853,7 +1989,7 @@ app.include_router(system_router, prefix="/api/v1/system")
 /settings                  → SettingsPage       (系统设置)
 ```
 
-#### 15.4.2 页面布局结构
+#### 10.4.2 页面布局结构
 
 所有页面共享统一的布局骨架：
 
@@ -1876,7 +2012,7 @@ app.include_router(system_router, prefix="/api/v1/system")
 └─────────────────────────────────────────────────────┘
 ```
 
-#### 15.4.3 页面详细设计
+#### 10.4.3 页面详细设计
 
 | 页面 | 路由 | 核心组件 | 数据来源 |
 |------|------|---------|---------|
@@ -1961,7 +2097,7 @@ App.vue
 
 ### 10.6 数据流设计
 
-#### 15.6.1 全局状态管理 (Pinia Store)
+#### 10.6.1 全局状态管理 (Pinia Store)
 
 ```typescript
 // stores/global.ts（概念设计）
@@ -1994,7 +2130,7 @@ interface GlobalState {
 | `useKnowledgeStore` | 知识库数据管理 | `search()`, `deleteRecords()`, `fetchVersions()` |
 | `useSettingsStore` | 系统配置管理 | `fetchConfig()`, `updateConfig()` |
 
-#### 15.6.2 数据流场景
+#### 10.6.2 数据流场景
 
 **场景 A：页面加载渲染**
 
@@ -2039,7 +2175,7 @@ interface GlobalState {
   → 处理完成 → ProcessResultSummary 展示结果
 ```
 
-#### 15.6.3 缓存策略
+#### 10.6.3 缓存策略
 
 | 数据类型 | 缓存方式 | 过期策略 |
 |---------|---------|---------|
@@ -2051,7 +2187,7 @@ interface GlobalState {
 
 ### 10.7 与 Streamlit 共存与迁移策略
 
-#### 15.7.1 三阶段迁移计划
+#### 10.7.1 三阶段迁移计划
 
 ```
 第 1 阶段：Vue 独立开发，Streamlit 保留
@@ -2071,7 +2207,7 @@ interface GlobalState {
   - 统一前端构建与部署
 ```
 
-#### 15.7.2 端口规划
+#### 10.7.2 端口规划
 
 | 服务 | 端口 | 说明 |
 |------|------|------|
@@ -2080,7 +2216,7 @@ interface GlobalState {
 | Streamlit (过渡期) | 8501 | Streamlit 看板（第 1 阶段保留） |
 | Nginx (生产) | 80/443 | 统一反向代理 |
 
-#### 15.7.3 启动方式
+#### 10.7.3 启动方式
 
 ```bash
 # 开发环境
@@ -2222,7 +2358,7 @@ HK-JobMarket-Analyzer/
 
 前端显示规则要求：除技术框架名称（如 React、AWS、Python）保持英文外，所有 UI 文本均使用中文显示。
 
-#### 13.1.1 地点映射表
+#### 10.10.1 地点映射表
 
 香港常见招聘地点中英文映射（约 50+ 条）：
 
@@ -2281,7 +2417,7 @@ HK-JobMarket-Analyzer/
 }
 ```
 
-#### 13.1.2 技能类别映射表
+#### 10.10.2 技能类别映射表
 
 ```json
 // config/i18n/categories_zh.json
@@ -2432,7 +2568,7 @@ class Translator:
 
 ### 11.5 页面设计
 
-#### 14.5.1 页面结构
+#### 11.5.1 页面结构
 
 Streamlit 多页面应用结构：
 
@@ -2445,7 +2581,7 @@ src/
     └── 02_数据探索.py           ← 可选：知识库浏览与探索
 ```
 
-#### 14.5.2 知识库管理页面布局
+#### 11.5.2 知识库管理页面布局
 
 ```
 ┌─────────────────────────────────────────────────┐
@@ -2498,7 +2634,7 @@ src/
 └─────────────────────────────────────────────────┘
 ```
 
-#### 14.5.3 处理反馈设计
+#### 11.5.3 处理反馈设计
 
 实时展示处理进度与统计摘要：
 
@@ -2517,7 +2653,7 @@ src/
 
 ### 11.6 上传管道设计
 
-#### 14.6.1 Uploader 核心类
+#### 11.6.1 Uploader 核心类
 
 ```python
 # src/knowledge_base/uploader.py（概念设计）
@@ -2564,7 +2700,7 @@ class Uploader:
         """去重后入库，返回实际写入条数"""
 ```
 
-#### 14.6.2 与现有模块的集成
+#### 11.6.2 与现有模块的集成
 
 ```python
 # 上传管道中直接复用现有模块
@@ -2579,7 +2715,7 @@ from src.i18n.translator import Translator     # 中文化
 
 ### 11.7 数据管理功能
 
-#### 14.7.1 数据探索
+#### 11.7.1 数据探索
 
 | 功能 | 实现方式 |
 |------|---------|
@@ -2589,7 +2725,7 @@ from src.i18n.translator import Translator     # 中文化
 | 批量删除 | 多选记录后批量删除（软删除或物理删除） |
 | 单条编辑 | 点击展开行内编辑（后续迭代） |
 
-#### 14.7.2 数据统计面板
+#### 11.7.2 数据统计面板
 
 | 指标 | 计算方式 |
 |------|---------|
@@ -2600,7 +2736,7 @@ from src.i18n.translator import Translator     # 中文化
 | 地点分布 | `location` 分组计数 |
 | 数据时间趋势 | `crawled_at` 按天聚合 |
 
-#### 14.7.3 文件清单
+#### 11.7.3 文件清单
 
 | 文件 | 用途 | 状态 |
 |------|------|------|
@@ -2622,7 +2758,7 @@ from src.i18n.translator import Translator     # 中文化
 
 向量数据库为系统提供语义搜索能力，用户可以通过自然语言查询快速找到相关岗位。基于 ChromaDB 实现，Embedding 生成复用现有的 LLM API。
 
-#### 13.8.1 核心能力
+#### 11.8.1 核心能力
 
 | 能力 | 说明 | 优先级 |
 |------|------|--------|
@@ -2639,7 +2775,7 @@ from src.i18n.translator import Translator     # 中文化
 | 存储模式 | 持久化模式 | `PersistentClient`，数据持久化到磁盘 `data/chromadb/` |
 | 相似度算法 | 余弦相似度 | ChromaDB 默认算法，适合文本 Embedding 场景 |
 
-#### 13.9.1 配置项
+#### 11.9.1 配置项
 
 ```python
 # config/settings.py（v2.1 新增）
@@ -2655,7 +2791,7 @@ class Settings:
 
 ### 11.10 向量存储模块设计
 
-#### 13.10.1 模块结构
+#### 11.10.1 模块结构
 
 ```
 src/vector_store/          # v2.1 向量数据库模块
@@ -2666,7 +2802,7 @@ src/vector_store/          # v2.1 向量数据库模块
 └── searcher.py            # 语义搜索接口
 ```
 
-#### 13.10.2 客户端封装
+#### 11.10.2 客户端封装
 
 ```python
 # src/vector_store/client.py（v2.1 新增）
@@ -2721,7 +2857,7 @@ class VectorDBClient:
         }
 ```
 
-#### 13.10.3 Embedding 生成器
+#### 11.10.3 Embedding 生成器
 
 ```python
 # src/vector_store/embeddings.py（v2.1 新增）
@@ -2740,7 +2876,7 @@ class EmbeddingGenerator:
         return [self.embed(t) for t in texts]
 ```
 
-#### 13.10.4 索引管道
+#### 11.10.4 索引管道
 
 ```python
 # src/vector_store/indexer.py（v2.1 新增）
@@ -2758,7 +2894,7 @@ class VectorIndexer:
         pass
 ```
 
-#### 13.10.5 语义搜索接口
+#### 11.10.5 语义搜索接口
 
 ```python
 # src/vector_store/searcher.py（v2.1 新增）
@@ -2786,7 +2922,7 @@ class SemanticSearcher:
 
 ### 11.12 前端架构
 
-#### 13.12.1 设置页新增标签
+#### 11.12.1 设置页新增标签
 
 SettingsPage 新增"向量数据库"标签页，包含：
 - 连接状态展示（el-descriptions）
@@ -2794,7 +2930,7 @@ SettingsPage 新增"向量数据库"标签页，包含：
 - [重建索引] 按钮 + [刷新状态] 按钮
 - 操作日志输出框
 
-#### 13.12.2 TypeScript 类型
+#### 11.12.2 TypeScript 类型
 
 ```typescript
 export interface VectorStoreStatus {
@@ -2873,7 +3009,7 @@ export interface SemanticSearchResult {
 └────────────────────────────────────────┘
 ```
 
-#### 13.18.1 后端 API
+#### 11.18.1 后端 API
 
 | 方法 | 端点 | 功能 |
 |------|------|------|
@@ -2907,7 +3043,7 @@ class BatchImportResult(BaseModel):
 
 ### 11.19 批量导入（Excel 模板）
 
-#### 13.19.1 模板规范
+#### 11.19.1 模板规范
 
 | 规则 | 说明 |
 |------|------|
@@ -2917,7 +3053,7 @@ class BatchImportResult(BaseModel):
 | 最大大小 | ≤ 20 MB |
 | 必填列 | `jd_raw` |
 
-#### 13.19.2 导入流程
+#### 11.19.2 导入流程
 
 ```
 用户下载模板 → 填写数据 → 拖拽/选择文件上传
@@ -2934,7 +3070,7 @@ class BatchImportResult(BaseModel):
 
 ### 11.20 前端架构
 
-#### 13.20.1 组件树
+#### 11.20.1 组件树
 
 ```
 KnowledgeBasePage
@@ -2991,7 +3127,7 @@ class BatchImporter:
 
 爬虫仪表面板提供可视化的爬虫任务管理功能，支持关键词驱动爬取、多源并发调度、实时状态监控和历史任务管理。
 
-#### 14.1.1 核心能力
+#### 12.1.1 核心能力
 
 | 能力 | 说明 | 优先级 |
 |------|------|--------|
@@ -3027,7 +3163,7 @@ class BatchImporter:
 
 ### 12.3 后端架构
 
-#### 14.3.1 任务模型
+#### 12.3.1 任务模型
 
 ```python
 # api/schemas/crawler.py（v2.0 新增）
@@ -3069,7 +3205,7 @@ class CrawlResultItem(BaseModel):
     skills: Optional[list[str]] = None
 ```
 
-#### 14.3.2 任务管理器
+#### 12.3.2 任务管理器
 
 ```python
 # src/crawler_controller/task_manager.py（v2.0 新增）
@@ -3090,7 +3226,7 @@ class TaskManager:
         pass
 ```
 
-#### 14.3.3 异步调度器
+#### 12.3.3 异步调度器
 
 ```python
 # src/crawler_controller/scheduler.py（v2.0 新增）
@@ -3117,7 +3253,7 @@ class CrawlerScheduler:
 
 ### 12.5 前端架构
 
-#### 14.5.1 页面布局
+#### 12.5.1 页面布局
 
 ```
 ┌─────────────────────────────────────────────────────┐
@@ -3146,7 +3282,7 @@ class CrawlerScheduler:
 └─────────────────────────────────────────────────────┘
 ```
 
-#### 14.5.2 Pinia Store
+#### 12.5.2 Pinia Store
 
 ```typescript
 export const useCrawlerStore = defineStore('crawler', () => {
@@ -3165,7 +3301,7 @@ export const useCrawlerStore = defineStore('crawler', () => {
 })
 ```
 
-#### 14.5.3 组件树
+#### 12.5.3 组件树
 
 ```
 CrawlerDashboardPage
@@ -3286,7 +3422,7 @@ CrawlerDashboardPage
 
 ### 13.3 Phase 1 验收情况
 
-#### 11.3.1 代码规模
+#### 13.3.1 代码规模
 
 | 指标 | 数值 |
 |------|------|
@@ -3298,7 +3434,7 @@ CrawlerDashboardPage
 | Vue 前端文件 | 26 个（web/） |
 | API 端点 | 21 个（stats/jobs/upload/knowledge/system/llm） |
 
-#### 11.3.2 语法验证
+#### 13.3.2 语法验证
 
 所有 79 个 Python 源文件通过 `compile()` 语法检查，无语法错误。
 
@@ -3349,7 +3485,7 @@ CrawlerDashboardPage
 | 测试配置 | `tests/conftest.py`, `tests/__init__.py` | ✅ 通过 |
 | 单元测试 | `tests/test_cleaner.py`, `tests/test_rule_engine.py`, `tests/test_llm_engine.py`, `tests/test_hybrid.py`, `tests/test_i18n.py`, `tests/test_utils.py`, `tests/test_validator.py`, `tests/test_merger.py`, `tests/test_config_manager.py`, `tests/test_integration.py` | ✅ 通过 |
 
-#### 11.3.3 各里程碑验收标准对照
+#### 13.3.3 各里程碑验收标准对照
 
 | 里程碑 | 验收标准 | 完成情况 |
 |--------|---------|---------|
@@ -3367,7 +3503,7 @@ CrawlerDashboardPage
 | **M12 单元测试** | pytest 覆盖 9 个模块、78 项测试、CI 自动化 | ✅ 10 个测试文件覆盖 cleaner/rule_engine/llm_engine/hybrid/i18n/merger/utils/validator/config_manager，集成测试验证端到端管道 |
 | **M13 CI/CD** | GitHub Actions + Docker 容器化部署 | ✅ `.github/workflows/ci.yml` Python 3.10/3.11/3.12 矩阵构建 + flake8 lint + pytest + 语法检查；`Dockerfile` slim 镜像 + healthcheck；`docker-compose.yml` 卷持久化 |
 
-#### 11.3.4 已知限制
+#### 13.3.4 已知限制
 
 | 项目 | 说明 | 计划解决阶段 | 当前状态 |
 |------|------|------------|---------|
@@ -3382,7 +3518,7 @@ CrawlerDashboardPage
 | 无单元测试 | 尚未编写 pytest 测试用例 | Phase 3 (M12) | ⏳ 待开发 |
 | 无 CI/CD | 尚未配置 GitHub Actions | Phase 3 (M13) | ⏳ 待开发 |
 
-#### 11.3.5 Phase 2 验收情况
+#### 13.3.5 Phase 2 验收情况
 
 Phase 2（增强阶段）已完成 M6-M11 共 6 个里程碑的开发与功能验收，覆盖多源爬虫、LLM 引擎、前端中文化、知识库模块、上传管道、知识库管理页面六大模块。
 
@@ -3488,7 +3624,7 @@ cd web && npm install && npm run dev
 docker-compose up -d
 ```
 
-#### 11.3.6 运行方式
+#### 13.3.6 运行方式
 
 ```bash
 # 安装依赖
@@ -3506,7 +3642,7 @@ docker-compose up -d
 
 > **注意**：LLM 配置现已迁移至 Vue 前端 SettingsPage，不再依赖 Streamlit 面板。Streamlit 看板 (`streamlit run src/app.py`) 仍可作为数据可视化备选方案运行。
 
-#### 11.3.7 项目目录结构
+#### 13.3.7 项目目录结构
 
 ```
 HK-JobMarket-Analyzer/
@@ -3643,4 +3779,61 @@ HK-JobMarket-Analyzer/
 
 > 本系统仅提供技术实现方案。使用者应自行评估目标网站的服务条款（ToS）并承担相应法律责任。因不当使用本系统造成的任何法律纠纷或服务中断，由使用者自行承担。
 
+---
+
+## 附录
+
+### A. 项目目录结构
+
+```
+HK-JobMarket-Analyzer/
+├── config/                    # 配置文件
+│   ├── tech_dict.json         # 技术栈词表
+│   └── crawler_settings.json  # 爬虫配置
+├── src/                       # 源代码
+│   ├── __init__.py
+│   ├── crawler.py             # 爬虫核心模块
+│   ├── cleaner.py             # 数据清洗与薪资标准化
+│   ├── analyzer.py            # 规则 + LLM 文本挖掘
+│   ├── visualize.py           # 图表生成
+│   ├── app.py                 # Streamlit 可视化看板
+│   ├── database.py            # MongoDB 持久化管理
+│   └── utils.py               # 工具函数
+├── data/                      # 数据目录
+│   ├── raw/                   # 原始数据
+│   └── cleaned/               # 清洗后数据
+├── output/                    # 输出目录
+│   ├── charts/                # 图表文件
+│   └── reports/               # 分析报告
+├── tests/                     # 单元测试
+│   ├── test_crawler.py
+│   ├── test_cleaner.py
+│   └── test_analyzer.py
+├── .env.example               # 环境变量模板
+├── requirements.txt           # Python 依赖
+└── README.md                  # 项目说明
+```
+
+### B. 词表维护说明
+
+规则引擎的准确度高度依赖词表质量。建议定期维护：
+
+```bash
+# 从 LLM 分析结果中提取新词，补充到词表
+python scripts/update_dict.py \
+    --llm-output data/analysis/llm_results.json \
+    --dict-path config/tech_dict.json \
+    --min-frequency 3
+```
+
+### C. 参考资源
+
+- [JobsDB 官网](https://hk.jobsdb.com/)
+- [Indeed HK](https://hk.indeed.com/)
+- [SEEK Group API 文档](https://developer.seek.com/)
+- [Playwright 文档](https://playwright.dev/)
+- [spaCy NLP 文档](https://spacy.io/)
+- [香港《个人资料（隐私）条例》](https://www.pcpd.org.hk/)
+
+---
 ---
