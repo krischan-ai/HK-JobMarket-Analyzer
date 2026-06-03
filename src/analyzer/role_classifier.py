@@ -66,6 +66,7 @@ class RoleClassifier:
 
     def _make_cache_key(self, text: str) -> str:
         import hashlib
+        text = str(text) if text and str(text) != "nan" else ""
         return hashlib.md5(text[:500].encode("utf-8")).hexdigest()
 
     def classify(self, jd_text: str) -> RoleResult:
@@ -127,7 +128,7 @@ class RoleClassifier:
             "max_tokens": 256,
         }
         url = f"{self.api_base}/chat/completions"
-        resp = requests.post(url, headers=headers, json=payload, timeout=self.timeout)
+        resp = requests.post(url, headers=headers, json=payload, timeout=self.timeout, proxies={"http": None, "https": None})
         resp.raise_for_status()
         return resp.json()
 
@@ -178,6 +179,8 @@ class RoleClassifier:
             batch = jobs[i : i + batch_size]
             for job in batch:
                 text = job.get(text_field, "")
+                if not isinstance(text, str):
+                    text = str(text) if text and str(text) != "nan" else ""
                 result = self.classify(text)
                 job["role_id"] = result.role_id
                 job["role_name"] = result.role_name

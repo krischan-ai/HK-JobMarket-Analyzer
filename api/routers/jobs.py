@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Query
 from api.dependencies import load_jobs_df, load_skills_df
+from api.routers.stats import location_to_zh
 import pandas as pd
 import math
 
@@ -47,7 +48,7 @@ def list_jobs(
             "job_id": str(row.get("job_id", "")),
             "title": str(row.get("title", "")),
             "company": str(row.get("company", "")),
-            "location": str(row.get("location", "")),
+            "location": location_to_zh(str(row.get("location", ""))),
             "salary_min": float(row.get("salary_min", 0)) if pd.notna(row.get("salary_min")) else None,
             "salary_max": float(row.get("salary_max", 0)) if pd.notna(row.get("salary_max")) else None,
             "source": str(row.get("source", "")),
@@ -72,4 +73,5 @@ def list_locations():
         return []
     locs = df["location"].dropna().value_counts().reset_index()
     locs.columns = ["name", "count"]
+    locs["name"] = locs["name"].apply(location_to_zh)
     return locs.to_dict(orient="records")

@@ -8,13 +8,13 @@
       <el-col :span="12">
         <el-card>
           <template #header><strong>技術棧需求排行 Top 15</strong></template>
-          <SkillBarChart :data="store.dashboard?.top_skills || []" />
+          <SkillBarChart :data="store.dashboard?.top_skills || []" :loading="store.loading" />
         </el-card>
       </el-col>
       <el-col :span="12">
         <el-card>
           <template #header><strong>薪資分佈概覽</strong></template>
-          <SalaryBoxChart :data="store.dashboard?.salary_by_location || []" />
+          <SalaryBoxChart :data="store.dashboard?.salary_by_location || []" :loading="store.loading" />
         </el-card>
       </el-col>
     </el-row>
@@ -23,13 +23,13 @@
       <el-col :span="12">
         <el-card>
           <template #header><strong>數據來源佔比</strong></template>
-          <SourcePieChart :data="store.dashboard?.source_distribution || []" />
+          <SourcePieChart :data="store.dashboard?.source_distribution || []" :loading="store.loading" />
         </el-card>
       </el-col>
       <el-col :span="12">
         <el-card>
           <template #header><strong>技能類別分佈</strong></template>
-          <CategoryPieChart :data="store.dashboard?.category_distribution || []" />
+          <CategoryPieChart :data="store.dashboard?.category_distribution || []" :loading="store.loading" />
         </el-card>
       </el-col>
     </el-row>
@@ -97,14 +97,18 @@ const statCards = computed(() => {
 })
 
 async function handleRunClassification() {
-  const result = await statsStore.runClassification()
-  if (result) {
-    ElMessage.success(result.message)
-    await Promise.all([
-      statsStore.fetchRoleDistribution(),
-      statsStore.fetchRoleSalary(),
-      statsStore.fetchLLMStatus(),
-    ])
+  try {
+    const result = await statsStore.runClassification()
+    if (result) {
+      ElMessage.success(result.message)
+      await Promise.all([
+        statsStore.fetchRoleDistribution(),
+        statsStore.fetchRoleSalary(),
+        statsStore.fetchLLMStatus(),
+      ])
+    }
+  } catch {
+    ElMessage.warning('分類請求失敗，請先在設置頁面配置 LLM')
   }
 }
 </script>

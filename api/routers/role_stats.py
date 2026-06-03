@@ -109,7 +109,7 @@ def run_classification(req: RunClassificationRequest = RunClassificationRequest(
 
     classifier = _get_classifier()
     if not classifier.available:
-        raise HTTPException(status_code=400, detail="LLM not configured")
+        logger.info("LLM not available, using rule-based fallback classification")
 
     if req.mode == "full":
         classifier.clear_cache()

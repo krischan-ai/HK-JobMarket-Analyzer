@@ -17,9 +17,9 @@ class IndeedCrawler(BaseCrawler, PlaywrightMixin):
 
     BASE_URL = "https://hk.indeed.com/jobs"
 
-    def __init__(self, headless: bool = True):
+    def __init__(self, headless: bool = True, proxy_server: str = None):
         BaseCrawler.__init__(self)
-        PlaywrightMixin.__init__(self, headless=headless)
+        PlaywrightMixin.__init__(self, headless=headless, proxy_server=proxy_server, timeout=60000)
         self.logger = get_logger(self.__class__.__name__)
 
     def fetch_page(self, keyword: str, page: int = 1) -> Optional[list[dict]]:
@@ -36,7 +36,7 @@ class IndeedCrawler(BaseCrawler, PlaywrightMixin):
         try:
             start = (page - 1) * 10
             url = f"{self.BASE_URL}?q={keyword}&l=Hong+Kong&start={start}"
-            success = await self._navigate(url, wait_selector="#mosaic-jobResults", wait_ms=4000)
+            success = await self._navigate(url, wait_selector="#mosaic-jobResults", wait_ms=5000, wait_until="domcontentloaded")
             if not success:
                 return None
 

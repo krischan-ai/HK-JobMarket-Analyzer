@@ -17,9 +17,9 @@ class HKSTPCrawler(BaseCrawler, PlaywrightMixin):
 
     BASE_URL = "https://www.hkstp.org/job-vacancy/"
 
-    def __init__(self, headless: bool = True):
+    def __init__(self, headless: bool = True, proxy_server: str = None):
         BaseCrawler.__init__(self)
-        PlaywrightMixin.__init__(self, headless=headless)
+        PlaywrightMixin.__init__(self, headless=headless, proxy_server=proxy_server, timeout=60000)
         self.logger = get_logger(self.__class__.__name__)
 
     def fetch_page(self, keyword: str, page: int = 1) -> Optional[list[dict]]:

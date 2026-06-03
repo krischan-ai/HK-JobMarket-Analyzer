@@ -25,9 +25,9 @@
         </div>
       </el-col>
     </el-row>
-    <div style="margin-top: 16px; text-align: center" v-if="status.llm_available">
+    <div style="margin-top: 16px; text-align: center">
       <el-button type="primary" size="small" :loading="classifying" @click="$emit('run')">
-        {{ classifying ? '分類中...' : '執行分類' }}
+        {{ classifying ? '分類中...' : (status.llm_available ? 'LLM 分類' : '規則分類') }}
       </el-button>
     </div>
   </el-card>

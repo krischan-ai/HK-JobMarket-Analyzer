@@ -67,7 +67,7 @@ class LLMExtractor:
             "max_tokens": 1024,
         }
         url = f"{self.api_base}/chat/completions"
-        resp = requests.post(url, headers=headers, json=payload, timeout=self.timeout)
+        resp = requests.post(url, headers=headers, json=payload, timeout=self.timeout, proxies={"http": None, "https": None})
         resp.raise_for_status()
         return resp.json()
 

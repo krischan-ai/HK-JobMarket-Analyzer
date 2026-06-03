@@ -97,7 +97,7 @@ class LLMConfigManager:
                 "max_tokens": 10,
             }
             url = f"{kwargs['api_base'].rstrip('/')}/chat/completions"
-            resp = requests.post(url, headers=headers, json=payload, timeout=timeout)
+            resp = requests.post(url, headers=headers, json=payload, timeout=timeout, proxies={"http": None, "https": None})
             resp.raise_for_status()
             return True, f"连接成功！模型: {kwargs['model']}"
         except ImportError:

@@ -1,5 +1,6 @@
 <template>
   <v-chart :option="option" autoresize :style="{ height: height + 'px' }" v-if="option" />
+  <el-empty description="暫無數據" :image-size="60" v-else-if="!loading" />
   <el-skeleton :rows="6" animated v-else />
 </template>
 
@@ -15,8 +16,10 @@ interface SourceItem {
 const props = withDefaults(defineProps<{
   data: SourceItem[]
   height?: number
+  loading?: boolean
 }>(), {
   height: 350,
+  loading: true,
 })
 
 const option = computed(() => {

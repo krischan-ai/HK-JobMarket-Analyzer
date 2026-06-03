@@ -1,5 +1,6 @@
 <template>
   <v-chart :option="option" autoresize :style="{ height: height + 'px' }" v-if="option" />
+  <el-empty description="暫無數據" :image-size="60" v-else-if="!loading" />
   <el-skeleton :rows="6" animated v-else />
 </template>
 
@@ -10,15 +11,17 @@ import VChart from 'vue-echarts'
 interface SalaryItem {
   location: string
   min: number
-  avg: number
   max: number
+  avg: number
 }
 
 const props = withDefaults(defineProps<{
   data: SalaryItem[]
   height?: number
+  loading?: boolean
 }>(), {
   height: 400,
+  loading: true,
 })
 
 const option = computed(() => {

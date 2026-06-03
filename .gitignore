@@ -33,6 +33,15 @@ Thumbs.db
 # Data
 data/raw/
 data/cleaned/
+data/auth/
+
+# Cookies / Auth tokens
+indeed_auth.json
+data/role_cache.json
+
+# Debug scripts
+scripts/_debug_*.py
+scripts/_test_*.py
 
 # Output
 output/

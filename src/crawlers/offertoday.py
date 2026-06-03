@@ -25,8 +25,11 @@ class OfferTodayCrawler(BaseCrawler):
         "Accept": "application/json",
     }
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, proxy_server: str = None):
+        proxy_config = None
+        if proxy_server:
+            proxy_config = {"http": proxy_server, "https": proxy_server}
+        super().__init__(proxy_config=proxy_config)
         self.session.headers.update(self.HEADERS)
         self.delay_controller = AdaptiveDelayController(delay_min=2, delay_max=4)
 

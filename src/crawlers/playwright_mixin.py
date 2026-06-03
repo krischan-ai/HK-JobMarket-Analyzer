@@ -10,10 +10,11 @@ from src.logger import get_logger
 class PlaywrightMixin:
     """为爬虫提供 Playwright 动态渲染能力的 Mixin 类"""
 
-    def __init__(self, headless: bool = True, timeout: int = 30000):
+    def __init__(self, headless: bool = True, timeout: int = 30000, proxy_server: str = None):
         self.logger = get_logger(self.__class__.__name__)
         self.headless = headless
         self.timeout = timeout
+        self.proxy_server = proxy_server
         self._browser = None
         self._page = None
         self._playwright = None
@@ -22,13 +23,17 @@ class PlaywrightMixin:
         try:
             from playwright.async_api import async_playwright
             self._playwright = await async_playwright().start()
+            launch_args = [
+                "--no-sandbox",
+                "--disable-blink-features=AutomationControlled",
+                "--disable-dev-shm-usage",
+            ]
+            if self.proxy_server:
+                launch_args.append(f"--proxy-server={self.proxy_server}")
+                self.logger.info("Playwright using proxy: %s", self.proxy_server)
             self._browser = await self._playwright.chromium.launch(
                 headless=self.headless,
-                args=[
-                    "--no-sandbox",
-                    "--disable-blink-features=AutomationControlled",
-                    "--disable-dev-shm-usage",
-                ],
+                args=launch_args,
             )
             context = await self._browser.new_context(
                 viewport={"width": 1920, "height": 1080},
@@ -48,11 +53,11 @@ class PlaywrightMixin:
             self.logger.error("Failed to start browser: %s", e)
             raise
 
-    async def _navigate(self, url: str, wait_selector: str = None, wait_ms: int = 3000) -> bool:
+    async def _navigate(self, url: str, wait_selector: str = None, wait_ms: int = 3000, wait_until: str = "networkidle") -> bool:
         if not self._page:
             return False
         try:
-            await self._page.goto(url, wait_until="networkidle", timeout=self.timeout)
+            await self._page.goto(url, wait_until=wait_until, timeout=self.timeout)
             await self._page.wait_for_timeout(wait_ms)
             if wait_selector:
                 await self._page.wait_for_selector(wait_selector, timeout=self.timeout)

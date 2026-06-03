@@ -1,8 +1,50 @@
 from fastapi import APIRouter, Query
 from api.dependencies import load_jobs_df, load_skills_df
 import json
+from pathlib import Path
 
 router = APIRouter(prefix="/api/stats", tags=["stats"])
+
+# 加载地点中文翻译
+_ZH_LOCATION_MAP: dict[str, str] | None = None
+
+def _get_zh_location_map() -> dict[str, str]:
+    global _ZH_LOCATION_MAP
+    if _ZH_LOCATION_MAP is not None:
+        return _ZH_LOCATION_MAP
+    path = Path(__file__).resolve().parent.parent.parent / "config" / "i18n" / "locations_zh.json"
+    if path.exists():
+        with open(path, encoding="utf-8") as f:
+            _ZH_LOCATION_MAP = json.load(f)
+    else:
+        _ZH_LOCATION_MAP = {}
+    return _ZH_LOCATION_MAP
+
+
+def location_to_zh(en: str) -> str:
+    """将英文地点名称翻译为中文"""
+    if not en or not isinstance(en, str):
+        return en or "Hong Kong"
+    loc = en.strip()
+    loc_lower = loc.lower()
+    zh_map = _get_zh_location_map()
+    if loc_lower in {k.lower(): v for k, v in zh_map.items()}:
+        return {k.lower(): v for k, v in zh_map.items()}[loc_lower]
+    if loc_lower == "remote":
+        return "遠端工作"
+    area_map = {
+        "kowloon": "九龍",
+        "hong kong island": "香港島",
+        "new territories": "新界",
+        "hong kong": "香港",
+    }
+    for suffix, area_zh in area_map.items():
+        if loc_lower.endswith(f", {suffix}"):
+            core = loc[:-(len(suffix) + 2)].strip()
+            core_lower = core.lower()
+            core_translated = {k.lower(): v for k, v in zh_map.items()}.get(core_lower, core)
+            return f"{core_translated}, {area_zh}"
+    return loc
 
 
 @router.get("/overview")
@@ -66,6 +108,7 @@ def salary_by_location():
     g = g.reset_index()
     g.columns = ["location", "min", "max", "avg", "count"]
     g["avg"] = g["avg"].round(0)
+    g["location"] = g["location"].apply(location_to_zh)
     return g.to_dict(orient="records")
 
 
@@ -86,6 +129,7 @@ def location_distribution():
         return []
     freq = df["location"].value_counts().head(30).reset_index()
     freq.columns = ["location", "count"]
+    freq["location"] = freq["location"].apply(location_to_zh)
     return freq.to_dict(orient="records")
 
 
