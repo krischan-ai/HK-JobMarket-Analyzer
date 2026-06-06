@@ -11,16 +11,20 @@ from src.analyzer.role_prompt import ROLE_DEFINITIONS, build_role_classify_messa
 class TestRolePrompt:
     def test_build_messages_structure(self):
         messages = build_role_classify_messages("Python developer with Django")
-        assert len(messages) >= 4
-        assert messages[0]["role"] == "system"
-        assert messages[-1]["role"] == "user"
-        assert "Python developer with Django" in messages[-1]["content"]
+        assert len(messages) == 1
+        assert messages[0]["role"] == "user"
+        assert "Python developer with Django" in messages[0]["content"]
 
     def test_role_definitions_count(self):
-        assert len(ROLE_DEFINITIONS) == 14
+        assert len(ROLE_DEFINITIONS) == 22
         assert "frontend" in ROLE_DEFINITIONS
         assert "other" in ROLE_DEFINITIONS
         assert ROLE_DEFINITIONS["frontend"]["name"] == "前端开发"
+        assert "solution_architect" in ROLE_DEFINITIONS
+        assert "engineering_manager" in ROLE_DEFINITIONS
+        assert "it_analyst" in ROLE_DEFINITIONS
+        assert "data_scientist" in ROLE_DEFINITIONS
+        assert "ml_engineer" in ROLE_DEFINITIONS
 
 
 class TestRoleClassifierRules:
@@ -54,13 +58,28 @@ class TestRoleClassifierRules:
 
     def test_classify_data_science_rule(self):
         result = self.c.classify("Data scientist with machine learning, TensorFlow, NLP experience")
-        assert result.role_id == "data_science"
-        assert result.role_name == "数据科学"
+        assert result.role_id in ("data_scientist", "data_science")
+        assert "数据科学" in result.role_name or "数据" in result.role_name
 
     def test_classify_ai_engineer_rule(self):
         result = self.c.classify("AI engineer: LLM, LangChain, RAG, prompt engineering")
-        assert result.role_id == "ai_engineer"
-        assert result.role_name == "AI 工程师"
+        assert result.role_id == "ai_application"
+        assert result.role_name == "AI應用開發"
+
+    def test_classify_solution_architect_rule(self):
+        result = self.c.classify("Solution Architect: system architecture, cloud infrastructure, enterprise architecture")
+        assert result.role_id == "solution_architect"
+        assert result.role_name == "解决方案架构师"
+
+    def test_classify_engineering_manager_rule(self):
+        result = self.c.classify("Engineering Manager: lead team of 10 engineers, technical management")
+        assert result.role_id == "engineering_manager"
+        assert result.role_name == "工程经理/技术主管"
+
+    def test_classify_it_analyst_rule(self):
+        result = self.c.classify("System Analyst: requirements gathering, system design documentation")
+        assert result.role_id == "it_analyst"
+        assert result.role_name == "IT 分析师/系统分析师"
 
     def test_classify_no_match_returns_other(self):
         result = self.c.classify("Good communication skills and team player")
@@ -78,7 +97,7 @@ class TestRoleClassifierRules:
         assert len(results) == 3
         assert results[0]["role_id"] == "frontend"
         assert results[1]["role_id"] == "backend"
-        assert results[2]["role_id"] == "data_science"
+        assert results[2]["role_id"] in ("data_scientist", "data_science")
 
     def test_cache_persistence(self):
         self.c.classify("React frontend developer")

@@ -39,6 +39,11 @@
         <el-table-column label="月薪" width="150">
           <template #default="{ row }">{{ row.salary_min ? `HK$${row.salary_min.toLocaleString()}` : '-' }}</template>
         </el-table-column>
+        <el-table-column label="數據時間" width="150">
+          <template #default="{ row }">
+            <span style="color: #909399">{{ row.import_time || '-' }}</span>
+          </template>
+        </el-table-column>
       </DataTable>
     </el-card>
   </div>

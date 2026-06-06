@@ -122,6 +122,96 @@ uvicorn api.main:app --reload --port 8000
 cd web && npm run dev</pre>
         </el-card>
       </el-tab-pane>
+
+      <el-tab-pane label="定時任務" name="scheduler">
+        <el-card>
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px">
+            <span><el-icon><Timer /></el-icon> 定時爬取任務</span>
+            <el-button type="primary" size="small" @click="showSchedulerForm = true" style="margin-left: auto">
+              新增任務
+            </el-button>
+          </div>
+
+          <!-- 新增/編輯表單 -->
+          <el-dialog v-model="showSchedulerForm" :title="editingJob ? '編輯任務' : '新增定時任務'" width="500px">
+            <el-form :model="schedulerForm" label-width="100px">
+              <el-form-item label="任務名稱">
+                <el-input v-model="schedulerForm.name" placeholder="例如：每週一爬取" />
+              </el-form-item>
+              <el-form-item label="關鍵詞">
+                <el-select-v2
+                  v-model="schedulerForm.keywords"
+                  multiple
+                  filterable
+                  allow-create
+                  default-first-option
+                  placeholder="輸入關鍵詞"
+                  style="width: 100%"
+                  :options="[]"
+                />
+              </el-form-item>
+              <el-form-item label="數據源">
+                <el-checkbox-group v-model="schedulerForm.sources">
+                  <el-checkbox value="jobsdb" label="JobsDB" />
+                  <el-checkbox value="jijis" label="JIJIS" />
+                  <el-checkbox value="offertoday" label="OfferToday" />
+                  <el-checkbox value="indeed" label="Indeed" />
+                </el-checkbox-group>
+              </el-form-item>
+              <el-form-item label="Cron 表達式">
+                <el-input v-model="schedulerForm.cron" placeholder="0 6 * * 1 (每週一 6:00)" />
+                <div style="font-size: 12px; color: #909399; margin-top: 4px">
+                  格式：分 時 日 月 週。每週一 6:00 = 0 6 * * 1
+                </div>
+              </el-form-item>
+              <el-form-item label="啟用">
+                <el-switch v-model="schedulerForm.enabled" />
+              </el-form-item>
+            </el-form>
+            <template #footer>
+              <el-button @click="showSchedulerForm = false">取消</el-button>
+              <el-button type="primary" @click="saveSchedulerJob" :loading="savingJob">
+                {{ editingJob ? '更新' : '新增' }}
+              </el-button>
+            </template>
+          </el-dialog>
+
+          <!-- 任務列表 -->
+          <el-table :data="cronJobs" stripe empty-text="暫無定時任務">
+            <el-table-column prop="name" label="名稱" min-width="140" />
+            <el-table-column label="關鍵詞" min-width="160">
+              <template #default="{ row }">
+                <el-tag v-for="kw in row.keywords" :key="kw" size="small" style="margin: 1px 2px">{{ kw }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="來源" width="160">
+              <template #default="{ row }">
+                <el-tag v-for="s in row.sources" :key="s" size="small" type="info" style="margin: 1px 2px">{{ s }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="cron" label="Cron" width="110" />
+            <el-table-column label="狀態" width="80">
+              <template #default="{ row }">
+                <el-tag :type="row.enabled ? 'success' : 'info'" size="small">{{ row.enabled ? '啟用' : '停用' }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="上次執行" width="170">
+              <template #default="{ row }">{{ row.last_run ? row.last_run.slice(0, 19) : '-' }}</template>
+            </el-table-column>
+            <el-table-column label="操作" width="150" fixed="right">
+              <template #default="{ row }">
+                <el-button link type="primary" size="small" @click="editJob(row)">編輯</el-button>
+                <el-button link size="small" @click="runJobNow(row.id)">立即執行</el-button>
+                <el-popconfirm title="確認刪除?" @confirm="deleteJob(row.id)">
+                  <template #reference>
+                    <el-button link type="danger" size="small">刪除</el-button>
+                  </template>
+                </el-popconfirm>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-card>
+      </el-tab-pane>
     </el-tabs>
   </div>
 </template>
@@ -154,7 +244,7 @@ const quickStartData = [
 ]
 
 onMounted(async () => {
-  await Promise.all([systemStore.checkHealth(), llmStore.fetchStatus()])
+  await Promise.all([systemStore.checkHealth(), llmStore.fetchStatus(), fetchCronJobs()])
   if (llmStore.configured) {
     form.base_url = llmStore.baseUrl
     form.model = llmStore.model
@@ -183,5 +273,98 @@ async function handleClear() {
   form.api_key = ''
   formDirty.value = true
   ElMessage.success('LLM 配置已清除')
+}
+
+// ── Scheduler ──
+import api from '@/api'
+import { Timer } from '@element-plus/icons-vue'
+
+interface CronJobDTO {
+  id: string
+  name: string
+  keywords: string[]
+  sources: string[]
+  cron: string
+  enabled: boolean
+  last_run: string | null
+  created_at: string
+}
+
+const cronJobs = ref<CronJobDTO[]>([])
+const showSchedulerForm = ref(false)
+const savingJob = ref(false)
+const editingJob = ref<CronJobDTO | null>(null)
+
+const schedulerForm = reactive({
+  name: '',
+  keywords: [] as string[],
+  sources: [] as string[],
+  cron: '0 6 * * 1',
+  enabled: true,
+})
+
+async function fetchCronJobs() {
+  try {
+    const { data } = await api.get('/scheduler/jobs')
+    cronJobs.value = data
+  } catch { /* ignore */ }
+}
+
+function editJob(job: CronJobDTO) {
+  editingJob.value = job
+  schedulerForm.name = job.name
+  schedulerForm.keywords = [...job.keywords]
+  schedulerForm.sources = [...job.sources]
+  schedulerForm.cron = job.cron
+  schedulerForm.enabled = job.enabled
+  showSchedulerForm.value = true
+}
+
+function resetSchedulerForm() {
+  editingJob.value = null
+  schedulerForm.name = ''
+  schedulerForm.keywords = []
+  schedulerForm.sources = []
+  schedulerForm.cron = '0 6 * * 1'
+  schedulerForm.enabled = true
+}
+
+async function saveSchedulerJob() {
+  if (!schedulerForm.name || !schedulerForm.keywords.length || !schedulerForm.sources.length) return
+  savingJob.value = true
+  try {
+    if (editingJob.value) {
+      await api.put(`/scheduler/jobs/${editingJob.value.id}`, schedulerForm)
+    } else {
+      await api.post('/scheduler/jobs', schedulerForm)
+    }
+    showSchedulerForm.value = false
+    resetSchedulerForm()
+    await fetchCronJobs()
+    ElMessage.success(editingJob.value ? '任務已更新' : '任務已創建')
+  } catch {
+    ElMessage.error('操作失敗')
+  } finally {
+    savingJob.value = false
+  }
+}
+
+async function deleteJob(jobId: string) {
+  try {
+    await api.delete(`/scheduler/jobs/${jobId}`)
+    await fetchCronJobs()
+    ElMessage.success('任務已刪除')
+  } catch {
+    ElMessage.error('刪除失敗')
+  }
+}
+
+async function runJobNow(jobId: string) {
+  try {
+    const { data } = await api.post(`/scheduler/jobs/${jobId}/run`)
+    ElMessage.success(`任務已觸發，任務 ID: ${data.task_id}`)
+  } catch {
+    ElMessage.error('執行失敗')
+  }
 }
 </script>

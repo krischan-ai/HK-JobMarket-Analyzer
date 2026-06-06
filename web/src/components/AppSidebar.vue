@@ -21,6 +21,10 @@
       <el-icon><Location /></el-icon>
       <span>區域分佈</span>
     </el-menu-item>
+    <el-menu-item index="/role-classify">
+      <el-icon><Aim /></el-icon>
+      <span>角色分類</span>
+    </el-menu-item>
     <el-menu-item-group title="知識庫">
       <el-menu-item index="/knowledge">
         <el-icon><Collection /></el-icon>
@@ -35,14 +39,20 @@
         <span>數據管理</span>
       </el-menu-item>
     </el-menu-item-group>
-    <el-menu-item index="/explore">
-      <el-icon><Search /></el-icon>
-      <span>數據探索</span>
-    </el-menu-item>
-    <el-menu-item index="/settings">
-      <el-icon><Setting /></el-icon>
-      <span>系統設置</span>
-    </el-menu-item>
+    <el-menu-item-group title="系統工具">
+      <el-menu-item index="/crawler">
+        <el-icon><Monitor /></el-icon>
+        <span>爬蟲控制台</span>
+      </el-menu-item>
+      <el-menu-item index="/explore">
+        <el-icon><Search /></el-icon>
+        <span>數據探索</span>
+      </el-menu-item>
+      <el-menu-item index="/settings">
+        <el-icon><Setting /></el-icon>
+        <span>系統設置</span>
+      </el-menu-item>
+    </el-menu-item-group>
   </el-menu>
 </template>
 

@@ -5,6 +5,27 @@ import warnings
 
 from bs4 import BeautifulSoup, MarkupResemblesLocatorWarning
 
+from src.logger import get_logger
+
+_logger = get_logger(__name__)
+
+# spaCy 懒加载（可选增强）
+_nlp = None
+
+
+def _get_nlp():
+    global _nlp
+    if _nlp is not None:
+        return _nlp
+    try:
+        import spacy
+        _nlp = spacy.load("en_core_web_sm")
+        _logger.info("spaCy en_core_web_sm loaded")
+    except Exception:
+        _nlp = False
+        _logger.info("spaCy not available, skipping NLP features")
+    return _nlp if _nlp is not False else None
+
 
 class JDTextCleaner:
     """JD 文本清洗器，按管道顺序执行多步清洗"""
@@ -54,3 +75,16 @@ class JDTextCleaner:
         text = self.remove_special_chars(text)
         text = self.normalize_whitespace(text)
         return text
+
+    @staticmethod
+    def extract_entities(text: str) -> list[dict]:
+        """抽取命名實體（組織、地點、技能），依賴 spaCy"""
+        nlp = _get_nlp()
+        if nlp is None:
+            return []
+        doc = nlp(text[:100000])
+        entities = []
+        for ent in doc.ents:
+            if ent.label_ in ("ORG", "GPE", "LOC", "PRODUCT", "TECH"):
+                entities.append({"text": ent.text, "label": ent.label_})
+        return entities

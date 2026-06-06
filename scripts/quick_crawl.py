@@ -19,10 +19,28 @@ PROXY = "http://127.0.0.1:10808"
 PROXIES = {"http": PROXY, "https": PROXY}
 
 KEYWORDS = [
-    "software-engineer", "data-scientist", "frontend-developer",
-    "backend-developer", "devops", "full-stack",
-    "AI-engineer", "mobile-developer", "data-engineer",
-    "cybersecurity", "cloud-engineer",
+    # 软件开发
+    "software-engineer", "frontend-developer",
+    "backend-developer", "full-stack",
+    "mobile-developer", "web-developer",
+    "java-developer", "python-developer",
+    # AI / 数据
+    "AI-engineer", "data-scientist",
+    "machine-learning", "data-engineer",
+    "data-analyst", "ML-engineer",
+    "LLM", "generative-AI",
+    # 架构
+    "solution-architect", "system-architect",
+    "cloud-architect", "enterprise-architect",
+    # DevOps / 基础设施
+    "devops", "cloud-engineer",
+    "SRE", "platform-engineer",
+    # 其他 IT
+    "cybersecurity", "qa-engineer",
+    "product-manager", "ui-ux-designer",
+    "blockchain-developer",
+    "engineering-manager",
+    "system-analyst", "business-analyst",
 ]
 
 MAX_PAGES = 5

@@ -24,25 +24,56 @@ EXCLUDE_PATTERN = re.compile(
 )
 
 def is_it_job(title):
+    """判断岗位标题是否属于 IT/技术类（覆盖全部 22 种角色）"""
     if not title:
         return False
     title_lower = title.lower()
     if EXCLUDE_PATTERN.search(title_lower):
         return False
-    ai_keywords = [
+    it_keywords = [
+        # AI / 前沿技术
         "ai", "ml", "llm", "nlp", "rag", "langchain", "gpt",
         "chatgpt", "openai", "deepseek", "generative",
         "machine learning", "deep learning", "neural network",
         "artificial intelligence", "computer vision",
-        "prompt", "large language model", "fine-tuning",
+        "prompt", "large language model", "fine-tuning", "pretrain",
+        "genai", "llama", "transformer", "diffusion",
+        "multi-modal", "multimodal", "world model", "embodied",
+        # 数据类
         "data scien", "data analy", "data engineer",
-        "software engineer", "developer", "programmer",
-        "frontend", "backend", "fullstack", "full stack",
-        "devops", "cloud", "backend", "front end",
-        "data engineer", "data architect",
-        "system", "architect",
+        "data architect", "data infrastructure",
+        "ml engineer", "mlops", "data pipeline", "etl",
+        # 软件开发
+        "software engineer", "software developer",
+        "developer", "programmer", "analyst programmer",
+        "frontend", "front-end", "front end",
+        "backend", "back-end", "back end",
+        "fullstack", "full stack", "full-stack",
+        "web developer", "web programmer",
+        "mobile developer", "ios developer", "android developer",
+        # 架构
+        "architect", "system architect", "solution architect",
+        "cloud architect", "enterprise architect",
+        # 工程管理
+        "engineering manager", "tech lead", "technical lead",
+        "team lead", "development manager",
+        # 分析师
+        "system analyst", "business analyst", "it analyst",
+        # DevOps / 基础设施
+        "devops", "sre", "cloud engineer", "platform engineer",
+        "kubernetes", "docker", "ci/cd", "infrastructure",
+        # 质量 / 安全
+        "qa engineer", "test automation", "quality assurance",
+        "tester", "cybersecurity", "security engineer",
+        "devsecops", "information security",
+        # 产品 / 设计
+        "product manager", "product owner", "scrum master",
+        "ui designer", "ux designer", "product designer",
+        "figma", "ui/ux",
+        # 区块链
+        "blockchain", "web3", "solidity", "smart contract",
     ]
-    return any(kw in title_lower for kw in ai_keywords)
+    return any(kw in title_lower for kw in it_keywords)
 
 
 async def check_cloudflare(page):
@@ -174,13 +205,38 @@ async def main():
     from playwright.async_api import async_playwright
 
     IT_KEYWORDS = [
+        # AI / ML / LLM
         "AI engineer", "machine learning", "deep learning",
         "large language model", "LLM", "NLP engineer",
         "computer vision", "AI developer", "ML engineer",
         "data scientist", "AI researcher",
         "LangChain", "RAG", "generative AI",
         "prompt engineer", "AI architect",
-        "artificial intelligence",
+        "artificial intelligence", "AI agent",
+        # 数据类
+        "data scientist", "data analyst", "data engineer",
+        "data architect", "MLOps",
+        # 软件开发
+        "software engineer", "frontend developer",
+        "backend developer", "full stack developer",
+        "mobile developer", "web developer",
+        "Java developer", "Python developer",
+        # 架构
+        "solution architect", "system architect",
+        "cloud architect", "enterprise architect",
+        # 工程管理
+        "engineering manager", "tech lead",
+        # 分析师
+        "system analyst", "business analyst",
+        # DevOps / 基础设施
+        "DevOps engineer", "cloud engineer", "SRE",
+        "platform engineer",
+        # 质量 / 安全
+        "QA engineer", "test automation",
+        "cybersecurity", "security engineer",
+        # 产品 / 设计 / 区块链
+        "product manager", "UI UX designer",
+        "blockchain developer", "Web3",
     ]
 
     print("=" * 60)
@@ -262,7 +318,7 @@ async def main():
             unique.append(j)
 
     print(f"\n{'=' * 60}")
-    print(f"Total: {len(all_jobs)} raw -> {len(unique)} unique AI/LLM jobs")
+    print(f"Total: {len(all_jobs)} raw -> {len(unique)} unique IT/tech jobs")
     print(f"Source: indeed")
     print(f"Keywords used: {', '.join(IT_KEYWORDS)}")
 

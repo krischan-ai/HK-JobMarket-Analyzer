@@ -14,7 +14,9 @@ const routes: RouteRecordRaw[] = [
       { path: '/upload', name: 'Upload', component: () => import('@/views/UploadPage.vue'), meta: { title: '上傳數據' } },
       { path: '/manage', name: 'Manage', component: () => import('@/views/ManagePage.vue'), meta: { title: '數據管理' } },
       { path: '/explore', name: 'Explore', component: () => import('@/views/ExplorePage.vue'), meta: { title: '數據探索' } },
+      { path: '/role-classify', name: 'RoleClassify', component: () => import('@/views/RoleClassificationPage.vue'), meta: { title: '角色分類' } },
       { path: '/settings', name: 'Settings', component: () => import('@/views/SettingsPage.vue'), meta: { title: '系統設置' } },
+      { path: '/crawler', name: 'Crawler', component: () => import('@/views/CrawlerDashboardPage.vue'), meta: { title: '爬蟲控制台' } },
     ],
   },
 ]

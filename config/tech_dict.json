@@ -4,7 +4,8 @@
     "c\\+\\+", "cpp", "c#", "csharp", "php", "ruby", "swift",
     "kotlin", "scala", "rust", "r\\s+language", "matlab",
     "perl", "shell", "bash", "powershell", "sql", "pl/sql",
-    "solidity", "vyper", "dart", "lua"
+    "solidity", "vyper", "dart", "lua",
+    "prompt\\s+engineering"
   ],
   "frameworks_libraries": [
     "react", "vue", "angular", "svelte", "next\\.js", "nuxt",
@@ -17,7 +18,15 @@
     "jquery", "bootstrap", "tailwind",
     "graphql", "restful", "grpc",
     "selenium", "cypress", "jest", "pytest",
-    "unity", "unreal", "opencv"
+    "unity", "unreal", "opencv",
+    "langchain", "llamaindex", "langgraph", "dify",
+    "rag", "autogpt", "crewai", "hugging\\s+face",
+    "llm", "large\\s+language\\s+model", "ai\\s+agent",
+    "fine.tuning", "lora", "peft", "rlhf",
+    "generative\\s+ai", "prompt\\s+flow", "vector\\s+db",
+    "embedding", "chatgpt", "gpt", "openai",
+    "machine\\s+learning", "deep\\s+learning", "nlp",
+    "computer\\s+vision"
   ],
   "cloud_devops": [
     "aws", "azure", "gcp", "google\\s+cloud", "aliyun", "tencent\\s+cloud",

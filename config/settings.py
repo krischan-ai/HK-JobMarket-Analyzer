@@ -30,6 +30,7 @@ class Settings:
 
     data_dir: Path = field(default_factory=lambda: Path(__file__).resolve().parent.parent / "data")
     output_dir: Path = field(default_factory=lambda: Path(__file__).resolve().parent.parent / "output")
+    vector_db_path: Path = field(default_factory=lambda: Path(__file__).resolve().parent.parent / "data" / "chromadb")
 
     def __post_init__(self):
         self._load_env()

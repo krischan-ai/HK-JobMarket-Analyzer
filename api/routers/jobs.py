@@ -3,6 +3,8 @@ from api.dependencies import load_jobs_df, load_skills_df
 from api.routers.stats import location_to_zh
 import pandas as pd
 import math
+from pathlib import Path
+from datetime import datetime
 
 router = APIRouter(prefix="/api/jobs", tags=["jobs"])
 
@@ -39,11 +41,22 @@ def list_jobs(
     start = (page - 1) * page_size
     df_page = df.iloc[start : start + page_size]
 
+    # 构建来源 → 时间的映射（按来源名匹配 raw 文件的修改时间）
+    raw_dir = Path(__file__).resolve().parent.parent.parent / "data" / "raw"
+    source_times: dict[str, str] = {}
+    if raw_dir.exists():
+        for f in raw_dir.glob("*_raw.json"):
+            src_name = f.stem.replace("_raw", "").lower()  # "jobsdb_raw" → "jobsdb"
+            src_time = datetime.fromtimestamp(f.stat().st_mtime).strftime("%Y-%m-%d %H:%M")
+            source_times[src_name] = src_time
+
     items = []
     for _, row in df_page.iterrows():
         skills = None
         if "skills" in df.columns and pd.notna(row.get("skills")):
             skills = row["skills"]
+        src = str(row.get("source", "")).lower().strip()
+        import_time = source_times.get(src, None)
         items.append({
             "job_id": str(row.get("job_id", "")),
             "title": str(row.get("title", "")),
@@ -53,6 +66,7 @@ def list_jobs(
             "salary_max": float(row.get("salary_max", 0)) if pd.notna(row.get("salary_max")) else None,
             "source": str(row.get("source", "")),
             "skills": skills,
+            "import_time": import_time,
         })
 
     return {"total": total, "page": page, "page_size": page_size, "items": items}

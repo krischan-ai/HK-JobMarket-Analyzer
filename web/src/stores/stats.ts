@@ -58,7 +58,7 @@ export const useStatsStore = defineStore('stats', () => {
   async function runClassification(batchSize: number = 5) {
     classifying.value = true
     try {
-      const { data } = await api.post<ClassificationResult>('/stats/run-classification', { mode: 'full', batch_size: batchSize })
+      const { data } = await api.post<ClassificationResult>('/stats/run-classification', { mode: 'full', batch_size: batchSize }, { timeout: 600000 })
       return data
     } finally {
       classifying.value = false

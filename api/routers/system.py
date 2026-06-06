@@ -6,7 +6,7 @@ class HealthResponse(BaseModel):
     version: str
     data_count: int
 
-router = APIRouter(prefix="/system", tags=["system"])
+router = APIRouter(prefix="/api/system", tags=["system"])
 
 @router.get("/health", response_model=HealthResponse)
 def health_check():

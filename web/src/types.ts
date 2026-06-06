@@ -9,6 +9,7 @@ export interface JobItem {
   skills?: Record<string, string[]>
   jd_raw?: string
   jd_text?: string
+  import_time?: string
   salary_currency?: string
   url?: string
 }
