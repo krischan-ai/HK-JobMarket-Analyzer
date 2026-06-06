@@ -1,0 +1,430 @@
+[
+  {
+    "job_id": "MOCK_001",
+    "title": "Senior Python Developer",
+    "company": "HK Fintech Ltd",
+    "location": "Central",
+    "salary_raw": "HK$45,000 - HK$60,000 /month",
+    "jd_raw": "<p>We are looking for a senior Python developer with experience in <strong>Django</strong> and <strong>AWS</strong>. Knowledge of <strong>PostgreSQL</strong> and <strong>Docker</strong> is required.</p>",
+    "source": "jobsdb",
+    "jd_text": "We are looking for a senior Python developer with experience in Django and AWS . Knowledge of PostgreSQL and Docker is required.",
+    "salary_min": 45000.0,
+    "salary_max": 60000.0,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [
+        "Python"
+      ],
+      "frameworks_libraries": [
+        "Django"
+      ],
+      "cloud_devops": [
+        "Aws",
+        "Docker"
+      ],
+      "databases": [
+        "Postgresql"
+      ],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "MOCK_002",
+    "title": "Frontend Engineer (React)",
+    "company": "Tech Corp HK",
+    "location": "Quarry Bay",
+    "salary_raw": "HK$600,000 - HK$720,000 per annum",
+    "jd_raw": "We need a React expert with TypeScript experience. Familiar with Next.js and Tailwind CSS. Agile team player with strong communication skills.",
+    "source": "jobsdb",
+    "jd_text": "We need a React expert with TypeScript experience. Familiar with Next.js and Tailwind CSS. Agile team player with strong communication skills.",
+    "salary_min": 50000.0,
+    "salary_max": 60000.0,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [
+        "Typescript"
+      ],
+      "frameworks_libraries": [
+        "Next.js",
+        "React",
+        "Tailwind"
+      ],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": [
+        "Agile",
+        "Communication"
+      ]
+    }
+  },
+  {
+    "job_id": "MOCK_003",
+    "title": "Data Scientist",
+    "company": "AI Lab HK",
+    "location": "Science Park",
+    "salary_raw": "HK$50,000 - HK$80,000 /month",
+    "jd_raw": "Looking for data scientist proficient in Python, TensorFlow, and PyTorch. Experience with Spark and Kafka is a plus. Strong analytical and problem-solving skills.",
+    "source": "jobsdb",
+    "jd_text": "Looking for data scientist proficient in Python, TensorFlow, and PyTorch. Experience with Spark and Kafka is a plus. Strong analytical and problem-solving skills.",
+    "salary_min": 50000.0,
+    "salary_max": 80000.0,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [
+        "Python"
+      ],
+      "frameworks_libraries": [
+        "Kafka",
+        "Pytorch",
+        "Spark",
+        "Tensorflow"
+      ],
+      "cloud_devops": [],
+      "databases": [
+        "Kafka"
+      ],
+      "soft_skills": [
+        "Analytical",
+        "Problem.solving"
+      ]
+    }
+  },
+  {
+    "job_id": "MOCK_004",
+    "title": "DevOps Engineer",
+    "company": "Cloud Native HK",
+    "location": "Kwai Chung",
+    "salary_raw": "HK$40,000 - HK$65,000 /month",
+    "jd_raw": "AWS certified DevOps engineer needed. Must know Kubernetes, Terraform, CI/CD pipelines, and monitoring with Prometheus and Grafana.",
+    "source": "jobsdb",
+    "jd_text": "AWS certified DevOps engineer needed. Must know Kubernetes, Terraform, CI/CD pipelines, and monitoring with Prometheus and Grafana.",
+    "salary_min": 40000.0,
+    "salary_max": 65000.0,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [
+        "Aws",
+        "Ci/cd",
+        "Devops",
+        "Grafana",
+        "Kubernetes",
+        "Prometheus",
+        "Terraform"
+      ],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "MOCK_005",
+    "title": "Java Spring Boot Developer",
+    "company": "Banking Tech",
+    "location": "Central",
+    "salary_raw": "HK$480,000 - HK$600,000 per annum",
+    "jd_raw": "Senior Java developer with Spring Boot expertise. Experience in MySQL, Redis, and microservices architecture. Good communication and teamwork skills.",
+    "source": "jobsdb",
+    "jd_text": "Senior Java developer with Spring Boot expertise. Experience in MySQL, Redis, and microservices architecture. Good communication and teamwork skills.",
+    "salary_min": 40000.0,
+    "salary_max": 50000.0,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [
+        "Java"
+      ],
+      "frameworks_libraries": [
+        "Spring",
+        "Spring boot"
+      ],
+      "cloud_devops": [],
+      "databases": [
+        "Mysql",
+        "Redis"
+      ],
+      "soft_skills": [
+        "Communication",
+        "Teamwork"
+      ]
+    }
+  },
+  {
+    "job_id": "MOCK_006",
+    "title": "Full Stack Engineer",
+    "company": "Startup HK",
+    "location": "Wong Chuk Hang",
+    "salary_raw": "HK$35,000 - HK$55,000 /month",
+    "jd_raw": "Full stack developer proficient in React, Node.js, and MongoDB. Understanding of Docker and cloud services (AWS/GCP). Self-motivated and independent.",
+    "source": "jobsdb",
+    "jd_text": "Full stack developer proficient in React, Node.js, and MongoDB. Understanding of Docker and cloud services (AWS/GCP). Self-motivated and independent.",
+    "salary_min": 35000.0,
+    "salary_max": 55000.0,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [
+        "Node.js",
+        "React"
+      ],
+      "cloud_devops": [
+        "Aws",
+        "Docker",
+        "Gcp"
+      ],
+      "databases": [
+        "Mongodb"
+      ],
+      "soft_skills": [
+        "Independent",
+        "Self.motivated"
+      ]
+    }
+  },
+  {
+    "job_id": "MOCK_007",
+    "title": "Mobile Developer (Flutter)",
+    "company": "App Studio HK",
+    "location": "Causeway Bay",
+    "salary_raw": "HK$30,000 - HK$50,000 /month",
+    "jd_raw": "Flutter developer with Dart experience. Knowledge of Firebase and RESTful APIs. Team player with good presentation skills.",
+    "source": "jobsdb",
+    "jd_text": "Flutter developer with Dart experience. Knowledge of Firebase and RESTful APIs. Team player with good presentation skills.",
+    "salary_min": 30000.0,
+    "salary_max": 50000.0,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [
+        "Dart"
+      ],
+      "frameworks_libraries": [
+        "Flutter",
+        "Restful"
+      ],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": [
+        "Presentation"
+      ]
+    }
+  },
+  {
+    "job_id": "MOCK_008",
+    "title": "Machine Learning Engineer",
+    "company": "AI Startup",
+    "location": "Cyberport",
+    "salary_raw": "HK$55,000 - HK$75,000 /month",
+    "jd_raw": "ML engineer skilled in Python, TensorFlow, and Kubernetes. Experience with MLOps, data pipelines, and model deployment in production.",
+    "source": "jobsdb",
+    "jd_text": "ML engineer skilled in Python, TensorFlow, and Kubernetes. Experience with MLOps, data pipelines, and model deployment in production.",
+    "salary_min": 55000.0,
+    "salary_max": 75000.0,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [
+        "Python"
+      ],
+      "frameworks_libraries": [
+        "Tensorflow"
+      ],
+      "cloud_devops": [
+        "Kubernetes",
+        "Mlops"
+      ],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "MOCK_009",
+    "title": "Backend Engineer (Go)",
+    "company": "Trading Firm",
+    "location": "Central",
+    "salary_raw": "HK$60,000 - HK$90,000 /month",
+    "jd_raw": "Backend engineer with Go expertise. Strong understanding of distributed systems, Kafka, and Redis. Critical thinking and cross-functional collaboration required.",
+    "source": "jobsdb",
+    "jd_text": "Backend engineer with Go expertise. Strong understanding of distributed systems, Kafka, and Redis. Critical thinking and cross-functional collaboration required.",
+    "salary_min": 60000.0,
+    "salary_max": 90000.0,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [
+        "Go"
+      ],
+      "frameworks_libraries": [
+        "Kafka"
+      ],
+      "cloud_devops": [],
+      "databases": [
+        "Kafka",
+        "Redis"
+      ],
+      "soft_skills": [
+        "Collaboration",
+        "Critical thinking",
+        "Cross.functional"
+      ]
+    }
+  },
+  {
+    "job_id": "MOCK_010",
+    "title": "Cloud Architect",
+    "company": "MNC HK",
+    "location": "Kowloon Bay",
+    "salary_raw": "HK$80,000 - HK$120,000 /month",
+    "jd_raw": "Cloud architect with deep AWS knowledge (ECS, EKS, Lambda, RDS). Experience with Terraform, CI/CD, and cloud security. Leadership and stakeholder management skills.",
+    "source": "jobsdb",
+    "jd_text": "Cloud architect with deep AWS knowledge (ECS, EKS, Lambda, RDS). Experience with Terraform, CI/CD, and cloud security. Leadership and stakeholder management skills.",
+    "salary_min": 80000.0,
+    "salary_max": 120000.0,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [
+        "Aws",
+        "Ci/cd",
+        "Ecs",
+        "Eks",
+        "Lambda",
+        "Rds",
+        "Terraform"
+      ],
+      "databases": [],
+      "soft_skills": [
+        "Leadership",
+        "Stakeholder management"
+      ]
+    }
+  },
+  {
+    "job_id": "MOCK_011",
+    "title": "Data Engineer",
+    "company": "Big Data Ltd",
+    "location": "Hong Kong",
+    "salary_raw": "HK$45,000 - HK$70,000 /month",
+    "jd_raw": "Data engineer with Spark, Airflow, and Snowflake experience. Python and SQL proficiency. Strong problem-solving and analytical abilities.",
+    "source": "jobsdb",
+    "jd_text": "Data engineer with Spark, Airflow, and Snowflake experience. Python and SQL proficiency. Strong problem-solving and analytical abilities.",
+    "salary_min": 45000.0,
+    "salary_max": 70000.0,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [
+        "Python",
+        "Sql"
+      ],
+      "frameworks_libraries": [
+        "Spark"
+      ],
+      "cloud_devops": [],
+      "databases": [
+        "Snowflake"
+      ],
+      "soft_skills": [
+        "Analytical",
+        "Problem.solving"
+      ]
+    }
+  },
+  {
+    "job_id": "MOCK_012",
+    "title": "Security Engineer",
+    "company": "CyberSec HK",
+    "location": "Central",
+    "salary_raw": "HK$50,000 - HK$80,000 /month",
+    "jd_raw": "Security engineer specializing in cloud security. Knowledge of AWS security services, penetration testing, and security best practices. CISSP preferred.",
+    "source": "jobsdb",
+    "jd_text": "Security engineer specializing in cloud security. Knowledge of AWS security services, penetration testing, and security best practices. CISSP preferred.",
+    "salary_min": 50000.0,
+    "salary_max": 80000.0,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [
+        "Aws"
+      ],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "MOCK_013",
+    "title": "QA Engineer",
+    "company": "Quality First",
+    "location": "Tsim Sha Tsui",
+    "salary_raw": "HK$30,000 - HK$45,000 /month",
+    "jd_raw": "QA engineer with Selenium and Cypress experience. Knowledge of automated testing frameworks and CI/CD integration. Attention to detail and analytical thinking.",
+    "source": "jobsdb",
+    "jd_text": "QA engineer with Selenium and Cypress experience. Knowledge of automated testing frameworks and CI/CD integration. Attention to detail and analytical thinking.",
+    "salary_min": 30000.0,
+    "salary_max": 45000.0,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [
+        "Cypress",
+        "Selenium"
+      ],
+      "cloud_devops": [
+        "Ci/cd"
+      ],
+      "databases": [],
+      "soft_skills": [
+        "Analytical"
+      ]
+    }
+  },
+  {
+    "job_id": "MOCK_014",
+    "title": "Product Manager (Tech)",
+    "company": "Product Co",
+    "location": "Wan Chai",
+    "salary_raw": "HK$55,000 - HK$75,000 /month",
+    "jd_raw": "Technical product manager with agile/scrum experience. Understanding of software development lifecycle. Excellent communication and stakeholder management.",
+    "source": "jobsdb",
+    "jd_text": "Technical product manager with agile/scrum experience. Understanding of software development lifecycle. Excellent communication and stakeholder management.",
+    "salary_min": 55000.0,
+    "salary_max": 75000.0,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": [
+        "Agile",
+        "Communication",
+        "Scrum",
+        "Stakeholder management"
+      ]
+    }
+  },
+  {
+    "job_id": "MOCK_015",
+    "title": "System Administrator",
+    "company": "IT Services HK",
+    "location": "Shatin",
+    "salary_raw": "HK$25,000 - HK$40,000 /month",
+    "jd_raw": "System admin with Linux expertise. Knowledge of shell scripting, nginx, and monitoring tools. Teamwork and time management skills.",
+    "source": "jobsdb",
+    "jd_text": "System admin with Linux expertise. Knowledge of shell scripting, nginx, and monitoring tools. Teamwork and time management skills.",
+    "salary_min": 25000.0,
+    "salary_max": 40000.0,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [
+        "Shell"
+      ],
+      "frameworks_libraries": [],
+      "cloud_devops": [
+        "Nginx"
+      ],
+      "databases": [],
+      "soft_skills": [
+        "Teamwork",
+        "Time management"
+      ]
+    }
+  }
+]

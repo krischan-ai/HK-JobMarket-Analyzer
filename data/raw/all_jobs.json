@@ -1,0 +1,5105 @@
+[
+  {
+    "job_id": "indeed_0_0",
+    "title": "Binance Accelerator Program - Applied AI Agent Engineer",
+    "company": "Binance",
+    "location": "Remote",
+    "salary_raw": "",
+    "jd_raw": "全職在家工作",
+    "source": "indeed",
+    "jd_text": "全職在家工作",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_4",
+    "title": "LLM Applied Data Scientist (RAG/ NLP)",
+    "company": "Binance",
+    "location": "Remote",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_8",
+    "title": "Binance Accelerator Program - Data Scientist (AI/LLM)",
+    "company": "Binance",
+    "location": "Remote",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_12",
+    "title": "Binance Accelerator Program - DevOps Engineer (AI)",
+    "company": "Binance",
+    "location": "Remote",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_16",
+    "title": "AI Engineer (F/M)",
+    "company": "QIMA",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "實習",
+    "source": "indeed",
+    "jd_text": "實習",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_17",
+    "title": "Senior Generative AI architectural Engineer",
+    "company": "Bank of China (Hong Kong) Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_21",
+    "title": "AI Engineer (Kowloon Bay, Python, Pytorch, Multiple vacancies)",
+    "company": "CL Technical Services Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_25",
+    "title": "Principal AI Consultant / Engineer",
+    "company": "Automated Systems (HK) Ltd",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_29",
+    "title": "Artificial Intelligence ( AI ) Development Team - Newly Formed",
+    "company": "Acton Consulting Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_33",
+    "title": "Senior Cloud Services Engineer - Associate - Cloud Platform Services - 12month contract",
+    "company": "Hong Kong Exchanges and Clearing Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "合約",
+    "source": "indeed",
+    "jd_text": "合約",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_34",
+    "title": "Senior Software Engineer / System Architect (Python/Django)",
+    "company": "Fundpark Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_38",
+    "title": "Backend Engineer",
+    "company": "The Payment Cards Group Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_4",
+    "title": "Computer Vision / ML Scientist",
+    "company": "Delvify",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_8",
+    "title": "AI Engineer",
+    "company": "QBS System",
+    "location": "Sha Tin, New Territories",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_12",
+    "title": "Binance Accelerator Program - AI Productivity Engineer",
+    "company": "Binance",
+    "location": "Remote",
+    "salary_raw": "",
+    "jd_raw": "在家工作",
+    "source": "indeed",
+    "jd_text": "在家工作",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_16",
+    "title": "Binance Accelerator Program - LLM Model Training & Data Processing",
+    "company": "Binance",
+    "location": "Remote",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_17",
+    "title": "Machine Learning Engineer",
+    "company": "TeamNote Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_21",
+    "title": "Embodied AI Researcher (VLA Models)",
+    "company": "Hyphen Connect Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_25",
+    "title": "AI Engineer/Developer",
+    "company": "Crystal International Group Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_29",
+    "title": "Machine Learning Intern - AI Agents Conversational AI",
+    "company": "NVIDIA",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_33",
+    "title": "Senior Data Scientist",
+    "company": "Ambition",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_37",
+    "title": "Web Developer, AI Projects - Financial Institution (Ref: WDAIP/HL)",
+    "company": "Crossings Executive Search",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_41",
+    "title": "Specialist (AI Expert)",
+    "company": "Bank of Communications Co., Ltd. Hong Kong Branch",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_17",
+    "title": "Deep Learning Researcher | Trading Team",
+    "company": "Jump Trading",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_21",
+    "title": "LLM Pre-training & Distributed Engineer (AI Infrastructure)",
+    "company": "Hyphen Connect Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_25",
+    "title": "AI Engineer",
+    "company": "SOCIF",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_34",
+    "title": "AI & Digital Solutions Lead (Risk Management)",
+    "company": "Bank of China (Hong Kong) Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_8",
+    "title": "Assistant Credit Risk Manager / Deputy Credit Risk Manager / Credit Risk Manager / Senior Credit Risk Manager (Large Language Model)",
+    "company": "Bank of China (Hong Kong) Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_12",
+    "title": "LLM Data Scientist/Algorithm Engineer",
+    "company": "Binance",
+    "location": "Remote",
+    "salary_raw": "",
+    "jd_raw": "全職在家工作",
+    "source": "indeed",
+    "jd_text": "全職在家工作",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_16",
+    "title": "Senior QA Engineer - AI/LLM",
+    "company": "Binance",
+    "location": "Remote",
+    "salary_raw": "",
+    "jd_raw": "全職在家工作",
+    "source": "indeed",
+    "jd_text": "全職在家工作",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_8",
+    "title": "Binance Accelerator Program - Applied AI Agent Developer",
+    "company": "Binance",
+    "location": "Remote",
+    "salary_raw": "",
+    "jd_raw": "在家工作",
+    "source": "indeed",
+    "jd_text": "在家工作",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_16",
+    "title": "AI Engineer/ Developer (OnShore)",
+    "company": "Ambition",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "短期 +1",
+    "source": "indeed",
+    "jd_text": "短期 +1",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_21",
+    "title": "AI Engineer",
+    "company": "Tata Consultancy Services",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_29",
+    "title": "Senior System Analyst (Digital Innovation)",
+    "company": "AS Watson Retail (HK) Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職 +1醫療保險",
+    "source": "indeed",
+    "jd_text": "全職 +1醫療保險",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_33",
+    "title": "IBM SA / AP / SP - Sizable Airlines Software Projects (4 Openings)",
+    "company": "Acton Consulting Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_17",
+    "title": "Software Engineer, Full-Stack",
+    "company": "Wizpresso",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_21",
+    "title": "Engineering Manager (AI)",
+    "company": "Classy Wheeler",
+    "location": "Hong Kong Science Park, New Territories",
+    "salary_raw": "月薪 $40,000 - $65,000",
+    "jd_raw": "月薪 $40,000 - $65,000長工",
+    "source": "indeed",
+    "jd_text": "月薪 40,000 - 65,000長工",
+    "salary_min": 40000.0,
+    "salary_max": 65000.0,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_25",
+    "title": "AI Engineer",
+    "company": "Capco",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_26",
+    "title": "AI Analyst (Infrastructure focus)",
+    "company": "Optimum Solutions (Hong Kong) Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "短期 +1",
+    "source": "indeed",
+    "jd_text": "短期 +1",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_30",
+    "title": "AI Infrastructure Analyst",
+    "company": "Optimum Solutions (Hong Kong) Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_0",
+    "title": "Computer Vision Specialist (Robotics)",
+    "company": "Hyphen Connect Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_4",
+    "title": "Junior Computer Vision Engineer / Data Science - Software Developer",
+    "company": "idNerd Studio Ltd.",
+    "location": "Lai Chi Kok, Kowloon",
+    "salary_raw": "",
+    "jd_raw": "全職醫療保險有薪年假彈性上班時間",
+    "source": "indeed",
+    "jd_text": "全職醫療保險有薪年假彈性上班時間",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_16",
+    "title": "3D Computer Vision Engineer",
+    "company": "ASMPT",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_17",
+    "title": "Senior Computer Vision Engineer / Computer Vision Engineer",
+    "company": "Sebit Company",
+    "location": "New Territories",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_21",
+    "title": "Intern (Computer Vision, 1-year programme)",
+    "company": "ASMPT",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "實習",
+    "source": "indeed",
+    "jd_text": "實習",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_25",
+    "title": "Post-doctoral Fellows / Research Assistants in Marine Computer Vision and Systems Design",
+    "company": "The Hong Kong University of Science and Technology",
+    "location": "Clear Water Bay, New Territories",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_29",
+    "title": "Data and Artificial Intelligence Architect",
+    "company": "West Kowloon Cultural District Authority",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_33",
+    "title": "R&D Software Engineer (5 days work)",
+    "company": "Asia Vision",
+    "location": "Kowloon Bay, Kowloon",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_4",
+    "title": "Artificial Intelligence ( AI ) Developer / Machine Learning ( ML ) Engineer",
+    "company": "Acton Consulting Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_17",
+    "title": "Senior Software Developer/Software Developer (at the rank of IT Officer/IT Technician) (2 posts)",
+    "company": "The University of Hong Kong",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "合約有薪年假",
+    "source": "indeed",
+    "jd_text": "合約有薪年假",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_21",
+    "title": "Contract Analyst Programmer - Java, mobile, JavaScript, SSADM (C36727) (Ref 57278-4)",
+    "company": "InfoTech Services (Hong Kong) Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "合約",
+    "source": "indeed",
+    "jd_text": "合約",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_25",
+    "title": "Analyst Programmer / Programmer – Decision Support Services",
+    "company": "Tradelink Technologies Ltd",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_29",
+    "title": "System Analyst(.Net)",
+    "company": "Besway Asia Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_33",
+    "title": "Frontend Developer (Hong Kong/ Malaysia)",
+    "company": "Pantheon Lab",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_37",
+    "title": "AI Consultant Summer Intern",
+    "company": "Techbob Academy Limited",
+    "location": "Kwun Tong, Kowloon",
+    "salary_raw": "月薪 $11,490",
+    "jd_raw": "月薪 $11,490實習在職專業培訓",
+    "source": "indeed",
+    "jd_text": "月薪 11,490實習在職專業培訓",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_41",
+    "title": "Product Manager (AI Product)",
+    "company": "nahc.io",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_0",
+    "title": "Machine Learning Engineer",
+    "company": "Tower Research Capital",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_4",
+    "title": "AI / Machine Learning Engineer",
+    "company": "Tai Wo Management Limited",
+    "location": "Kowloon",
+    "salary_raw": "月薪 $32,000 - $38,000",
+    "jd_raw": "月薪 $32,000 - $38,000全職",
+    "source": "indeed",
+    "jd_text": "月薪 32,000 - 38,000全職",
+    "salary_min": 32000.0,
+    "salary_max": 38000.0,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_12",
+    "title": "Machine Learning Engineer",
+    "company": "Wizpresso",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_33",
+    "title": "Software Engineer (Machine Learning)",
+    "company": "nahc.io",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_4",
+    "title": "Data Scientist or Data Engineer or Data Developer - 2 Openings",
+    "company": "Acton Consulting Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_16",
+    "title": "Data Scientist, NLP & Trading Strategies (Quantitative)",
+    "company": "Binance",
+    "location": "Remote",
+    "salary_raw": "",
+    "jd_raw": "全職在家工作",
+    "source": "indeed",
+    "jd_text": "全職在家工作",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_17",
+    "title": "Data Scientist Lead - LLM (Chatbot)",
+    "company": "Binance",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_21",
+    "title": "Senior Data Scientist (Content, Feeds, Recommendation)",
+    "company": "Binance",
+    "location": "Remote",
+    "salary_raw": "",
+    "jd_raw": "全職在家工作",
+    "source": "indeed",
+    "jd_text": "全職在家工作",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_25",
+    "title": "Data Scientist",
+    "company": "Classy Wheeler",
+    "location": "Sha Tin, New Territories",
+    "salary_raw": "月薪 $25,000 - $35,000",
+    "jd_raw": "月薪 $25,000 - $35,000",
+    "source": "indeed",
+    "jd_text": "月薪 25,000 - 35,000",
+    "salary_min": 25000.0,
+    "salary_max": 35000.0,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_33",
+    "title": "Senior Data Scientist, Editorial & Content",
+    "company": "South China Morning Post",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_34",
+    "title": "Pioneer Talent Program - Applied Data Scientist",
+    "company": "Binance",
+    "location": "Remote",
+    "salary_raw": "",
+    "jd_raw": "全職在家工作",
+    "source": "indeed",
+    "jd_text": "全職在家工作",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_38",
+    "title": "Senior Manager, Data Scientist (172698)",
+    "company": "Shangri-La Hotels",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "長工",
+    "source": "indeed",
+    "jd_text": "長工",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_42",
+    "title": "Data Scientist",
+    "company": "ubiZense",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_46",
+    "title": "Data Scientist",
+    "company": "LRQA group",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_50",
+    "title": "Data Scientist / Analyst - Systematic Data Platform",
+    "company": "Millennium Management",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_4",
+    "title": "(Senior) Forward Deployed AI Scientist, Greater China - BCG X",
+    "company": "Boston Consulting Group",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_16",
+    "title": "Quantitative Researcher – Machine Learning",
+    "company": "Point72",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_17",
+    "title": "Chair Professor/Professor/Associate Professor/Assistant Professor in the Department of Systems Engineering",
+    "company": "City University of Hong Kong",
+    "location": "Kowloon Tong, Kowloon",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_21",
+    "title": "Postdoctoral Fellow in the Department of Data Science (Appointment for 12 months)",
+    "company": "City University of Hong Kong",
+    "location": "Kowloon Tong, Kowloon",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_25",
+    "title": "Professor/Associate Professor/Assistant Professor in the Department of Architecture and Civil Engineering",
+    "company": "City University of Hong Kong",
+    "location": "Kowloon Tong, Kowloon",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_29",
+    "title": "Chair Professor/Professor/Associate Professor in the Department of Architecture and Civil Engineering",
+    "company": "City University of Hong Kong",
+    "location": "Kowloon Tong, Kowloon",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_16",
+    "title": "Binance Accelerator Program - Software Engineer (AI/LLM Experience a Plus)",
+    "company": "Binance",
+    "location": "Remote",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_17",
+    "title": "AI Analyst",
+    "company": "Winson Group",
+    "location": "Hong Kong",
+    "salary_raw": "月薪 $20,000 起",
+    "jd_raw": "月薪 $20,000 起合約",
+    "source": "indeed",
+    "jd_text": "月薪 20,000 起合約",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_21",
+    "title": "Summer Intern, Data Engineering",
+    "company": "Wizpresso",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_29",
+    "title": "Senior DevSecOps Engineer (Security, AI)",
+    "company": "Binance",
+    "location": "Remote",
+    "salary_raw": "",
+    "jd_raw": "在家工作",
+    "source": "indeed",
+    "jd_text": "在家工作",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_42",
+    "title": "Senior Business Architect",
+    "company": "HSBC Global Services Limited",
+    "location": "Central, Hong Kong Island",
+    "salary_raw": "",
+    "jd_raw": "全職在職專業培訓",
+    "source": "indeed",
+    "jd_text": "全職在職專業培訓",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_16",
+    "title": "Binance Accelerator Program - AI Engineer, Dev Tools",
+    "company": "Binance",
+    "location": "Remote",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_17",
+    "title": "Consultant - AI Engineer",
+    "company": "Sia",
+    "location": "Wan Chai, Hong Kong Island",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_25",
+    "title": "Data Scientist(LLM)",
+    "company": "Binance",
+    "location": "Remote",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_26",
+    "title": "Director, GenAI Digital Delivery",
+    "company": "FWD Insurance",
+    "location": "Taikoo Shing, Hong Kong Island",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_34",
+    "title": "Pioneer Talent Program - AI Agent Developer",
+    "company": "Binance",
+    "location": "Remote",
+    "salary_raw": "",
+    "jd_raw": "在家工作",
+    "source": "indeed",
+    "jd_text": "在家工作",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_38",
+    "title": "Pioneer Talent Program - AI Engineer, Dev Tools",
+    "company": "Binance",
+    "location": "Remote",
+    "salary_raw": "",
+    "jd_raw": "全職在家工作",
+    "source": "indeed",
+    "jd_text": "全職在家工作",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_42",
+    "title": "Pioneer Talent Program - AI-powered Productivity Platform Engineer",
+    "company": "Binance",
+    "location": "Remote",
+    "salary_raw": "",
+    "jd_raw": "全職在家工作",
+    "source": "indeed",
+    "jd_text": "全職在家工作",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_4",
+    "title": "Prompt Engineer / AI Creative Technologist",
+    "company": "Human Prompt",
+    "location": "Hong Kong",
+    "salary_raw": "月薪 $20,000 起",
+    "jd_raw": "月薪 $20,000 起全職",
+    "source": "indeed",
+    "jd_text": "月薪 20,000 起全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_8",
+    "title": "Machine Learning Intern - Multimodal Models Generative AI",
+    "company": "NVIDIA",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_17",
+    "title": "Engineer (IT Developer)",
+    "company": "South China Morning Post",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_33",
+    "title": "AI Security Engineer",
+    "company": "Crypto.com",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職醫療保險有薪年假",
+    "source": "indeed",
+    "jd_text": "全職醫療保險有薪年假",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_34",
+    "title": "AI Automations Engineer",
+    "company": "Pattern",
+    "location": "Causeway Bay, Hong Kong Island",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_38",
+    "title": "Internal AI Product Owner",
+    "company": "Yodo1",
+    "location": "Remote",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_42",
+    "title": "Senior AI Security Engineer",
+    "company": "Zoolatech",
+    "location": "Central, Hong Kong Island",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_0",
+    "title": "Agentic Systems Architect (AI Engineering)",
+    "company": "Hyphen Connect Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_4",
+    "title": "Cloud Solution Architect",
+    "company": "Morgan McKinley",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "長工",
+    "source": "indeed",
+    "jd_text": "長工",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_8",
+    "title": "Lead Solutions Architect (Digital Transformation / Data Analytics / AI) - IC",
+    "company": "Classy Wheeler",
+    "location": "Quarry Bay, Hong Kong Island",
+    "salary_raw": "月薪 $80,000 - $95,000",
+    "jd_raw": "月薪 $80,000 - $95,000長工",
+    "source": "indeed",
+    "jd_text": "月薪 80,000 - 95,000長工",
+    "salary_min": 80000.0,
+    "salary_max": 95000.0,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_0_12",
+    "title": "AI Solution Architect",
+    "company": "EcoCeres",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_17",
+    "title": "Android Architect (BigPay, Binance Chat)",
+    "company": "Binance",
+    "location": "Remote",
+    "salary_raw": "",
+    "jd_raw": "全職在家工作",
+    "source": "indeed",
+    "jd_text": "全職在家工作",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_21",
+    "title": "Chief Engineer / Chief Architect (ASIC Design)",
+    "company": "AI Chip Center for Emerging Smart Systems Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職 +1醫療保險有薪年假牙科保險有薪病假",
+    "source": "indeed",
+    "jd_text": "全職 +1醫療保險有薪年假牙科保險有薪病假",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_25",
+    "title": "Principal Engineer / Principal Architect",
+    "company": "AI Chip Center for Emerging Smart Systems Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職 +1醫療保險有薪年假牙科保險有薪病假",
+    "source": "indeed",
+    "jd_text": "全職 +1醫療保險有薪年假牙科保險有薪病假",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_29",
+    "title": "Senior AWS Data Solution Architect",
+    "company": "Hexience Systems Limited",
+    "location": "Hong Kong Island",
+    "salary_raw": "",
+    "jd_raw": "長工",
+    "source": "indeed",
+    "jd_text": "長工",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_34",
+    "title": "Senior Technical Business Analyst (Solution Architect)",
+    "company": "Li & Fung (Trading) Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職員工購物優惠",
+    "source": "indeed",
+    "jd_text": "全職員工購物優惠",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_38",
+    "title": "AI Platform & Infra Architect",
+    "company": "Cummins Inc.",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_42",
+    "title": "Senior Solution Architect (AI)",
+    "company": "EPAM Systems, Inc.",
+    "location": "Central and Western District, Hong Kong Island",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_46",
+    "title": "Digital Workplace Architect",
+    "company": "Tata Consultancy Services",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "",
+    "source": "indeed",
+    "jd_text": "",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_50",
+    "title": "Information Security Architect",
+    "company": "Allianz",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_17",
+    "title": "Assistant Manager - AI & Information Systems",
+    "company": "Hays",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "長工",
+    "source": "indeed",
+    "jd_text": "長工",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_1_21",
+    "title": "(Senior) AML Manager, AI development",
+    "company": "Bank of China (Hong Kong) Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_22",
+    "title": "Senior AML Manager / AML Manager - Fraud Risk",
+    "company": "Bank of China (Hong Kong) Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_26",
+    "title": "Senior AML Manager / AML Manager – Fraud Risk",
+    "company": "Bank of China (Hong Kong) Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "indeed_2_30",
+    "title": "Senior AML Manager / AML Manager - Fraud Risk (Regtech Project)",
+    "company": "Bank of China (Hong Kong) Limited",
+    "location": "Hong Kong",
+    "salary_raw": "",
+    "jd_raw": "全職",
+    "source": "indeed",
+    "jd_text": "全職",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_engineer_p1_0",
+    "title": "AI Automation Engineer (VTT358/J01)",
+    "company": "VTECH Corporate Services Ltd",
+    "location": "Tai Po District",
+    "salary_raw": "",
+    "jd_raw": "Leverage AI agents to revolutionize connected devices at VTech. Fresh grads welcome for mentorship & flexible growth.",
+    "source": "jobsdb",
+    "jd_text": "Leverage AI agents to revolutionize connected devices at VTech. Fresh grads welcome for mentorship flexible growth.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_engineer_p1_1",
+    "title": "(Associate) AI/LLM Engineer — Multi-Agent Systems",
+    "company": "AutoInsight Ltd",
+    "location": "Hong Kong SAR",
+    "salary_raw": "",
+    "jd_raw": "We're looking for a curious, self-driven engineer to join our AI engineering team. You'll work alongside experienced AI architects and engineers to...",
+    "source": "jobsdb",
+    "jd_text": "We re looking for a curious, self-driven engineer to join our AI engineering team. You ll work alongside experienced AI architects and engineers to...",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_engineer_p1_2",
+    "title": "AI Engineer Lead / AI Engineer",
+    "company": "Automated Systems (HK) Ltd",
+    "location": "Hong Kong SAR",
+    "salary_raw": "",
+    "jd_raw": "Lead AI feature design and RAG optimization while mentoring juniors; requires a related degree and 2 years of experience with Python and LLMs.",
+    "source": "jobsdb",
+    "jd_text": "Lead AI feature design and RAG optimization while mentoring juniors; requires a related degree and 2 years of experience with Python and LLMs.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [
+        "Python"
+      ],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": [
+        "Mentoring"
+      ]
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_engineer_p1_3",
+    "title": "AI Engineer",
+    "company": "APJ Software (Hong Kong) Company Limited",
+    "location": "Kowloon Bay",
+    "salary_raw": "$30,000 – $40,000 per month",
+    "jd_raw": "AI Engineer role developing, testing and maintaining AI apps, implementing prompts, RAG and AI agents, and supporting legacy modernization with GenAI.",
+    "source": "jobsdb",
+    "jd_text": "AI Engineer role developing, testing and maintaining AI apps, implementing prompts, RAG and AI agents, and supporting legacy modernization with GenAI.",
+    "salary_min": 40000.0,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_engineer_p1_4",
+    "title": "Technical Analyst (AI Data Engineer)",
+    "company": "Orient Overseas Container Line Ltd (OOCL)",
+    "location": "Sha Tin District",
+    "salary_raw": "",
+    "jd_raw": "If you're seeking a challenging technical position that offers high level of autonomy, and a strong sense of teamwork, here comes the opportunity!",
+    "source": "jobsdb",
+    "jd_text": "If you re seeking a challenging technical position that offers high level of autonomy, and a strong sense of teamwork, here comes the opportunity!",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": [
+        "Teamwork"
+      ]
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_engineer_p2_10",
+    "title": "Robotics Navigation & Embodied AI Engineer",
+    "company": "AIDEA TECHNOLOGEIS LIMITED",
+    "location": "Sha Tin District",
+    "salary_raw": "$30,000 – $40,000 per month",
+    "jd_raw": "全职核心技术岗，深度参与家用康养机器人硬件选型、算法设计、系统集成与产品迭代全流程，项目主导权与实践空间充足。团队由多模态感知、AI、机器人及硬件工程资深专家组成，技术氛围浓厚。公司提供有竞争力薪酬、香港工作签证及长期激励，助力员工在具身智能、康养机器人领域快速成长，推动产品从原型落地真实家庭场景。",
+    "source": "jobsdb",
+    "jd_text": "全职核心技术岗 深度参与家用康养机器人硬件选型 算法设计 系统集成与产品迭代全流程 项目主导权与实践空间充足 团队由多模态感知 AI 机器人及硬件工程资深专家组成 技术氛围浓厚 公司提供有竞争力薪酬 香港工作签证及长期激励 助力员工在具身智能 康养机器人领域快速成长 推动产品从原型落地真实家庭场景",
+    "salary_min": 40000.0,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_engineer_p2_11",
+    "title": "AI Engineer",
+    "company": "SmarTone Telecommunications Limited",
+    "location": "Ngau Tau Kok",
+    "salary_raw": "",
+    "jd_raw": "Taking Gen AI use cases from concept to production, implement solutions using Microsoft Copilot and Amazon Bedrock for commercial deployment.",
+    "source": "jobsdb",
+    "jd_text": "Taking Gen AI use cases from concept to production, implement solutions using Microsoft Copilot and Amazon Bedrock for commercial deployment.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_engineer_p2_12",
+    "title": "AI Engineer",
+    "company": "KOS International Limited",
+    "location": "Quarry Bay",
+    "salary_raw": "Negotiable",
+    "jd_raw": "Our client is looking for AI Engineer to join their team.",
+    "source": "jobsdb",
+    "jd_text": "Our client is looking for AI Engineer to join their team.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_engineer_p2_13",
+    "title": "AI Engineer",
+    "company": "Global Headwear Limited",
+    "location": "Kwun Tong District",
+    "salary_raw": "",
+    "jd_raw": "Experience in the garment and manufacturing industries is preferred. Join our dynamic team!",
+    "source": "jobsdb",
+    "jd_text": "Experience in the garment and manufacturing industries is preferred. Join our dynamic team!",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_engineer_p2_14",
+    "title": "AI Engineer",
+    "company": "United Chinese Plastics Products Co Ltd",
+    "location": "Hung Hom",
+    "salary_raw": "",
+    "jd_raw": "N/A",
+    "source": "jobsdb",
+    "jd_text": "N/A",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_engineer_p2_15",
+    "title": "LLM Engineer (Data and Optimization)",
+    "company": "TCL Corporate Research (Hong Kong) Co., Limited",
+    "location": "Science Park",
+    "salary_raw": "",
+    "jd_raw": "This position offers the opportunity to work on innovative projects and contribute to the development of advanced AI solutions",
+    "source": "jobsdb",
+    "jd_text": "This position offers the opportunity to work on innovative projects and contribute to the development of advanced AI solutions",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_engineer_p2_16",
+    "title": "AI Analyst (Infrastructure focus)",
+    "company": "Optimum Solutions (Hong Kong) Limited",
+    "location": "Central",
+    "salary_raw": "",
+    "jd_raw": "Opportunity to work in good company",
+    "source": "jobsdb",
+    "jd_text": "Opportunity to work in good company",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_engineer_p2_17",
+    "title": "AI Technical Leads / AI Officers",
+    "company": "Quam Plus International Financial Limited",
+    "location": "Sheung Wan",
+    "salary_raw": "",
+    "jd_raw": "This role offers the opportunity to shape AI in a dynamic financial services firm and deliver impactful business solutions",
+    "source": "jobsdb",
+    "jd_text": "This role offers the opportunity to shape AI in a dynamic financial services firm and deliver impactful business solutions",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_engineer_p2_18",
+    "title": "AI Engineer",
+    "company": "ESD Services Limited (ESDlife)",
+    "location": "Hung Hom",
+    "salary_raw": "",
+    "jd_raw": "Build RAG pipelines, LLM apps, integrate APIs, optimize, ensure security & innovate.",
+    "source": "jobsdb",
+    "jd_text": "Build RAG pipelines, LLM apps, integrate APIs, optimize, ensure security innovate.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_engineer_p2_19",
+    "title": "AI Engineer",
+    "company": "Chain Technology Development Co. Limited",
+    "location": "Kowloon Bay",
+    "salary_raw": "",
+    "jd_raw": "Looking for a skilled Machine Learning Engineer, focus on AI(Agentic) & LLM Application Engineering (LLMOps) with solid foundation in algorithms.",
+    "source": "jobsdb",
+    "jd_text": "Looking for a skilled Machine Learning Engineer, focus on AI(Agentic) LLM Application Engineering (LLMOps) with solid foundation in algorithms.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_engineer_p2_20",
+    "title": "Machine Learning Engineer, Computer Vision (Gaming company, Up to $60k)",
+    "company": "Recruit Logic Limited",
+    "location": "Lai Chi Kok",
+    "salary_raw": "",
+    "jd_raw": "Our client is seeking a machine learning engineer who is familiar with computer vision and is a strong coder.",
+    "source": "jobsdb",
+    "jd_text": "Our client is seeking a machine learning engineer who is familiar with computer vision and is a strong coder.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_engineer_p2_21",
+    "title": "System Analyst (AI Team)",
+    "company": "I-Medi Asia Limited",
+    "location": "Mong Kok",
+    "salary_raw": "",
+    "jd_raw": "Join a listed MNC’s new AI transformation team to build innovative digital and AI-powered solutions using emerging technologies and LLMs.",
+    "source": "jobsdb",
+    "jd_text": "Join a listed MNC s new AI transformation team to build innovative digital and AI-powered solutions using emerging technologies and LLMs.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_engineer_p2_22",
+    "title": "AI Engineer",
+    "company": "Legend Interiors Limited",
+    "location": "Kowloon Bay",
+    "salary_raw": "",
+    "jd_raw": "Design, develop, and implement AI solutions to enhance the company’s interior design, operations, and management efficiency",
+    "source": "jobsdb",
+    "jd_text": "Design, develop, and implement AI solutions to enhance the company s interior design, operations, and management efficiency",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_engineer_p2_23",
+    "title": "AI Platform Architect",
+    "company": "Dah Chong Hong Holdings Limited",
+    "location": "Kowloon Bay",
+    "salary_raw": "",
+    "jd_raw": "Own the technical architecture of our AI agentic platform while leading the formation of a dedicated AI-assisted development team.",
+    "source": "jobsdb",
+    "jd_text": "Own the technical architecture of our AI agentic platform while leading the formation of a dedicated AI-assisted development team.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_engineer_p2_24",
+    "title": "Senior AI Solution Engineer",
+    "company": "ESD Services Limited (ESDlife)",
+    "location": "Hung Hom",
+    "salary_raw": "",
+    "jd_raw": "Lead the design and delivery of enterprise AI and GenAI solutions, integrating LLM, RAG, and MLOps to support business transformation.",
+    "source": "jobsdb",
+    "jd_text": "Lead the design and delivery of enterprise AI and GenAI solutions, integrating LLM, RAG, and MLOps to support business transformation.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [
+        "Mlops"
+      ],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_engineer_p2_25",
+    "title": "Senior Software Engineer",
+    "company": "Solos Technology Limited",
+    "location": "Sha Tin District",
+    "salary_raw": "",
+    "jd_raw": "We're looking for mobile app and AI backend senior software engineers to build an innovative smart glasses product.",
+    "source": "jobsdb",
+    "jd_text": "We re looking for mobile app and AI backend senior software engineers to build an innovative smart glasses product.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_engineer_p2_26",
+    "title": "AI Software Engineer - Strategic Office - Toptier MNC",
+    "company": "Ignite Recruitment Hong Kong Limited",
+    "location": "Hong Kong Island",
+    "salary_raw": "$35,000 – $50,000 per month",
+    "jd_raw": "AI as a core enterprise capability. We treat AI engineering like mission-critical software: secure, observable, scalable, and supportable.",
+    "source": "jobsdb",
+    "jd_text": "AI as a core enterprise capability. We treat AI engineering like mission-critical software: secure, observable, scalable, and supportable.",
+    "salary_min": 50000.0,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_engineer_p2_27",
+    "title": "AI Application Architect",
+    "company": "China Mobile International Limited",
+    "location": "Kwai Hing",
+    "salary_raw": "",
+    "jd_raw": "e are seeking a forward-thinking and experienced AI Application Architect to lead our company-wide AI empowerment initiative",
+    "source": "jobsdb",
+    "jd_text": "e are seeking a forward-thinking and experienced AI Application Architect to lead our company-wide AI empowerment initiative",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_engineer_p2_28",
+    "title": "AI Solution Engineer",
+    "company": "Accentrix Company Limited",
+    "location": "Tsim Sha Tsui",
+    "salary_raw": "",
+    "jd_raw": "Business Analyst bridge business needs and technology, driving improvements through analysis, requirements gathering and collaboration with teams.",
+    "source": "jobsdb",
+    "jd_text": "Business Analyst bridge business needs and technology, driving improvements through analysis, requirements gathering and collaboration with teams.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": [
+        "Collaboration"
+      ]
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_engineer_p3_52",
+    "title": "Senior AI Solution Engineer (Ref: 26052802)",
+    "company": "CIAO International Limited",
+    "location": "Ngau Tau Kok",
+    "salary_raw": "",
+    "jd_raw": "Design, develop, and implement enterprise-grade AI- centric solutions.",
+    "source": "jobsdb",
+    "jd_text": "Design, develop, and implement enterprise-grade AI- centric solutions.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_machine_learning_p1_0",
+    "title": "Data Scientist",
+    "company": "Meego Technology Limited",
+    "location": "Sheung Wan",
+    "salary_raw": "",
+    "jd_raw": "Fast growing company, opportunity to lead, build and create new innovations.",
+    "source": "jobsdb",
+    "jd_text": "Fast growing company, opportunity to lead, build and create new innovations.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_machine_learning_p2_12",
+    "title": "Data Scientist – Leading Technology Consultancy - J12851",
+    "company": "Pinpoint Asia",
+    "location": "Admiralty",
+    "salary_raw": "",
+    "jd_raw": "Architect, train, and operationalize scalable Machine Learning models to solve real-world business challenges.",
+    "source": "jobsdb",
+    "jd_text": "Architect, train, and operationalize scalable Machine Learning models to solve real-world business challenges.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_machine_learning_p2_13",
+    "title": "Intern Trainee - AI",
+    "company": "Kin Wing Engineering Company Limited",
+    "location": "Lai Chi Kok",
+    "salary_raw": "",
+    "jd_raw": "Assist in designing and documenting work flow improvements powered by AI.",
+    "source": "jobsdb",
+    "jd_text": "Assist in designing and documenting work flow improvements powered by AI.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_machine_learning_p2_16",
+    "title": "Data & AI Architect",
+    "company": "ConnectedGroup Limited",
+    "location": "Central and Western District",
+    "salary_raw": "",
+    "jd_raw": "Our client, a leading HK-based organization is looking to hire an experienced Data and AI Architect.",
+    "source": "jobsdb",
+    "jd_text": "Our client, a leading HK-based organization is looking to hire an experienced Data and AI Architect.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_machine_learning_p2_19",
+    "title": "Senior Data Analyst / Assistant Manager (Digital Transformation & AI)",
+    "company": "Emperor Cinemas Limited",
+    "location": "Wan Chai District",
+    "salary_raw": "",
+    "jd_raw": "We are seeking a commercially-minded and talent to drive data-driven decision-making and operational efficiency across our cinema network.",
+    "source": "jobsdb",
+    "jd_text": "We are seeking a commercially-minded and talent to drive data-driven decision-making and operational efficiency across our cinema network.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_machine_learning_p2_23",
+    "title": "Data Analyst",
+    "company": "ONEDEGREE HONG KONG LIMITED",
+    "location": "Kwun Tong District",
+    "salary_raw": "",
+    "jd_raw": "We are looking for a Data Analyst to transform data into actionable insights that shape product strategy, customer experience and business performance",
+    "source": "jobsdb",
+    "jd_text": "We are looking for a Data Analyst to transform data into actionable insights that shape product strategy, customer experience and business performance",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_machine_learning_p2_24",
+    "title": "AI Engineer(24K)",
+    "company": "Manpower Services (Hong Kong) Limited",
+    "location": "North Point",
+    "salary_raw": "",
+    "jd_raw": "AI Engineer(24K)",
+    "source": "jobsdb",
+    "jd_text": "AI Engineer(24K)",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_machine_learning_p2_28",
+    "title": "Senior Data Scientist",
+    "company": "Ambition",
+    "location": "Central and Western District",
+    "salary_raw": "Negotiable",
+    "jd_raw": "Our Well-known Global MNC Client is looking for a Senior Data Scientist",
+    "source": "jobsdb",
+    "jd_text": "Our Well-known Global MNC Client is looking for a Senior Data Scientist",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_deep_learning_p2_16",
+    "title": "AI Multi-modal & World Model Scientist",
+    "company": "TCL Corporate Research (Hong Kong) Co., Limited",
+    "location": "Science Park",
+    "salary_raw": "",
+    "jd_raw": "This position offers the opportunity to work on innovative projects and contribute to the development of advanced AI solutions",
+    "source": "jobsdb",
+    "jd_text": "This position offers the opportunity to work on innovative projects and contribute to the development of advanced AI solutions",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_deep_learning_p2_21",
+    "title": "AI Researcher",
+    "company": "Logistics and Supply Chain MultiTech R&D Centre Limited",
+    "location": "Cyberport",
+    "salary_raw": "",
+    "jd_raw": "The role is to drive innovative prototypes and deploy production multimodal Al systems, translating cutting-edge research into real-world applications",
+    "source": "jobsdb",
+    "jd_text": "The role is to drive innovative prototypes and deploy production multimodal Al systems, translating cutting-edge research into real-world applications",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_deep_learning_p2_23",
+    "title": "Software Engineer - ML / AI Engineer (Perm/Contract)",
+    "company": "EYT3 Limited",
+    "location": "Southern District",
+    "salary_raw": "",
+    "jd_raw": "We look for a forward-thinking ML/AI Engineer to contribute to a confidential large language model (LLM) project in the financial services domain.",
+    "source": "jobsdb",
+    "jd_text": "We look for a forward-thinking ML/AI Engineer to contribute to a confidential large language model (LLM) project in the financial services domain.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_deep_learning_p2_26",
+    "title": "Consultant / Senior Consultant / Manager / Senior Manager - Gen-AI - Hong Kong",
+    "company": "Deloitte Touche Tohmatsu",
+    "location": "Admiralty",
+    "salary_raw": "",
+    "jd_raw": "Design, drive and implement AI solutions and strategies for external clients tailored to their needs with a focus on user experience",
+    "source": "jobsdb",
+    "jd_text": "Design, drive and implement AI solutions and strategies for external clients tailored to their needs with a focus on user experience",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_large_language_model_p1_4",
+    "title": "Senior Consultant (AI and Digital)",
+    "company": "WSP (Asia) Limited",
+    "location": "Kowloon Bay",
+    "salary_raw": "",
+    "jd_raw": "Lead end‑to‑end AI solution design, prototyping, and integration, turning business needs into scalable digital solutions across industries",
+    "source": "jobsdb",
+    "jd_text": "Lead end to end AI solution design, prototyping, and integration, turning business needs into scalable digital solutions across industries",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_large_language_model_p2_10",
+    "title": "Senior Generative AI architectural Engineer",
+    "company": "Bank of China (Hong Kong) Limited",
+    "location": "Fo Tan",
+    "salary_raw": "",
+    "jd_raw": "-",
+    "source": "jobsdb",
+    "jd_text": "-",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_large_language_model_p2_16",
+    "title": "Artificial Intelligence ( AI ) Development Team - Newly Formed",
+    "company": "Acton Consulting Limited",
+    "location": "Kowloon",
+    "salary_raw": "",
+    "jd_raw": "A newly formed Artificial Intelligence Team from a MNC looking for several AI Experts - AI Developer or ML Engineer or LLM Specialist",
+    "source": "jobsdb",
+    "jd_text": "A newly formed Artificial Intelligence Team from a MNC looking for several AI Experts - AI Developer or ML Engineer or LLM Specialist",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_large_language_model_p2_17",
+    "title": "Senior AI/ML Engineer (LLM / CV / OCR) - AI Healthcare",
+    "company": "Dr. Kudos Lab Limited",
+    "location": "Wan Chai District",
+    "salary_raw": "",
+    "jd_raw": "Develop, fine-tune and optimize LLMs and CV/OCR models, deploy in production, and work with teams to deliver scalable, production-ready AI solutions",
+    "source": "jobsdb",
+    "jd_text": "Develop, fine-tune and optimize LLMs and CV/OCR models, deploy in production, and work with teams to deliver scalable, production-ready AI solutions",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_large_language_model_p2_18",
+    "title": "Data Engineer (LLM, ML)",
+    "company": "PERSOL",
+    "location": "Hong Kong Island",
+    "salary_raw": "",
+    "jd_raw": "Document technical designs, contribute to code reviews, and maintain best practices in AI and ML",
+    "source": "jobsdb",
+    "jd_text": "Document technical designs, contribute to code reviews, and maintain best practices in AI and ML",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_large_language_model_p2_20",
+    "title": "AI Agent Researcher",
+    "company": "DocPro Limited",
+    "location": "Hong Kong Island",
+    "salary_raw": "",
+    "jd_raw": "Shape how the world interacts with legal information by pioneering next-generation agentic workflows.",
+    "source": "jobsdb",
+    "jd_text": "Shape how the world interacts with legal information by pioneering next-generation agentic workflows.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_large_language_model_p2_24",
+    "title": "Head of Product - AI & Agent (Web3)",
+    "company": "Page Executive",
+    "location": "Central and Western District",
+    "salary_raw": "",
+    "jd_raw": "Head of Product - AI & Agent (Web3)",
+    "source": "jobsdb",
+    "jd_text": "Head of Product - AI Agent (Web3)",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_large_language_model_p2_26",
+    "title": "AI Lead",
+    "company": "ESD Services Limited (ESDlife)",
+    "location": "Hung Hom",
+    "salary_raw": "",
+    "jd_raw": "Lead the design and delivery of enterprise AI and GenAI solutions, integrating LLM, RAG, and MLOps to support business transformation.",
+    "source": "jobsdb",
+    "jd_text": "Lead the design and delivery of enterprise AI and GenAI solutions, integrating LLM, RAG, and MLOps to support business transformation.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [
+        "Mlops"
+      ],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_LLM_p1_3",
+    "title": "Software Engineer (AI & LLM Applications)",
+    "company": "unotech Limited",
+    "location": "Kwun Tong",
+    "salary_raw": "",
+    "jd_raw": "independent contributor who can own features, ship production code, and grow into advanced AI/LLMOps responsibilities.",
+    "source": "jobsdb",
+    "jd_text": "independent contributor who can own features, ship production code, and grow into advanced AI/LLMOps responsibilities.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": [
+        "Independent"
+      ]
+    }
+  },
+  {
+    "job_id": "jobsdb_LLM_p2_12",
+    "title": "AI Engineer Intern (RAG/LLM)",
+    "company": "ICC (Hong Kong) Limited",
+    "location": "Hong Kong SAR",
+    "salary_raw": "",
+    "jd_raw": "RAG System Design & OptimizationBuild and improve RAG pipelines for contract use cases:\nDocument parsing (PDFs, OCR, tables)\nChunking, embedding,...",
+    "source": "jobsdb",
+    "jd_text": "RAG System Design OptimizationBuild and improve RAG pipelines for contract use cases: Document parsing (PDFs, OCR, tables) Chunking, embedding,...",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_LLM_p2_14",
+    "title": "Senior AI Innovation Engineer (LLM/CV) - J12594",
+    "company": "Pinpoint Asia",
+    "location": "Kowloon",
+    "salary_raw": "$65,000 – $75,000 per month",
+    "jd_raw": "As the driving force behind AI innovation, you will lead the conceptualization and development of advanced Proof-of-Concept (PoC) solutions",
+    "source": "jobsdb",
+    "jd_text": "As the driving force behind AI innovation, you will lead the conceptualization and development of advanced Proof-of-Concept (PoC) solutions",
+    "salary_min": 75000.0,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_LLM_p2_16",
+    "title": "LLM Pre-training & Distributed Engineer (AI Infrastructure)",
+    "company": "Hyphen Connect Limited",
+    "location": "Hong Kong SAR",
+    "salary_raw": "",
+    "jd_raw": "We are seeking a highly skilled LLM Pre-training & Distributed Systems Engineer. This role is essential for orchestrating large-scale machine...",
+    "source": "jobsdb",
+    "jd_text": "We are seeking a highly skilled LLM Pre-training Distributed Systems Engineer. This role is essential for orchestrating large-scale machine...",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_LLM_p2_19",
+    "title": "LLM MLOps Engineer",
+    "company": "Robert Walters (HK) Ltd",
+    "location": "Central and Western District",
+    "salary_raw": "Negotiable",
+    "jd_raw": "A leading organisation in Hong Kong is seeking an LLM MLOps Engineer to join their renowned Data Monetisation Team.",
+    "source": "jobsdb",
+    "jd_text": "A leading organisation in Hong Kong is seeking an LLM MLOps Engineer to join their renowned Data Monetisation Team.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [
+        "Mlops"
+      ],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_LLM_p2_20",
+    "title": "Software Developer - AI and HPC",
+    "company": "Appcara Hong Kong Limited",
+    "location": "Kowloon Bay",
+    "salary_raw": "",
+    "jd_raw": "Assists the development and delivery of our HPC platform, developed in NodeJS, Rust, Python, PostgreSQL, Kubernetes, and Slurm",
+    "source": "jobsdb",
+    "jd_text": "Assists the development and delivery of our HPC platform, developed in NodeJS, Rust, Python, PostgreSQL, Kubernetes, and Slurm",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [
+        "Python",
+        "Rust"
+      ],
+      "frameworks_libraries": [],
+      "cloud_devops": [
+        "Kubernetes"
+      ],
+      "databases": [
+        "Postgresql"
+      ],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_LLM_p2_23",
+    "title": "LLM Research Scientist",
+    "company": "Cummins Hong Kong Limited",
+    "location": "Hong Kong SAR",
+    "salary_raw": "",
+    "jd_raw": "We are seeking a Senior LLM Research Scientist to drive advanced research, design next-generation domain LLMs, and influence the AI Lab’s future...",
+    "source": "jobsdb",
+    "jd_text": "We are seeking a Senior LLM Research Scientist to drive advanced research, design next-generation domain LLMs, and influence the AI Lab s future...",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_NLP_engineer_p2_10",
+    "title": "AI Engineer (On-site, Hong Kong Office)",
+    "company": "Modern Space Asia Limited",
+    "location": "Wan Chai",
+    "salary_raw": "",
+    "jd_raw": "Drive AI adoption at a global scale-up — build copilots, automate workflows, and shape Modernspace’s AI future from Hong Kong.",
+    "source": "jobsdb",
+    "jd_text": "Drive AI adoption at a global scale-up build copilots, automate workflows, and shape Modernspace s AI future from Hong Kong.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_NLP_engineer_p2_27",
+    "title": "Artificial Intelligence Agent Associate / AI Builder (5 Day Work, Bonus)",
+    "company": "Magic Compass Securities Limited",
+    "location": "Wan Chai",
+    "salary_raw": "",
+    "jd_raw": "Artificial Intelligence Agent Associate , AI Internship",
+    "source": "jobsdb",
+    "jd_text": "Artificial Intelligence Agent Associate , AI Internship",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_computer_vision_p1_1",
+    "title": "3D Computer Vision Engineer",
+    "company": "ASMPT Technology Hong Kong Limited",
+    "location": "Tsing Yi",
+    "salary_raw": "",
+    "jd_raw": "Join us as a 3D Computer Vision Engineer to develop 3D vision products! Research latest 3D sensing, reconstruction, metrology technologies",
+    "source": "jobsdb",
+    "jd_text": "Join us as a 3D Computer Vision Engineer to develop 3D vision products! Research latest 3D sensing, reconstruction, metrology technologies",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_computer_vision_p2_23",
+    "title": "Computer Vision Algorithm Engineer",
+    "company": "Apple",
+    "location": "Hong Kong SAR",
+    "salary_raw": "",
+    "jd_raw": "We are a team at Apple developing state-of-the-art generative AI and 3D computer vision technologies for next-generation content creation systems....",
+    "source": "jobsdb",
+    "jd_text": "We are a team at Apple developing state-of-the-art generative AI and 3D computer vision technologies for next-generation content creation systems....",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_computer_vision_p2_29",
+    "title": "AI Application and Integration Engineer",
+    "company": "Spark Education (Hong Kong) Limited",
+    "location": "Wan Chai District",
+    "salary_raw": "",
+    "jd_raw": "Welcome to submit your resume to join us, let's grow together",
+    "source": "jobsdb",
+    "jd_text": "Welcome to submit your resume to join us, let s grow together",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_developer_p1_3",
+    "title": "Programmer (AI Solutions)",
+    "company": "The Union Gas Appliances Trading Limited",
+    "location": "Quarry Bay",
+    "salary_raw": "",
+    "jd_raw": "Interested parties please apply with your full resume stating present and expected salary to \"APPLY NOW\".",
+    "source": "jobsdb",
+    "jd_text": "Interested parties please apply with your full resume stating present and expected salary to APPLY NOW .",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_developer_p1_4",
+    "title": "Application Developer / Senior Application Developer (AI Agent Development)",
+    "company": "CITIC Telecom International Holdings Limited",
+    "location": "Kwai Fong",
+    "salary_raw": "",
+    "jd_raw": "Lead the architectural evolution of core telecom BSS/OSS platforms by integrating cutting-edge AI Agent technologies and robust cloud-native framework",
+    "source": "jobsdb",
+    "jd_text": "Lead the architectural evolution of core telecom BSS/OSS platforms by integrating cutting-edge AI Agent technologies and robust cloud-native framework",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_developer_p2_9",
+    "title": "AI Developer / Programmer (Python, Over $40K)",
+    "company": "CL Technical Services Ltd.",
+    "location": "Kowloon Bay",
+    "salary_raw": "$40,000 – $45,000 per month",
+    "jd_raw": "AI, Python, web/mobile applications",
+    "source": "jobsdb",
+    "jd_text": "AI, Python, web/mobile applications",
+    "salary_min": 45000.0,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [
+        "Python"
+      ],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_developer_p2_10",
+    "title": "Analyst Programmer (AI Focus)",
+    "company": "Gleneagles Hospital Hong Kong",
+    "location": "Southern District",
+    "salary_raw": "",
+    "jd_raw": "Develop and enable enterprise AI solutions to streamline workflows and enhance productivity across the organization",
+    "source": "jobsdb",
+    "jd_text": "Develop and enable enterprise AI solutions to streamline workflows and enhance productivity across the organization",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_developer_p2_12",
+    "title": "AI Web Developer (40K+, Startup Mindset)",
+    "company": "Robert Walters (HK) Ltd",
+    "location": "Central and Western District",
+    "salary_raw": "",
+    "jd_raw": "Our client are embarking on an exciting journey to revolutionize the business and IT environment.",
+    "source": "jobsdb",
+    "jd_text": "Our client are embarking on an exciting journey to revolutionize the business and IT environment.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_developer_p2_13",
+    "title": "Software Engineer (ACT)",
+    "company": "Clustertech Limited",
+    "location": "Sha Tin District",
+    "salary_raw": "",
+    "jd_raw": "The role sits at the intersection of high-performance software engineering and AI orchestration, making our AI solutions fast, stable, and scalable.",
+    "source": "jobsdb",
+    "jd_text": "The role sits at the intersection of high-performance software engineering and AI orchestration, making our AI solutions fast, stable, and scalable.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_developer_p2_14",
+    "title": "Senior AI Developer",
+    "company": "Banclogix System Co., Limited",
+    "location": "Admiralty",
+    "salary_raw": "",
+    "jd_raw": "Senior AI Developer - AI Native Fintech",
+    "source": "jobsdb",
+    "jd_text": "Senior AI Developer - AI Native Fintech",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_developer_p2_15",
+    "title": "Full-Stack AI Web Developer - Elite Financial Entity - J12837",
+    "company": "Pinpoint Asia",
+    "location": "Admiralty",
+    "salary_raw": "$45,000 – $60,000 per month",
+    "jd_raw": "As a Web Developer, you will be at the forefront of the company's innovation strategy, evaluating and maintaining web applications",
+    "source": "jobsdb",
+    "jd_text": "As a Web Developer, you will be at the forefront of the company s innovation strategy, evaluating and maintaining web applications",
+    "salary_min": 60000.0,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_developer_p2_16",
+    "title": "Senior AI Developer (at the rank of IT Officer) for AI Applications Team",
+    "company": "The University of Hong Kong",
+    "location": "Pok Fu Lam",
+    "salary_raw": "",
+    "jd_raw": "Senior AI Developer (at the rank of IT Officer) for AI Applications Team",
+    "source": "jobsdb",
+    "jd_text": "Senior AI Developer (at the rank of IT Officer) for AI Applications Team",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_developer_p2_17",
+    "title": "Senior AI Application Developer",
+    "company": "Robert Walters (HK) Ltd",
+    "location": "Central and Western District",
+    "salary_raw": "$70k - $95k p.m. + Bonus",
+    "jd_raw": "Support strategic AI initiatives by designing, developing and deliver production-ready AI applications as Senior AI Application Developer in HK.",
+    "source": "jobsdb",
+    "jd_text": "Support strategic AI initiatives by designing, developing and deliver production-ready AI applications as Senior AI Application Developer in HK.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_developer_p2_18",
+    "title": "Full-Stack AI Developer (Web/mobile platform)",
+    "company": "CL Technical Services Ltd.",
+    "location": "Kowloon Bay",
+    "salary_raw": "$35,000 – $50,000 per month",
+    "jd_raw": "Design, develop, and test enhancements for AI",
+    "source": "jobsdb",
+    "jd_text": "Design, develop, and test enhancements for AI",
+    "salary_min": 50000.0,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_developer_p2_19",
+    "title": "Web Developer, AI Projects - Financial Institution (Ref: WDAIP/HL)",
+    "company": "Crossings Executive Search",
+    "location": "Hong Kong Island",
+    "salary_raw": "",
+    "jd_raw": "Our financial client is seeking a bright Web Developer to join their team.",
+    "source": "jobsdb",
+    "jd_text": "Our financial client is seeking a bright Web Developer to join their team.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_developer_p2_22",
+    "title": "Part-time / Full-time AI and IT Developer",
+    "company": "Fai Po Gem & Jewellery Limited",
+    "location": "Hung Hom",
+    "salary_raw": "",
+    "jd_raw": "Seeking a talented  AI and IT Developer to drive digital innovation at our jewelry firm, enhancing operations from design to sales.",
+    "source": "jobsdb",
+    "jd_text": "Seeking a talented AI and IT Developer to drive digital innovation at our jewelry firm, enhancing operations from design to sales.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_developer_p2_23",
+    "title": "Senior Software Developer | Luxury Retail Fashion House",
+    "company": "Techforce Group Limited",
+    "location": "Central",
+    "salary_raw": "$30,000 – $35,000 per month",
+    "jd_raw": "Bespoke APAC .NET Senior Developer with strong UI/UX and AI-assisted coding skills to build and support secure, scalable web apps.",
+    "source": "jobsdb",
+    "jd_text": "Bespoke APAC .NET Senior Developer with strong UI/UX and AI-assisted coding skills to build and support secure, scalable web apps.",
+    "salary_min": 35000.0,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_developer_p2_24",
+    "title": "Senior Full Stack Developer (AI project management / application)",
+    "company": "CL Technical Services Ltd.",
+    "location": "Kowloon Bay",
+    "salary_raw": "$50,000 – $68,000 per month",
+    "jd_raw": "AI Project management",
+    "source": "jobsdb",
+    "jd_text": "AI Project management",
+    "salary_min": 68000.0,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": [
+        "Project management"
+      ]
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_developer_p2_26",
+    "title": "Web Developer  (AI & Modern Web Applications)",
+    "company": "Oliver James Associates Limited",
+    "location": "Kwai Hing",
+    "salary_raw": "",
+    "jd_raw": "Web Developer to join their growing AI & Innovation team",
+    "source": "jobsdb",
+    "jd_text": "Web Developer to join their growing AI Innovation team",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_developer_p2_27",
+    "title": "Analyst Programmer (C#, AI) - 20-40k",
+    "company": "Manpower Services (Hong Kong) Limited",
+    "location": "Hong Kong Island",
+    "salary_raw": "",
+    "jd_raw": "Our client is now looking for Analyst Programmer (C#, AI) to join within their team.",
+    "source": "jobsdb",
+    "jd_text": "Our client is now looking for Analyst Programmer (C#, AI) to join within their team.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_developer_p2_28",
+    "title": "Junior AI Application Developer (Contract)",
+    "company": "Popular e-Learning (H.K.) Limited",
+    "location": "Tsuen Wan District",
+    "salary_raw": "",
+    "jd_raw": "Junior team member to support the development of AI tools for teachers and students. The role focuses on using generative AI tools.",
+    "source": "jobsdb",
+    "jd_text": "Junior team member to support the development of AI tools for teachers and students. The role focuses on using generative AI tools.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_developer_p2_29",
+    "title": "AI Engineer/ Developer (OnShore)",
+    "company": "Ambition",
+    "location": "Hong Kong Island",
+    "salary_raw": "$40k - $80k p.m.",
+    "jd_raw": "Lead end-to-end GenAI architecture & Python development. Requires trilingual fluency (English/Cantonese/Mandarin) for global team collaboration.",
+    "source": "jobsdb",
+    "jd_text": "Lead end-to-end GenAI architecture Python development. Requires trilingual fluency (English/Cantonese/Mandarin) for global team collaboration.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [
+        "Python"
+      ],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": [
+        "Collaboration"
+      ]
+    }
+  },
+  {
+    "job_id": "jobsdb_ML_engineer_p2_21",
+    "title": "AI ML Engineer,Multimodal NLP & Speech",
+    "company": "Onwards Media Group (HK) Limited",
+    "location": "Hong Kong SAR",
+    "salary_raw": "",
+    "jd_raw": "As a Machine Learning Engineer specializing in Multimodal NLP & Speech, you will drive the\nresearch and execution of next-generation narrative...",
+    "source": "jobsdb",
+    "jd_text": "As a Machine Learning Engineer specializing in Multimodal NLP Speech, you will drive the research and execution of next-generation narrative...",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_ML_engineer_p2_22",
+    "title": "Artificial Intelligence (AI) Engineer",
+    "company": "Ping An Digital Bank (International) Limited",
+    "location": "Hong Kong SAR",
+    "salary_raw": "",
+    "jd_raw": "Focus on transitioning machine learning models from development to business application in banking industry",
+    "source": "jobsdb",
+    "jd_text": "Focus on transitioning machine learning models from development to business application in banking industry",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_ML_engineer_p2_24",
+    "title": "Software Engineer - ML / AI Engineer (Perm/Contract)",
+    "company": "221b Limited",
+    "location": "Southern District",
+    "salary_raw": "",
+    "jd_raw": "We look for a forward-thinking ML/AI Engineer to contribute to a confidential large language model (LLM) project in the financial services domain.",
+    "source": "jobsdb",
+    "jd_text": "We look for a forward-thinking ML/AI Engineer to contribute to a confidential large language model (LLM) project in the financial services domain.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_ML_engineer_p2_25",
+    "title": "AI Engineer",
+    "company": "United Asia Finance Limited",
+    "location": "Wan Chai",
+    "salary_raw": "",
+    "jd_raw": "Collaborate with cross-functional teams to plan and execute cloud transformation strategies",
+    "source": "jobsdb",
+    "jd_text": "Collaborate with cross-functional teams to plan and execute cloud transformation strategies",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": [
+        "Cross.functional"
+      ]
+    }
+  },
+  {
+    "job_id": "jobsdb_ML_engineer_p2_27",
+    "title": "Senior Data Scientist",
+    "company": "Green Tomato Limited",
+    "location": "Kowloon Bay",
+    "salary_raw": "",
+    "jd_raw": "We are hiring talent like you!",
+    "source": "jobsdb",
+    "jd_text": "We are hiring talent like you!",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_data_scientist_p1_3",
+    "title": "Senior Data Analyst",
+    "company": "Lalamove",
+    "location": "Kowloon Tong",
+    "salary_raw": "",
+    "jd_raw": "Drive decisions for the company via data analytics, visualization dashboards, and stakeholder collaboration.",
+    "source": "jobsdb",
+    "jd_text": "Drive decisions for the company via data analytics, visualization dashboards, and stakeholder collaboration.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": [
+        "Collaboration"
+      ]
+    }
+  },
+  {
+    "job_id": "jobsdb_data_scientist_p2_10",
+    "title": "Data Scientist Analyst (Top-tier Bank, 80k)",
+    "company": "Michael Page International (HK) Ltd",
+    "location": "Kowloon",
+    "salary_raw": "$65k - $80k p.m.",
+    "jd_raw": "Act as the primary interface between the technical development team (Data Scientists/Engineers) and business stakeholders (Compliance, Risk, Ops).",
+    "source": "jobsdb",
+    "jd_text": "Act as the primary interface between the technical development team (Data Scientists/Engineers) and business stakeholders (Compliance, Risk, Ops).",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_data_scientist_p2_14",
+    "title": "Business Analytics & Campaign Management Professional (Contract)",
+    "company": "China Construction Bank (Asia) Corporation Limited",
+    "location": "Kowloon Bay",
+    "salary_raw": "",
+    "jd_raw": "Manage marketing campaigns\nFormulate business analyses \ninitiate the development of appropriate propensity models",
+    "source": "jobsdb",
+    "jd_text": "Manage marketing campaigns Formulate business analyses initiate the development of appropriate propensity models",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_data_scientist_p2_15",
+    "title": "Senior Product Manager (AI/ Data/ API-based Products)",
+    "company": "HKT",
+    "location": "Hong Kong Island",
+    "salary_raw": "",
+    "jd_raw": "Senior Product Manager for GenAI platform and App Center initiatives: training materials, user guidelines, and documentation",
+    "source": "jobsdb",
+    "jd_text": "Senior Product Manager for GenAI platform and App Center initiatives: training materials, user guidelines, and documentation",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_data_scientist_p2_16",
+    "title": "Data Analytics Executive, Employee Benefits",
+    "company": "Nova Insurance Consultants Limited",
+    "location": "Kowloon Bay",
+    "salary_raw": "",
+    "jd_raw": "Assist in designing, maintaining, and enhancing Power BI dashboards to track...",
+    "source": "jobsdb",
+    "jd_text": "Assist in designing, maintaining, and enhancing Power BI dashboards to track...",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_data_scientist_p2_17",
+    "title": "Data Scientist (Computer Science or Equivalent) (Level 2-5) (Good Bonus)",
+    "company": "Risksis Technology Limited",
+    "location": "Hong Kong SAR",
+    "salary_raw": "",
+    "jd_raw": "Responsibilities:\n- Front-to-Back Software System Development\n- Machine Learning or AI Algorithm Development\n- Data Science and Analytic Works",
+    "source": "jobsdb",
+    "jd_text": "Responsibilities: - Front-to-Back Software System Development - Machine Learning or AI Algorithm Development - Data Science and Analytic Works",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_data_scientist_p2_19",
+    "title": "Data Engineer (AWS, Tableau) - Financial Services Industry",
+    "company": "TEKsystems",
+    "location": "Central",
+    "salary_raw": "$35,000 – $45,000 per month",
+    "jd_raw": "Data engineering role for regional initative in financial services industry",
+    "source": "jobsdb",
+    "jd_text": "Data engineering role for regional initative in financial services industry",
+    "salary_min": 45000.0,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_data_scientist_p2_20",
+    "title": "Senior Data Scientist",
+    "company": "The Hong Kong Jockey Club",
+    "location": "Sha Tin District",
+    "salary_raw": "",
+    "jd_raw": "Maintain and enhance data processes to ensure accurate, reliable data",
+    "source": "jobsdb",
+    "jd_text": "Maintain and enhance data processes to ensure accurate, reliable data",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_data_scientist_p2_21",
+    "title": "Business Analyst (Agentic AI Platform)",
+    "company": "Set Sail Venture Limited",
+    "location": "Cheung Sha Wan",
+    "salary_raw": "$18,000 – $25,000 per month",
+    "jd_raw": "Set Sail A.I. seeks a Business Analyst to enhance virtual assistant development. Join a passionate team, leveraging AI and user-centered design.",
+    "source": "jobsdb",
+    "jd_text": "Set Sail A.I. seeks a Business Analyst to enhance virtual assistant development. Join a passionate team, leveraging AI and user-centered design.",
+    "salary_min": 25000.0,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_data_scientist_p2_22",
+    "title": "Data Scientist - Financial Institutions",
+    "company": "Ikas International (Asia) Limited",
+    "location": "Central",
+    "salary_raw": "",
+    "jd_raw": "Data Scientist opportunity at a well-known financial institutions.",
+    "source": "jobsdb",
+    "jd_text": "Data Scientist opportunity at a well-known financial institutions.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_researcher_p1_4",
+    "title": "Analyst - Business Consulting - Strategy & Gen-AI Core - Hong Kong",
+    "company": "Deloitte Touche Tohmatsu",
+    "location": "Tai Koo",
+    "salary_raw": "",
+    "jd_raw": "Minimum 1 year experience in AI strategy consulting and advisory",
+    "source": "jobsdb",
+    "jd_text": "Minimum 1 year experience in AI strategy consulting and advisory",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_researcher_p2_10",
+    "title": "AI Researcher (Phd in Computer Science Preferred)",
+    "company": "Risksis Technology Limited",
+    "location": "Hong Kong SAR",
+    "salary_raw": "",
+    "jd_raw": "Responsibilities:\n- AI Academic Research\n- AI Programming & Experiments on Research",
+    "source": "jobsdb",
+    "jd_text": "Responsibilities: - AI Academic Research - AI Programming Experiments on Research",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_researcher_p2_12",
+    "title": "AI & TECHNOLOGY ANALYST",
+    "company": "Sun Hung Kai Properties Ltd",
+    "location": "Wan Chai",
+    "salary_raw": "",
+    "jd_raw": "\"Building Homes with Heart\" - SHKP was publicly listed in 1972 and is now one of the largest property companies in HK with about 38,000 employees.",
+    "source": "jobsdb",
+    "jd_text": "Building Homes with Heart - SHKP was publicly listed in 1972 and is now one of the largest property companies in HK with about 38,000 employees.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_researcher_p2_17",
+    "title": "Project Manager / AI Financial Algorithm Engineer/ Sr. Quantitative Researcher",
+    "company": "Capital Finance Holdings Limited",
+    "location": "Wan Chai",
+    "salary_raw": "",
+    "jd_raw": "Selected candidates will play a pivotal role in leading high-level research projects in collaboration with the Hong Kong Academy.",
+    "source": "jobsdb",
+    "jd_text": "Selected candidates will play a pivotal role in leading high-level research projects in collaboration with the Hong Kong Academy.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": [
+        "Collaboration"
+      ]
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_researcher_p2_18",
+    "title": "AI & Technology Consultant",
+    "company": "Alternative Logic",
+    "location": "Hong Kong Island",
+    "salary_raw": "",
+    "jd_raw": "Alternative Logic seeks an AI & Technology Consultant to drive innovation within our construction disputes practice.",
+    "source": "jobsdb",
+    "jd_text": "Alternative Logic seeks an AI Technology Consultant to drive innovation within our construction disputes practice.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_researcher_p2_19",
+    "title": "AI Solutions Consultant/Senior AI Solutions Consultant",
+    "company": "China Telecom Global Limited",
+    "location": "Wan Chai District",
+    "salary_raw": "",
+    "jd_raw": "Design and implement AI solutions while building strategic partnerships to drive business growth in global markets.",
+    "source": "jobsdb",
+    "jd_text": "Design and implement AI solutions while building strategic partnerships to drive business growth in global markets.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_researcher_p2_27",
+    "title": "Consultant, Industrial AI",
+    "company": "Hong Kong Productivity Council",
+    "location": "Kowloon Tong",
+    "salary_raw": "",
+    "jd_raw": "Execute technology projects and industry-wide enhancement projects",
+    "source": "jobsdb",
+    "jd_text": "Execute technology projects and industry-wide enhancement projects",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_LangChain_p2_14",
+    "title": "Graduate Associate -  AI Development / Software Development",
+    "company": "Appcara Hong Kong Limited",
+    "location": "Kowloon Bay",
+    "salary_raw": "",
+    "jd_raw": "Full-Stack Development: Design, code, and maintain scalable features for our applications using modern frameworks.",
+    "source": "jobsdb",
+    "jd_text": "Full-Stack Development: Design, code, and maintain scalable features for our applications using modern frameworks.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_LangChain_p2_16",
+    "title": "AI Product Owner Graduate Trainee",
+    "company": "Galaxy Telecom (Hong Kong) Limited",
+    "location": "Ngau Tau Kok",
+    "salary_raw": "$20,000 – $25,000 per month",
+    "jd_raw": "AI Product Owner Graduate Trainee",
+    "source": "jobsdb",
+    "jd_text": "AI Product Owner Graduate Trainee",
+    "salary_min": 25000.0,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_LangChain_p2_19",
+    "title": "Intern – AI Agent Research",
+    "company": "Dabanc",
+    "location": "Tseung Kwan O",
+    "salary_raw": "$10,000 per month",
+    "jd_raw": "Conduct deep-dive research on the AI Agent technology ecosystem.",
+    "source": "jobsdb",
+    "jd_text": "Conduct deep-dive research on the AI Agent technology ecosystem.",
+    "salary_min": 10000.0,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_LangChain_p2_20",
+    "title": "Senior Product Engineer (AI Agent Application)",
+    "company": "CITIC Telecom International Holdings Limited",
+    "location": "Kwai Fong",
+    "salary_raw": "",
+    "jd_raw": "Product Engineering and AI Agent application",
+    "source": "jobsdb",
+    "jd_text": "Product Engineering and AI Agent application",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_LangChain_p2_22",
+    "title": "Senior AI Engineer (1-year contract)",
+    "company": "Langham Hotels International Ltd",
+    "location": "Hong Kong Island",
+    "salary_raw": "",
+    "jd_raw": "About Langham Hospitality Group    A wholly-owned subsidiary of Great Eagle Holdings, Langham Hospitality Group (LHG) comprises a family of distin",
+    "source": "jobsdb",
+    "jd_text": "About Langham Hospitality Group A wholly-owned subsidiary of Great Eagle Holdings, Langham Hospitality Group (LHG) comprises a family of distin",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_LangChain_p2_23",
+    "title": "Technical Product Manager (AI Infrastructure & Agents)",
+    "company": "OneAsia Network Limited",
+    "location": "Kowloon Bay",
+    "salary_raw": "",
+    "jd_raw": "Product Roadmap & Strategy, Agent Ecosystem & Commercialization, Cross-Silicon Strategy, Value Proposition & Use Cases, etc.",
+    "source": "jobsdb",
+    "jd_text": "Product Roadmap Strategy, Agent Ecosystem Commercialization, Cross-Silicon Strategy, Value Proposition Use Cases, etc.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_LangChain_p2_26",
+    "title": "DevOps Engineer",
+    "company": "OAC Group Limited",
+    "location": "Kowloon",
+    "salary_raw": "$55,000 – $65,000 per month",
+    "jd_raw": "Power energy growth, transform data, and fuel sustainable AI innovation.",
+    "source": "jobsdb",
+    "jd_text": "Power energy growth, transform data, and fuel sustainable AI innovation.",
+    "salary_min": 65000.0,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_LangChain_p2_28",
+    "title": "Assistant Program Manager (AI) - ITSO and VPABO",
+    "company": "The Hong Kong University of Science and Technology",
+    "location": "Sai Kung District",
+    "salary_raw": "",
+    "jd_raw": "Assistant Program Manager (AI) - Information Technology Services Office and Office of the Vice-President for Administration & Business",
+    "source": "jobsdb",
+    "jd_text": "Assistant Program Manager (AI) - Information Technology Services Office and Office of the Vice-President for Administration Business",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_RAG_p1_0",
+    "title": "Junior AI Engineer (RAG, Cutting Edge Solution) - Michael Page",
+    "company": "Michael Page International (HK) Ltd",
+    "location": "Hong Kong SAR",
+    "salary_raw": "",
+    "jd_raw": "Developing and implementing AI models and algorithms to solve complex business problems.\nCollaborating with cross-functional teams to integrate AI...",
+    "source": "jobsdb",
+    "jd_text": "Developing and implementing AI models and algorithms to solve complex business problems. Collaborating with cross-functional teams to integrate AI...",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": [
+        "Cross.functional"
+      ]
+    }
+  },
+  {
+    "job_id": "jobsdb_RAG_p2_13",
+    "title": "Data Scientist / Senior Data Scientist",
+    "company": "Pacific Basin Shipping (HK) Limited",
+    "location": "Southern District",
+    "salary_raw": "",
+    "jd_raw": "Designing and delivering advanced data solutions, including ML and AI, for operational performance and business decision-making.",
+    "source": "jobsdb",
+    "jd_text": "Designing and delivering advanced data solutions, including ML and AI, for operational performance and business decision-making.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_RAG_p2_18",
+    "title": "(Senior) Technology Risk Manager (Artificial Intelligence)",
+    "company": "Bank of China (Hong Kong) Limited",
+    "location": "Central",
+    "salary_raw": "Negotiable",
+    "jd_raw": "--",
+    "source": "jobsdb",
+    "jd_text": "--",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_RAG_p2_22",
+    "title": "Senior Software Engineers",
+    "company": "TeamNote Limited",
+    "location": "Lai Chi Kok",
+    "salary_raw": "",
+    "jd_raw": "Build TeamNote’s core platform and private LLM/RAG solutions using AI tools to ship secure, high-quality corporate software at an accelerated pace.",
+    "source": "jobsdb",
+    "jd_text": "Build TeamNote s core platform and private LLM/RAG solutions using AI tools to ship secure, high-quality corporate software at an accelerated pace.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_generative_AI_p1_1",
+    "title": "Systems Development Manager (Generative AI) - AVP - Corporate Web Services - IT",
+    "company": "Hong Kong Exchanges & Clearing Ltd",
+    "location": "Hong Kong SAR",
+    "salary_raw": "",
+    "jd_raw": "You will play a vital role in driving the successful deployment and integration of Generative/ Traditional AI solutions across HKEX.",
+    "source": "jobsdb",
+    "jd_text": "You will play a vital role in driving the successful deployment and integration of Generative/ Traditional AI solutions across HKEX.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_generative_AI_p2_11",
+    "title": "Chief Director, AI Platform & Solutions",
+    "company": "Hong Kong Applied Science and Technology Research Institute Company Limited",
+    "location": "Sha Tin District",
+    "salary_raw": "",
+    "jd_raw": "The incumbent will lead our professional technical department, applying their expertise in the field of AI Platform & Solutions.",
+    "source": "jobsdb",
+    "jd_text": "The incumbent will lead our professional technical department, applying their expertise in the field of AI Platform Solutions.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_generative_AI_p2_15",
+    "title": "AI Engineering Lead (GenAI / Platform)",
+    "company": "Michael Page International (HK) Ltd",
+    "location": "Central and Western District",
+    "salary_raw": "$60k - $88k p.m.",
+    "jd_raw": "It leads the design and development of an enterprise AI platform, combining hands-on engineering with team leadership to enable scalable AI platform.",
+    "source": "jobsdb",
+    "jd_text": "It leads the design and development of an enterprise AI platform, combining hands-on engineering with team leadership to enable scalable AI platform.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": [
+        "Leadership"
+      ]
+    }
+  },
+  {
+    "job_id": "jobsdb_generative_AI_p2_17",
+    "title": "AI Platform Lead | GenAI & MLOps | Top Financial Firm - J12838",
+    "company": "Pinpoint Asia",
+    "location": "Central and Western District",
+    "salary_raw": "$60,000 – $80,000 per month",
+    "jd_raw": "You will design, develop, and maintain the client's cutting-edge AI infrastructure and platforms.",
+    "source": "jobsdb",
+    "jd_text": "You will design, develop, and maintain the client s cutting-edge AI infrastructure and platforms.",
+    "salary_min": 80000.0,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_generative_AI_p2_25",
+    "title": "Copilot SME AI Engineer – Transform Enterprise AI",
+    "company": "TEKsystems",
+    "location": "Hong Kong Island",
+    "salary_raw": "",
+    "jd_raw": "Drive enterprise AI adoption at a global bank by building and delivering Microsoft Copilot solutions.",
+    "source": "jobsdb",
+    "jd_text": "Drive enterprise AI adoption at a global bank by building and delivering Microsoft Copilot solutions.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_prompt_engineer_p2_6",
+    "title": "AI Safety Specialist (AI Engineering)",
+    "company": "Hyphen Connect Limited",
+    "location": "Hong Kong SAR",
+    "salary_raw": "",
+    "jd_raw": "We are searching for an AI Safety Specialist who will play a crucial role in enhancing the security and robustness of language models. You will...",
+    "source": "jobsdb",
+    "jd_text": "We are searching for an AI Safety Specialist who will play a crucial role in enhancing the security and robustness of language models. You will...",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_prompt_engineer_p2_7",
+    "title": "AI Algorithm Engineer",
+    "company": "SaneChoice HK Limited",
+    "location": "Kwai Chung",
+    "salary_raw": "",
+    "jd_raw": "AI 算法工程师",
+    "source": "jobsdb",
+    "jd_text": "AI 算法工程师",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_prompt_engineer_p2_9",
+    "title": "Network Engineer / System Engineer / NOC Engineer / IT Support",
+    "company": "Seamatch Asia Limited",
+    "location": "Tsim Sha Tsui",
+    "salary_raw": "",
+    "jd_raw": "Good working opportunities, Large Company, 5 days' work",
+    "source": "jobsdb",
+    "jd_text": "Good working opportunities, Large Company, 5 days work",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_prompt_engineer_p2_14",
+    "title": "Associate Product Manager (FormX.ai)",
+    "company": "Oursky Limited",
+    "location": "Lai Chi Kok",
+    "salary_raw": "$33,000 – $40,000 per month",
+    "jd_raw": "Most PM roles have you writing tickets. This one has you shaping product alongside a founder, on a platform enterprises in Asia actually depend on.",
+    "source": "jobsdb",
+    "jd_text": "Most PM roles have you writing tickets. This one has you shaping product alongside a founder, on a platform enterprises in Asia actually depend on.",
+    "salary_min": 40000.0,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_prompt_engineer_p2_20",
+    "title": "Back-end Developer / Engineer / Programmer",
+    "company": "Eventmaster Limited",
+    "location": "Lai Chi Kok",
+    "salary_raw": "",
+    "jd_raw": "Join us as a Backend Developer! \nBuild scalable systems, integrate modern AI workflows, and grow with a great team. Fresh grads welcome. \nApply now!",
+    "source": "jobsdb",
+    "jd_text": "Join us as a Backend Developer! Build scalable systems, integrate modern AI workflows, and grow with a great team. Fresh grads welcome. Apply now!",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_prompt_engineer_p2_21",
+    "title": "AI 助理 (AI Assistant)",
+    "company": "Sino Shine Investment Limited",
+    "location": "Central",
+    "salary_raw": "$20,000 – $22,000 per month",
+    "jd_raw": "【徵人】AI 助理 (AI Assistant)",
+    "source": "jobsdb",
+    "jd_text": "徵人 AI 助理 (AI Assistant)",
+    "salary_min": 22000.0,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_prompt_engineer_p2_22",
+    "title": "Front-end Developer / Engineer/Programmer",
+    "company": "Eventmaster Limited",
+    "location": "Lai Chi Kok",
+    "salary_raw": "",
+    "jd_raw": "Craft beautiful user interfaces and explore the latest frontend tech. We value brainstorming, learning, and fresh ideas. Fresh grads welcome to apply!",
+    "source": "jobsdb",
+    "jd_text": "Craft beautiful user interfaces and explore the latest frontend tech. We value brainstorming, learning, and fresh ideas. Fresh grads welcome to apply!",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_architect_p1_2",
+    "title": "Senior Manager - Information Technology (AI solutions)",
+    "company": "Macleans Consulting International Limited",
+    "location": "Kowloon",
+    "salary_raw": "",
+    "jd_raw": "Hong Kong and Asia well-established Listed Group, business involve property development, retail and supply chain.",
+    "source": "jobsdb",
+    "jd_text": "Hong Kong and Asia well-established Listed Group, business involve property development, retail and supply chain.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_architect_p1_4",
+    "title": "Solution Architect (AI, Infrastructure, Bank / Finance, 65-85K)",
+    "company": "Swing Consulting Limited",
+    "location": "Tsim Sha Tsui",
+    "salary_raw": "$65,000 – $75,000 per month",
+    "jd_raw": "Seeking a Solution Architect to deliver production-grade AI platforms, manage GPU infrastructure, and drive banking-grade vendor evaluations.",
+    "source": "jobsdb",
+    "jd_text": "Seeking a Solution Architect to deliver production-grade AI platforms, manage GPU infrastructure, and drive banking-grade vendor evaluations.",
+    "salary_min": 75000.0,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_architect_p2_12",
+    "title": "Solutions Architect (AI/IoT)",
+    "company": "Tenth Revolution Group",
+    "location": "Hong Kong Island",
+    "salary_raw": "$55k - $65k p.m. +  Negotiable",
+    "jd_raw": "Solutions Architect (AI, IoT & Security)",
+    "source": "jobsdb",
+    "jd_text": "Solutions Architect (AI, IoT Security)",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_architect_p2_13",
+    "title": "Data Architect (AVP) – Chief Data Office - IT",
+    "company": "Hong Kong Exchanges & Clearing Ltd",
+    "location": "Hong Kong SAR",
+    "salary_raw": "",
+    "jd_raw": "Data Architect supports Chief Data Office by building a scalable, well structured, and AI ready data foundation. As HKEX expands its data...",
+    "source": "jobsdb",
+    "jd_text": "Data Architect supports Chief Data Office by building a scalable, well structured, and AI ready data foundation. As HKEX expands its data...",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_architect_p2_14",
+    "title": "ERP Solution Architect, Group IT",
+    "company": "Tenth Revolution Group",
+    "location": "Central and Western District",
+    "salary_raw": "$85k - $100k p.m. +  Negotiable",
+    "jd_raw": "🚨 Hiring: ERP Solution Architect (Hong Kong)",
+    "source": "jobsdb",
+    "jd_text": "Hiring: ERP Solution Architect (Hong Kong)",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_architect_p2_16",
+    "title": "Agent Solution Architect",
+    "company": "Tectura Hong Kong Ltd",
+    "location": "Tsim Sha Tsui",
+    "salary_raw": "",
+    "jd_raw": "Unique opportunity to define and lead the architectural vision for AI‑driven enterprise solutions.",
+    "source": "jobsdb",
+    "jd_text": "Unique opportunity to define and lead the architectural vision for AI driven enterprise solutions.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_architect_p2_17",
+    "title": "AI System Architect / System Analyst, Financial Technonlogy",
+    "company": "Industrial and Commercial Bank of China (Asia) Limited",
+    "location": "Hung Hom",
+    "salary_raw": "",
+    "jd_raw": "Participate in the application architectural design",
+    "source": "jobsdb",
+    "jd_text": "Participate in the application architectural design",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_architect_p2_18",
+    "title": "Lead Solution Architect",
+    "company": "Lenovo PCCW Solutions",
+    "location": "Tai Kok Tsui",
+    "salary_raw": "",
+    "jd_raw": "The Lead Solution Architect is responsible for end to end application and system architecture for government and public sector clients",
+    "source": "jobsdb",
+    "jd_text": "The Lead Solution Architect is responsible for end to end application and system architecture for government and public sector clients",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_architect_p2_19",
+    "title": "Infrastructure Technical Architect",
+    "company": "ADECCO",
+    "location": "Hong Kong Island",
+    "salary_raw": "$80,000 – $100,000 per month",
+    "jd_raw": "to provide technical expertise and support in infrastructure solutions, including public cloud, mainframe, and network systems",
+    "source": "jobsdb",
+    "jd_text": "to provide technical expertise and support in infrastructure solutions, including public cloud, mainframe, and network systems",
+    "salary_min": 100000.0,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_architect_p2_21",
+    "title": "AI and Data Systems Architecture Engineer",
+    "company": "SaneChoice HK Limited",
+    "location": "Kwai Chung",
+    "salary_raw": "",
+    "jd_raw": "AI与数据系统架构工程师",
+    "source": "jobsdb",
+    "jd_text": "AI与数据系统架构工程师",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_architect_p2_22",
+    "title": "AI Solutions Architect",
+    "company": "Spark Education (Hong Kong) Limited",
+    "location": "Wan Chai District",
+    "salary_raw": "",
+    "jd_raw": "Welcome to submit your resume to join us, let's grow together",
+    "source": "jobsdb",
+    "jd_text": "Welcome to submit your resume to join us, let s grow together",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_architect_p2_23",
+    "title": "Project Manager Data &AI (Leading Financial Institution) - J12572",
+    "company": "Pinpoint Asia",
+    "location": "Admiralty",
+    "salary_raw": "$60,000 – $80,000 per month",
+    "jd_raw": "A high-caliber Data Solutions and AI Project Manager to spearhead the next generation of intelligent banking.",
+    "source": "jobsdb",
+    "jd_text": "A high-caliber Data Solutions and AI Project Manager to spearhead the next generation of intelligent banking.",
+    "salary_min": 80000.0,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_architect_p2_24",
+    "title": "Solutions Architect Lead",
+    "company": "Nextlink (HK) Technology Co., Ltd.",
+    "location": "Hong Kong SAR",
+    "salary_raw": "",
+    "jd_raw": "Experienced solution architect passionate about solving business challenges with Public Cloud solutions.",
+    "source": "jobsdb",
+    "jd_text": "Experienced solution architect passionate about solving business challenges with Public Cloud solutions.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_architect_p2_25",
+    "title": "AI Engineer/ AI Architect",
+    "company": "ST Partnership Limited",
+    "location": "Hong Kong Island",
+    "salary_raw": "$60,000 – $85,000 per month",
+    "jd_raw": "Step into a high-impact role where your AI expertise will shape the future of financial services.",
+    "source": "jobsdb",
+    "jd_text": "Step into a high-impact role where your AI expertise will shape the future of financial services.",
+    "salary_min": 85000.0,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_architect_p2_26",
+    "title": "AI Platform Lead - Financial Institutions",
+    "company": "Ikas International (Asia) Limited",
+    "location": "Hong Kong Island",
+    "salary_raw": "",
+    "jd_raw": "Lead production AI platforms: scalable architecture, MLOps/LLMOps, GPU optimization, IaC, POCs. Partner with DS/AI teams in a regulated environment.",
+    "source": "jobsdb",
+    "jd_text": "Lead production AI platforms: scalable architecture, MLOps/LLMOps, GPU optimization, IaC, POCs. Partner with DS/AI teams in a regulated environment.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [
+        "Mlops"
+      ],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_architect_p2_27",
+    "title": "AI Solution Architect (Ref: JDB/CISC/AI)",
+    "company": "CISC Limited",
+    "location": "Wong Chuk Hang",
+    "salary_raw": "",
+    "jd_raw": "C&T Group is a leading IT service provider committed to delivering best-of-breed software products, effective IT solutions, and quality services.",
+    "source": "jobsdb",
+    "jd_text": "C T Group is a leading IT service provider committed to delivering best-of-breed software products, effective IT solutions, and quality services.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  },
+  {
+    "job_id": "jobsdb_AI_architect_p2_28",
+    "title": "Systems Architect (C39079)",
+    "company": "InfoTech Services ( HK ) Ltd. 資訊科技服務(香港)有限公司",
+    "location": "Hong Kong Island",
+    "salary_raw": "",
+    "jd_raw": "The Systems Architect supports the documentation and consolidation of technology architecture views.",
+    "source": "jobsdb",
+    "jd_text": "The Systems Architect supports the documentation and consolidation of technology architecture views.",
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": "HKD",
+    "skills": {
+      "programming_languages": [],
+      "frameworks_libraries": [],
+      "cloud_devops": [],
+      "databases": [],
+      "soft_skills": []
+    }
+  }
+]

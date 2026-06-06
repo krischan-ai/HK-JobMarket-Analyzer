@@ -30,9 +30,7 @@ web/package-lock.json
 Thumbs.db
 .DS_Store
 
-# Data
-data/raw/
-data/cleaned/
+# Data (crawler raw & cleaned data should be tracked)
 data/auth/
 
 # Cookies / Auth tokens
