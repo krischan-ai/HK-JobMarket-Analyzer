@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import threading
 import time
 import json as _json
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -20,6 +21,12 @@ from src.logger import get_logger
 router = APIRouter(prefix="/api/stats", tags=["role-stats"])
 logger = get_logger("api.role_stats")
 
+# 分类状态（全局共享，跨请求持久化）
+_classify_progress: dict = {"running": False, "progress": 0, "total": 0, "done": 0, "message": "", "llm_mode": False}
+_classify_result: list[dict] = []
+_classify_last_at: Optional[str] = None  # 最近一次分类完成时间
+_classify_thread: Optional[threading.Thread] = None
+
 
 def _get_classifier() -> RoleClassifier:
     return RoleClassifier()
@@ -29,7 +36,9 @@ def _get_classifier() -> RoleClassifier:
 def role_distribution():
     classifier = _get_classifier()
     stats = classifier.get_statistics()
-    return stats["distribution"]
+    # 排除「其他」类别，未分类的岗位不显示在分布图中
+    filtered = [item for item in stats["distribution"] if item["role_id"] != "other"]
+    return filtered
 
 
 @router.get("/role-salary")
@@ -104,6 +113,7 @@ def llm_status():
 class RunClassificationRequest(BaseModel):
     mode: str = "full"
     batch_size: int = 5
+    use_llm: bool = True  # True=LLM可用时使用LLM, False=强制规则模式
 
 
 @router.post("/run-classification")
@@ -159,21 +169,25 @@ def run_classification(req: RunClassificationRequest = RunClassificationRequest(
     }
 
 
-@router.post("/classify-jobs")
-def classify_jobs(req: RunClassificationRequest = RunClassificationRequest()):
-    """分类岗位并返回带技能标签的详细结果（并发 LLM 调用）"""
+def _run_classify_in_background(req: RunClassificationRequest):
+    """在后台线程中执行分类，结果存入 _classify_result"""
+    global _classify_progress, _classify_result, _classify_last_at, _classify_thread
+
     df = load_jobs_df()
     if df.empty:
-        raise HTTPException(status_code=400, detail="No job data available")
+        _classify_progress = {"running": False, "progress": 0, "total": 0, "done": 0, "message": "没有数据", "llm_mode": False}
+        return
 
     classifier = _get_classifier()
-    llm_mode = classifier.available
-    logger.info("Classify-jobs: LLM=%s, mode=%s, batch=%d, total=%d", llm_mode, req.mode, req.batch_size, len(df))
+    llm_mode = classifier.available and req.use_llm
+    logger.info("Classify-bg: LLM=%s, total=%d, use_llm=%s", llm_mode, len(df), req.use_llm)
+
+    _classify_progress = {"running": True, "progress": 0, "total": len(df), "done": 0, "message": "正在初始化分類...", "llm_mode": llm_mode}
+    _classify_result = []
 
     if req.mode == "full":
         classifier.clear_cache()
 
-    # 技能提取引擎
     skill_extractor = RuleBasedSkillExtractor()
     skill_extractor.clear_cache()
 
@@ -184,7 +198,6 @@ def classify_jobs(req: RunClassificationRequest = RunClassificationRequest()):
     cache_lock = Lock()
     classified_count = [0]
 
-    # 安全 float（处理 NaN）
     def _safe_float(v):
         try:
             fv = float(v) if v is not None else 0.0
@@ -193,31 +206,21 @@ def classify_jobs(req: RunClassificationRequest = RunClassificationRequest()):
             return 0.0
 
     def _safe_int(v, default=0):
-        """安全 int 转换（处理 NaN / None）"""
         try:
-            if v is None:
-                return default
+            if v is None: return default
             fv = float(v)
-            if fv != fv:  # NaN check
-                return default
-            return int(fv)
+            return default if fv != fv else int(fv)
         except (ValueError, TypeError):
             return default
 
     def _safe_bool(v) -> bool:
-        """安全 bool 转换（NaN 视为 False）"""
-        if v is None:
-            return False
-        if isinstance(v, float) and v != v:  # NaN
-            return False
+        if v is None: return False
+        if isinstance(v, float) and v != v: return False
         return bool(v)
 
     def _safe_str(v) -> str:
-        """安全 str 转换（NaN / None 视为空字符串）"""
-        if v is None:
-            return ""
-        if isinstance(v, float) and v != v:  # NaN
-            return ""
+        if v is None: return ""
+        if isinstance(v, float) and v != v: return ""
         return str(v)
 
     def _classify_one(job: dict) -> dict:
@@ -225,37 +228,27 @@ def classify_jobs(req: RunClassificationRequest = RunClassificationRequest()):
             return _do_classify(job)
         except Exception as e:
             logger.exception("Failed to classify job %s: %s", job.get("job_id", "?"), e)
-            # 返回一个最低置信度的 other 结果，避免整个请求失败
             return {
-                "job_id": str(job.get("job_id", "")),
-                "title": str(job.get("title", "")),
-                "company": str(job.get("company", "")),
-                "location": str(job.get("location", "")),
-                "source": str(job.get("source", "")),
-                "role_id": "other",
-                "role_name": "其他",
-                "role_confidence": "low",
+                "job_id": _safe_str(job.get("job_id")),
+                "title": _safe_str(job.get("title")),
+                "company": _safe_str(job.get("company")),
+                "location": _safe_str(job.get("location")),
+                "source": _safe_str(job.get("source")),
+                "role_id": "other", "role_name": "其他", "role_confidence": "low",
                 "salary_min": _safe_float(job.get("salary_min")),
                 "salary_max": _safe_float(job.get("salary_max")),
-                "skills": [],
-                "is_insurance_sales": False,
-                "insurance_score": 0,
-                "llm_is_insurance": False,
-                "llm_confidence": "",
-                "llm_explanation": "",
+                "skills": [], "is_insurance_sales": False, "insurance_score": 0,
+                "llm_is_insurance": False, "llm_confidence": "", "llm_explanation": "",
             }
 
     def _do_classify(job: dict) -> dict:
         jd_text = str(job.get("jd_raw", "") or "")
-        # 分类文本：用 JD 文本，若太短则用标题补充
         classify_text = jd_text if len(jd_text) > 20 else str(job.get("title", ""))
         cache_key = classifier._make_cache_key(classify_text)
 
-        # 先检查缓存（加锁）
         with cache_lock:
             if cache_key in classifier._cache:
                 cached = classifier._cache[cache_key]
-                # 过滤掉内部字段（如 _job_id）
                 cls_result = RoleResult(
                     role_id=cached.get("role_id", "other"),
                     role_name=cached.get("role_name", "其他"),
@@ -266,8 +259,7 @@ def classify_jobs(req: RunClassificationRequest = RunClassificationRequest()):
                 from_cache = False
 
         if not from_cache:
-            # LLM 调用不加锁，允许并发
-            if classifier.available:
+            if llm_mode:
                 try:
                     cls_result = classifier._classify_with_llm(classify_text)
                 except Exception:
@@ -275,7 +267,6 @@ def classify_jobs(req: RunClassificationRequest = RunClassificationRequest()):
             else:
                 cls_result = classifier._classify_with_rules(classify_text)
 
-            # 写回缓存（加锁）
             with cache_lock:
                 classifier._cache[cache_key] = {
                     "role_id": cls_result.role_id,
@@ -287,7 +278,6 @@ def classify_jobs(req: RunClassificationRequest = RunClassificationRequest()):
         if cls_result.role_id and cls_result.role_id != "other":
             classified_count[0] += 1
 
-        # 提取技术栈（用规则引擎从 JD 文本+标题中提取）
         jd_text_raw = str(job.get("jd_text", "") or job.get("jd_raw", "") or "")
         title_raw = str(job.get("title", ""))
         skill_dict = skill_extractor.extract(jd_text_raw + " " + title_raw)
@@ -296,16 +286,15 @@ def classify_jobs(req: RunClassificationRequest = RunClassificationRequest()):
             for s in skill_set:
                 flat_skills.append({"name": str(s), "category": str(cat)})
 
-        # 保险销售标记（爬虫阶段已计算）
         is_ins = _safe_bool(job.get("is_insurance_sales"))
         ins_score = _safe_int(job.get("insurance_score", 0))
 
         return {
-            "job_id": str(job.get("job_id", "")),
-            "title": str(job.get("title", "")),
-            "company": str(job.get("company", "")),
-            "location": str(job.get("location", "")),
-            "source": str(job.get("source", "")),
+            "job_id": _safe_str(job.get("job_id")),
+            "title": _safe_str(job.get("title")),
+            "company": _safe_str(job.get("company")),
+            "location": _safe_str(job.get("location")),
+            "source": _safe_str(job.get("source")),
             "role_id": cls_result.role_id,
             "role_name": cls_result.role_name,
             "role_confidence": cls_result.confidence,
@@ -319,7 +308,7 @@ def classify_jobs(req: RunClassificationRequest = RunClassificationRequest()):
             "llm_explanation": _safe_str(job.get("llm_explanation")),
         }
 
-    # 并发分类（max_workers 控制 LLM 并发数）
+    # 并发分类
     workers = min(8, total)
     results_map: dict[int, dict] = {}
     with ThreadPoolExecutor(max_workers=workers) as pool:
@@ -328,24 +317,22 @@ def classify_jobs(req: RunClassificationRequest = RunClassificationRequest()):
             idx = futures[future]
             try:
                 results_map[idx] = future.result()
-            except Exception as e:
-                logger.exception("Unexpected error classifying job index %d: %s", idx, e)
+            except Exception:
                 results_map[idx] = {
-                    "job_id": str(jobs[idx].get("job_id", "")),
-                    "title": str(jobs[idx].get("title", "")),
-                    "company": "", "location": "", "source": "",
+                    "job_id": _safe_str(jobs[idx].get("job_id")),
                     "role_id": "other", "role_name": "其他", "role_confidence": "low",
                     "salary_min": 0.0, "salary_max": 0.0, "skills": [],
-                    "is_insurance_sales": False, "insurance_score": 0,
-                    "llm_is_insurance": False, "llm_confidence": "", "llm_explanation": "",
                 }
-            done = len(results_map)
-            if done % 50 == 0 or done == total:
-                logger.info("Classify progress: %d/%d", done, total)
+            done_count = len(results_map)
+            pct = round(done_count / total * 100, 0)
+            _classify_progress = {
+                "running": True, "progress": int(pct), "total": total,
+                "done": done_count,
+                "message": f"正在分類... {done_count}/{total} ({int(pct)}%)",
+                "llm_mode": llm_mode,
+            }
 
-    # 恢复原始顺序
     results = [results_map[i] for i in range(total) if i in results_map]
-
     elapsed = (time.time() - start) * 1000
 
     # Save cache
@@ -355,15 +342,55 @@ def classify_jobs(req: RunClassificationRequest = RunClassificationRequest()):
             classifier._cache[cache_key]["_job_id"] = str(job.get("job_id", ""))
     classifier._save_cache()
 
-    return {
-        "success": True,
-        "total": total,
-        "classified": classified_count[0],
-        "duration_ms": round(elapsed, 0),
+    now_ts = datetime.now(timezone.utc).isoformat()
+    _classify_result = results
+    _classify_last_at = now_ts
+    _classify_progress = {
+        "running": False, "progress": 100, "total": total, "done": total,
+        "message": f"分類完成：{classified_count[0]}/{total} ({ 'LLM' if llm_mode else '規則' } 模式)",
         "llm_mode": llm_mode,
-        "message": f"Classified {classified_count[0]}/{total} jobs in {elapsed/1000:.1f}s ({'LLM' if llm_mode else 'Rules'})",
-        "items": results,
+        "duration_ms": round(elapsed, 0),
+        "classified": classified_count[0],
     }
+    _classify_thread = None
+    logger.info("Classify-bg done: %d/%d in %.1fs", classified_count[0], total, elapsed / 1000)
+
+
+@router.post("/classify-jobs")
+def classify_jobs(req: RunClassificationRequest = RunClassificationRequest()):
+    """启动后台分类任务，立即返回。进度通过 GET /classify-progress 查询"""
+    global _classify_progress, _classify_result, _classify_thread
+
+    # 如果已有任务在运行，拒绝
+    if _classify_progress.get("running"):
+        raise HTTPException(status_code=409, detail="分类任务正在运行中，请等待完成")
+
+    df = load_jobs_df()
+    if df.empty:
+        raise HTTPException(status_code=400, detail="No job data available")
+
+    # 重置状态
+    _classify_result = []
+    _classify_progress = {"running": True, "progress": 0, "total": len(df), "done": 0, "message": "正在啟動...", "llm_mode": False}
+
+    # 启动后台线程
+    _classify_thread = threading.Thread(
+        target=_run_classify_in_background, args=(req,), daemon=True
+    )
+    _classify_thread.start()
+
+    return {"started": True, "total": len(df), "message": "分類任務已啟動，請透過 GET /classify-progress 查詢進度"}
+
+
+@router.get("/classify-progress")
+def classify_progress():
+    """查询分类进度和结果（供前端轮询）"""
+    global _classify_progress, _classify_result, _classify_last_at
+    resp = _classify_progress.copy()
+    if not _classify_progress.get("running") and _classify_result:
+        resp["results"] = _classify_result
+    resp["last_classified_at"] = _classify_last_at
+    return resp
 
 
 class InsuranceReviewRequest(BaseModel):

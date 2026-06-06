@@ -43,9 +43,19 @@
     <!-- 分類控制區 -->
     <el-card style="margin-bottom: 16px">
       <template #header>
-        <span><el-icon><DataAnalysis /></el-icon> 執行分類</span>
+        <div style="display: flex; align-items: center; gap: 12px">
+          <span><el-icon><DataAnalysis /></el-icon> 執行分類</span>
+          <span v-if="store.lastClassifiedAt" style="font-size: 12px; color: #909399; margin-left: auto">
+            上次分類: {{ formatTime(store.lastClassifiedAt) }}
+          </span>
+        </div>
       </template>
       <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap">
+        <span>分類模式:</span>
+        <el-radio-group v-model="store.useLLM" :disabled="store.running" size="small">
+          <el-radio-button :value="true">LLM 模式</el-radio-button>
+          <el-radio-button :value="false">規則模式</el-radio-button>
+        </el-radio-group>
         <span>批次大小:</span>
         <el-input-number v-model="batchSize" :min="1" :max="50" :disabled="store.running" size="small" />
         <el-button
@@ -59,6 +69,8 @@
           {{ store.running ? '分類中...' : '開始分類全部崗位' }}
         </el-button>
         <el-tag v-if="store.llmMode" type="success" size="small">使用 LLM 智能分類</el-tag>
+        <el-tag v-else-if="store.useLLM && !store.llmAvailable" type="warning" size="small">LLM 不可用，使用規則引擎</el-tag>
+        <el-tag v-else-if="!store.useLLM" type="warning" size="small">使用關鍵詞規則分類</el-tag>
         <el-tag v-else-if="store.duration" type="warning" size="small">使用關鍵詞規則分類</el-tag>
         <span v-if="store.duration" style="font-size: 13px; color: #909399">
           耗時 {{ (store.duration / 1000).toFixed(1) }}s
@@ -327,16 +339,23 @@ async function handleReviewInsurance() {
 
 async function handleRun() {
   try {
-    await store.runWithPoll(batchSize.value)
-    ElMessage.success(store.message)
+    await store.startClassify(batchSize.value)
   } catch {
     ElMessage.error('分類失敗')
   }
 }
 
+function formatTime(iso: string): string {
+  try {
+    return new Date(iso).toLocaleString('zh-HK')
+  } catch {
+    return iso
+  }
+}
+
 onMounted(() => {
   store.fetchStatus()
-  store.fetchDistribution()
+  store.resumeOnMount()
 })
 </script>
 

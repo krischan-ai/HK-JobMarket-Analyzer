@@ -65,11 +65,14 @@ export const useClassificationStore = defineStore('classification', () => {
   const classified = ref(0)
   const duration = ref(0)
   const llmMode = ref(false)
+  const useLLM = ref(true)  // 用户选择是否使用 LLM
   const message = ref('')
   const results = ref<ClassifiedJob[]>([])
   const distribution = ref<RoleDistItem[]>([])
   const llmAvailable = ref(false)
   const coverageRate = ref(0)
+  const lastClassifiedAt = ref<string | null>(null)
+  let _pollTimer: ReturnType<typeof setInterval> | null = null
 
   // filter/stats state
   const roleFilter = ref('')
@@ -168,75 +171,112 @@ export const useClassificationStore = defineStore('classification', () => {
     }
   }
 
-  async function runClassify(batchSize = 5) {
+  // 启动分类 + 轮询进度（POST 立即返回，后端后台执行）
+  async function startClassify(batchSize = 5) {
     running.value = true
     progress.value = 0
     total.value = 0
     classified.value = 0
+    duration.value = 0
     results.value = []
-    message.value = '正在初始化分類...'
+    message.value = '正在啟動分類任務...'
 
     try {
-      const { data } = await api.post<ClassifyResult>('/stats/classify-jobs', {
+      const { data } = await api.post('/stats/classify-jobs', {
         mode: 'full',
         batch_size: batchSize,
-      }, { timeout: 300000 })
+        use_llm: useLLM.value,
+      })
 
-      results.value = data.items || []
-      total.value = data.total
-      classified.value = data.classified
-      duration.value = data.duration_ms
-      llmMode.value = data.llm_mode
-      progress.value = 100
-      message.value = data.message
-      await fetchDistribution()
+      total.value = data.total || 0
+      message.value = '分類中...'
+      _startPolling()
     } catch (e: unknown) {
       const err = e as { response?: { data?: { detail?: string } }; message?: string }
-      message.value = err?.response?.data?.detail || err?.message || '分類失敗'
-    } finally {
+      if (err?.response?.status === 409) {
+        message.value = '已有任務正在運行，正在恢復監聽...'
+        _startPolling()
+      } else {
+        message.value = err?.response?.data?.detail || err?.message || '啟動失敗'
+        running.value = false
+      }
+    }
+  }
+
+  // 页面挂载时调用：恢复进度监听 / 加载已有结果
+  async function resumeOnMount() {
+    _stopPoll()
+    try {
+      const { data } = await api.get('/stats/classify-progress')
+      if (data.running) {
+        // 后台有任务在跑 → 恢复进度显示并开始轮询
+        running.value = true
+        total.value = data.total || 0
+        progress.value = data.progress || 0
+        message.value = data.message || '分類中...'
+        llmMode.value = data.llm_mode || false
+        _startPolling()
+      } else if (data.results && data.results.length > 0) {
+        // 任务已完成 → 加载缓存结果
+        results.value = data.results
+        total.value = data.total || data.results.length
+        progress.value = 100
+        classified.value = data.classified || data.results.length
+        duration.value = data.duration_ms || 0
+        llmMode.value = data.llm_mode || false
+        lastClassifiedAt.value = data.last_classified_at || null
+        message.value = data.message || '分類完成'
+        running.value = false
+      } else {
+        // 无历史结果
+        running.value = false
+      }
+    } catch {
       running.value = false
     }
   }
 
-  // Poll progress during long classification
-  async function runWithPoll(batchSize = 5) {
-    running.value = true
-    progress.value = 0
-    total.value = 0
-    results.value = []
-    message.value = '正在初始化...'
+  function _startPolling() {
+    _stopPoll()
+    _pollTimer = setInterval(async () => {
+      try {
+        const { data } = await api.get('/stats/classify-progress')
+        progress.value = data.progress || 0
+        total.value = data.total || total.value
+        message.value = data.message || ''
+        llmMode.value = data.llm_mode || false
 
-    try {
-      const { data } = await api.post<ClassifyResult>('/stats/classify-jobs', {
-        mode: 'full',
-        batch_size: batchSize,
-      }, { timeout: 600000 })
+        if (!data.running) {
+          _stopPoll()
+          running.value = false
+          // 任务完成 → 加载结果
+          if (data.results && data.results.length > 0) {
+            results.value = data.results
+            classified.value = data.classified || data.results.length
+            duration.value = data.duration_ms || 0
+            lastClassifiedAt.value = data.last_classified_at || null
+            await fetchDistribution()
+          } else if (data.last_classified_at) {
+            lastClassifiedAt.value = data.last_classified_at
+          }
+        }
+      } catch { /* ignore poll errors */ }
+    }, 1500)
+  }
 
-      results.value = data.items || []
-      total.value = data.total
-      classified.value = data.classified
-      duration.value = data.duration_ms
-      llmMode.value = data.llm_mode
-      progress.value = 100
-      message.value = data.message
-
-      // Refresh distribution
-      const distResp = await api.get('/stats/role-distribution')
-      distribution.value = distResp.data
-    } catch (e: unknown) {
-      const err = e as { response?: { data?: { detail?: string } }; message?: string }
-      message.value = err?.response?.data?.detail || err?.message || '分類失敗'
-    } finally {
-      running.value = false
+  function _stopPoll() {
+    if (_pollTimer) {
+      clearInterval(_pollTimer)
+      _pollTimer = null
     }
   }
 
   return {
-    running, progress, total, classified, duration, llmMode, message,
+    running, progress, total, classified, duration, llmMode, useLLM, message,
     results, filteredResults, distribution, roleStats, uniqueSkills,
-    llmAvailable, coverageRate, roleFilter,
+    llmAvailable, coverageRate, roleFilter, lastClassifiedAt,
     insuranceCount, llmInsuranceCount,
     reviewing, reviewInsurance,
-    fetchStatus, fetchDistribution, runClassify, runWithPoll,
+    fetchStatus, fetchDistribution, startClassify, resumeOnMount,
   }
 })

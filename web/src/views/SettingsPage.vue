@@ -31,7 +31,7 @@
                 v-model="form.api_key"
                 type="password"
                 show-password
-                placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                :placeholder="llmStore.apiKeySet ? '已儲存（輸入新值可覆蓋）' : 'sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'"
                 @input="formDirty = true"
               >
                 <template #prefix><el-icon><Lock /></el-icon></template>
@@ -253,7 +253,17 @@ onMounted(async () => {
 })
 
 async function handleSave() {
-  await llmStore.saveConfig({ ...form })
+  // 如果 api_key 为空且之前已保存，保持原有 key，只更新其他配置
+  const payload: Record<string, string | number> = {
+    base_url: form.base_url,
+    model: form.model,
+    timeout: form.timeout,
+  }
+  // 只有用户修改了 api_key 或之前未配置时才提交
+  if (form.api_key || !llmStore.apiKeySet) {
+    payload.api_key = form.api_key
+  }
+  await llmStore.saveConfig(payload)
   formDirty.value = false
   ElMessage.success('LLM 配置已保存')
 }

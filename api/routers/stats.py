@@ -2,8 +2,12 @@ from fastapi import APIRouter, Query
 from api.dependencies import load_jobs_df, load_skills_df
 import json
 from pathlib import Path
+import pandas as pd
 
 router = APIRouter(prefix="/api/stats", tags=["stats"])
+
+# 仪表盘技术栈应排除的类别（软技能 + AI 概念/子领域）
+_NON_TECH_CATEGORIES = {"soft_skills", "ai_concepts"}
 
 # 加载地点中文翻译
 _ZH_LOCATION_MAP: dict[str, str] | None = None
@@ -62,7 +66,12 @@ def overview():
     locations = df["location"].nunique() if "location" in df.columns else 0
 
     skill_df = load_skills_df()
-    total_skills = len(skill_df) if not skill_df.empty else 0
+    # 仅计算技术技能（排除软技能 + AI 概念）
+    if not skill_df.empty:
+        tech_df = skill_df[~skill_df["category"].isin(_NON_TECH_CATEGORIES)]
+        total_skills = len(tech_df) if not tech_df.empty else 0
+    else:
+        total_skills = 0
 
     return {
         "total_jobs": total,
@@ -75,26 +84,59 @@ def overview():
         "location_count": int(locations),
     }
 
+def _get_enriched_skills():
+    """获取合并了 CSV + 分类结果的技术技能数据"""
+    skill_df = load_skills_df()
+    try:
+        from api.routers.role_stats import _classify_result
+        if _classify_result:
+            classify_skills = []
+            for item in _classify_result:
+                for s in (item.get("skills") or []):
+                    classify_skills.append({
+                        "skill": s.get("name", ""),
+                        "category": s.get("category", ""),
+                    })
+            if classify_skills:
+                classify_df = pd.DataFrame(classify_skills)
+                if not skill_df.empty:
+                    skill_df = pd.concat([skill_df, classify_df], ignore_index=True)
+                else:
+                    skill_df = classify_df
+    except ImportError:
+        pass
+    return skill_df
+
 
 @router.get("/top-skills")
 def top_skills(top_n: int = Query(default=15)):
-    skill_df = load_skills_df()
+    skill_df = _get_enriched_skills()
+
     if skill_df.empty:
         return []
-    freq = skill_df["skill"].value_counts().head(top_n).reset_index()
+    # 过滤掉非技术类别（软技能 + AI 概念）
+    tech_df = skill_df[~skill_df["category"].isin(_NON_TECH_CATEGORIES)]
+    if tech_df.empty:
+        tech_df = skill_df
+    freq = tech_df["skill"].value_counts().head(top_n).reset_index()
     freq.columns = ["skill", "count"]
     freq["category"] = freq["skill"].apply(
-        lambda s: skill_df[skill_df["skill"] == s]["category"].iloc[0] if len(skill_df[skill_df["skill"] == s]) > 0 else ""
+        lambda s: tech_df[tech_df["skill"] == s]["category"].iloc[0] if len(tech_df[tech_df["skill"] == s]) > 0 else ""
     )
     return freq.to_dict(orient="records")
 
 
 @router.get("/categories")
 def category_distribution():
-    skill_df = load_skills_df()
+    skill_df = _get_enriched_skills()
+
     if skill_df.empty:
         return []
-    freq = skill_df["category"].value_counts().reset_index()
+    # 排除非技术类别（软技能 + AI 概念）
+    tech_df = skill_df[~skill_df["category"].isin(_NON_TECH_CATEGORIES)]
+    if tech_df.empty:
+        tech_df = skill_df
+    freq = tech_df["category"].value_counts().reset_index()
     freq.columns = ["category", "count"]
     return freq.to_dict(orient="records")
 

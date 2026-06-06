@@ -19,6 +19,9 @@ config/llm_config.json
 .idea/
 *.swp
 
+# Vite cache
+.vite/
+
 # Node
 node_modules/
 web/node_modules/

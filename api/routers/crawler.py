@@ -13,7 +13,7 @@ from api.schemas.crawler import (
     CrawlTaskResponse,
 )
 from src.crawler_controller.scheduler import CrawlerScheduler
-from src.crawler_controller.status import CrawlerStatus
+from src.crawler_controller.status import CrawlerStatus, StateMachine
 from src.crawler_controller.task_manager import TaskManager
 from src.crawlers import list_sources
 
@@ -32,7 +32,7 @@ def _to_response(task) -> CrawlTaskResponse:
         keywords=task.keywords,
         sources=task.sources,
         status=task.status.value,
-        status_label=CrawlerStatus.label(task.status),
+        status_label=StateMachine.label(task.status),
         progress=task.progress,
         total_jobs=task.total_jobs,
         source_progress=task.source_progress,

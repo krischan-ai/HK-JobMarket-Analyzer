@@ -38,6 +38,11 @@
     <h3 style="margin: 0 0 12px">角色分類分析</h3>
 
     <el-row :gutter="16" style="margin-bottom: 16px">
+      <el-col :span="24">
+        <RoleSalaryChart :data="statsStore.roleSalary" />
+      </el-col>
+    </el-row>
+    <el-row :gutter="16" style="margin-bottom: 16px">
       <el-col :span="6">
         <LLMStatusCard
           :status="statsStore.llmStatus!"
@@ -49,11 +54,8 @@
           <el-empty description="無法獲取 LLM 狀態" :image-size="60" />
         </el-card>
       </el-col>
-      <el-col :span="9">
+      <el-col :span="18">
         <RoleDistributionChart :data="statsStore.roleDistribution" />
-      </el-col>
-      <el-col :span="9">
-        <RoleSalaryChart :data="statsStore.roleSalary" />
       </el-col>
     </el-row>
   </div>
