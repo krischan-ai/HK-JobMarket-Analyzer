@@ -15,3 +15,7 @@ app.include_router(llm.router)
 app.include_router(role_stats.router)
 app.include_router(crawler.router)
 app.include_router(scheduler.router)
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -9,6 +9,10 @@
       <el-icon><Odometer /></el-icon>
       <span>儀表盤</span>
     </el-menu-item>
+    <el-menu-item index="/jobs">
+      <el-icon><Document /></el-icon>
+      <span>崗位瀏覽</span>
+    </el-menu-item>
     <el-menu-item index="/tech-trends">
       <el-icon><TrendCharts /></el-icon>
       <span>技術趨勢</span>

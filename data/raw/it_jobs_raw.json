@@ -6,7 +6,11 @@
     "location": "遠程",
     "salary_raw": "",
     "jd_raw": "全職在家工作",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_4",
@@ -15,7 +19,11 @@
     "location": "遠程",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_8",
@@ -24,7 +32,11 @@
     "location": "遠程",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_12",
@@ -33,7 +45,11 @@
     "location": "遠程",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_16",
@@ -42,7 +58,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "實習",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_17",
@@ -51,7 +71,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_21",
@@ -60,7 +84,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_25",
@@ -69,7 +97,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_29",
@@ -78,7 +110,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_33",
@@ -87,7 +123,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "合約",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_34",
@@ -96,7 +136,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_38",
@@ -105,7 +149,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_4",
@@ -114,7 +162,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_8",
@@ -123,7 +175,11 @@
     "location": "Sha Tin, New Territories",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_12",
@@ -132,7 +188,11 @@
     "location": "遠程",
     "salary_raw": "",
     "jd_raw": "在家工作",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_16",
@@ -141,7 +201,11 @@
     "location": "遠程",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_17",
@@ -150,7 +214,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_21",
@@ -159,7 +227,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_25",
@@ -168,7 +240,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_29",
@@ -177,7 +253,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_33",
@@ -186,7 +266,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_37",
@@ -195,7 +279,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_41",
@@ -204,7 +292,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_17",
@@ -213,7 +305,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_21",
@@ -222,7 +318,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_25",
@@ -231,7 +331,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_34",
@@ -240,7 +344,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_8",
@@ -249,7 +357,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_12",
@@ -258,7 +370,11 @@
     "location": "遠程",
     "salary_raw": "",
     "jd_raw": "全職在家工作",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_16",
@@ -267,7 +383,11 @@
     "location": "遠程",
     "salary_raw": "",
     "jd_raw": "全職在家工作",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_8",
@@ -276,7 +396,11 @@
     "location": "遠程",
     "salary_raw": "",
     "jd_raw": "在家工作",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_16",
@@ -285,7 +409,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "短期 +1",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_21",
@@ -294,7 +422,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_29",
@@ -303,7 +435,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職 +1醫療保險",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_33",
@@ -312,7 +448,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_17",
@@ -321,7 +461,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_21",
@@ -330,7 +474,11 @@
     "location": "Hong Kong Science Park, New Territories",
     "salary_raw": "月薪 $40,000 - $65,000",
     "jd_raw": "月薪 $40,000 - $65,000長工",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_25",
@@ -339,7 +487,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_26",
@@ -348,7 +500,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "短期 +1",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_30",
@@ -357,7 +513,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_0",
@@ -366,7 +526,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_4",
@@ -375,7 +539,11 @@
     "location": "Lai Chi Kok, Kowloon",
     "salary_raw": "",
     "jd_raw": "全職醫療保險有薪年假彈性上班時間",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_16",
@@ -384,7 +552,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_17",
@@ -393,7 +565,11 @@
     "location": "New Territories",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_21",
@@ -402,7 +578,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "實習",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_25",
@@ -411,7 +591,11 @@
     "location": "Clear Water Bay, New Territories",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_29",
@@ -420,7 +604,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_33",
@@ -429,7 +617,11 @@
     "location": "Kowloon Bay, Kowloon",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_4",
@@ -438,7 +630,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_17",
@@ -447,7 +643,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "合約有薪年假",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_21",
@@ -456,7 +656,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "合約",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_25",
@@ -465,7 +669,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_29",
@@ -474,7 +682,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_33",
@@ -483,7 +695,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_37",
@@ -492,7 +708,11 @@
     "location": "Kwun Tong, Kowloon",
     "salary_raw": "月薪 $11,490",
     "jd_raw": "月薪 $11,490實習在職專業培訓",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_41",
@@ -501,7 +721,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_0",
@@ -510,7 +734,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_4",
@@ -519,7 +747,11 @@
     "location": "Kowloon",
     "salary_raw": "月薪 $32,000 - $38,000",
     "jd_raw": "月薪 $32,000 - $38,000全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_12",
@@ -528,7 +760,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_33",
@@ -537,7 +773,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_4",
@@ -546,7 +786,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_16",
@@ -555,7 +799,11 @@
     "location": "遠程",
     "salary_raw": "",
     "jd_raw": "全職在家工作",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_17",
@@ -564,7 +812,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_21",
@@ -573,7 +825,11 @@
     "location": "遠程",
     "salary_raw": "",
     "jd_raw": "全職在家工作",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_25",
@@ -582,7 +838,11 @@
     "location": "Sha Tin, New Territories",
     "salary_raw": "月薪 $25,000 - $35,000",
     "jd_raw": "月薪 $25,000 - $35,000",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_33",
@@ -591,7 +851,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_34",
@@ -600,7 +864,11 @@
     "location": "遠程 in Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職在家工作",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_38",
@@ -609,7 +877,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "長工",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_42",
@@ -618,7 +890,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_46",
@@ -627,7 +903,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_50",
@@ -636,7 +916,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_4",
@@ -645,7 +929,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_16",
@@ -654,7 +942,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_17",
@@ -663,7 +955,11 @@
     "location": "Kowloon Tong, Kowloon",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_21",
@@ -672,7 +968,11 @@
     "location": "Kowloon Tong, Kowloon",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_25",
@@ -681,7 +981,11 @@
     "location": "Kowloon Tong, Kowloon",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_29",
@@ -690,7 +994,11 @@
     "location": "Kowloon Tong, Kowloon",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_16",
@@ -699,7 +1007,11 @@
     "location": "遠程",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_17",
@@ -708,7 +1020,11 @@
     "location": "Hong Kong",
     "salary_raw": "月薪 $20,000 起",
     "jd_raw": "月薪 $20,000 起合約",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_21",
@@ -717,7 +1033,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_29",
@@ -726,7 +1046,11 @@
     "location": "遠程",
     "salary_raw": "",
     "jd_raw": "在家工作",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_42",
@@ -735,7 +1059,11 @@
     "location": "Central, Hong Kong Island",
     "salary_raw": "",
     "jd_raw": "全職在職專業培訓",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_16",
@@ -744,7 +1072,11 @@
     "location": "遠程",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_17",
@@ -753,7 +1085,11 @@
     "location": "Wan Chai, Hong Kong Island",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_25",
@@ -762,7 +1098,11 @@
     "location": "遠程 in Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_26",
@@ -771,7 +1111,11 @@
     "location": "Taikoo Shing, Hong Kong Island",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_34",
@@ -780,7 +1124,11 @@
     "location": "遠程",
     "salary_raw": "",
     "jd_raw": "在家工作",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_38",
@@ -789,7 +1137,11 @@
     "location": "遠程",
     "salary_raw": "",
     "jd_raw": "全職在家工作",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_42",
@@ -798,7 +1150,11 @@
     "location": "遠程",
     "salary_raw": "",
     "jd_raw": "全職在家工作",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_4",
@@ -807,7 +1163,11 @@
     "location": "Hong Kong",
     "salary_raw": "月薪 $20,000 起",
     "jd_raw": "月薪 $20,000 起全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_8",
@@ -816,7 +1176,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_17",
@@ -825,7 +1189,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_33",
@@ -834,7 +1202,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職醫療保險有薪年假",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_34",
@@ -843,7 +1215,11 @@
     "location": "Causeway Bay, Hong Kong Island",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_38",
@@ -852,7 +1228,11 @@
     "location": "遠程 in Hong Kong",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_42",
@@ -861,7 +1241,11 @@
     "location": "Central, Hong Kong Island",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_0",
@@ -870,7 +1254,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_4",
@@ -879,7 +1267,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "長工",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_8",
@@ -888,7 +1280,11 @@
     "location": "Quarry Bay, Hong Kong Island",
     "salary_raw": "月薪 $80,000 - $95,000",
     "jd_raw": "月薪 $80,000 - $95,000長工",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_0_12",
@@ -897,7 +1293,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_17",
@@ -906,7 +1306,11 @@
     "location": "遠程",
     "salary_raw": "",
     "jd_raw": "全職在家工作",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_21",
@@ -915,7 +1319,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職 +1醫療保險有薪年假牙科保險有薪病假",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_25",
@@ -924,7 +1332,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職 +1醫療保險有薪年假牙科保險有薪病假",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_29",
@@ -933,7 +1345,11 @@
     "location": "Hong Kong Island",
     "salary_raw": "",
     "jd_raw": "長工",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_34",
@@ -942,7 +1358,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職員工購物優惠",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_38",
@@ -951,7 +1371,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_42",
@@ -960,7 +1384,11 @@
     "location": "Central and Western District, Hong Kong Island",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_46",
@@ -969,7 +1397,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_50",
@@ -978,7 +1410,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_17",
@@ -987,7 +1423,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "長工",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_1_21",
@@ -996,7 +1436,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_22",
@@ -1005,7 +1449,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_26",
@@ -1014,7 +1462,11 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "job_id": "indeed_2_30",
@@ -1023,6 +1475,10 @@
     "location": "Hong Kong",
     "salary_raw": "",
     "jd_raw": "全職",
-    "source": "indeed"
+    "source": "indeed",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   }
 ]

@@ -66,6 +66,13 @@ def list_jobs(
             "salary_max": float(row.get("salary_max", 0)) if pd.notna(row.get("salary_max")) else None,
             "source": str(row.get("source", "")),
             "skills": skills,
+            "jd_text": str(row.get("jd_text", "")) if pd.notna(row.get("jd_text")) else "",
+            "jd_raw": str(row.get("jd_raw", "")) if pd.notna(row.get("jd_raw")) else "",
+            "url": str(row.get("url", "")) if pd.notna(row.get("url")) else "",
+            "posted_at": str(row.get("posted_at", "")) if pd.notna(row.get("posted_at")) else "",
+            "employment_type": str(row.get("employment_type", "")) if pd.notna(row.get("employment_type")) else "",
+            "industry_category": str(row.get("industry_category", "")) if pd.notna(row.get("industry_category")) else "",
+            "application_volume": str(row.get("application_volume", "")) if pd.notna(row.get("application_volume")) else "",
             "import_time": import_time,
         })
 

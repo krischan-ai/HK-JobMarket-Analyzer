@@ -16,6 +16,7 @@ const routes: RouteRecordRaw[] = [
       { path: '/explore', name: 'Explore', component: () => import('@/views/ExplorePage.vue'), meta: { title: '數據探索' } },
       { path: '/role-classify', name: 'RoleClassify', component: () => import('@/views/RoleClassificationPage.vue'), meta: { title: '角色分類' } },
       { path: '/settings', name: 'Settings', component: () => import('@/views/SettingsPage.vue'), meta: { title: '系統設置' } },
+      { path: '/jobs', name: 'JobBrowse', component: () => import('@/views/JobBrowsePage.vue'), meta: { title: '崗位瀏覽' } },
       { path: '/crawler', name: 'Crawler', component: () => import('@/views/CrawlerDashboardPage.vue'), meta: { title: '爬蟲控制台' } },
     ],
   },

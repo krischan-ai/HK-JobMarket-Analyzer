@@ -12,6 +12,10 @@ export interface JobItem {
   import_time?: string
   salary_currency?: string
   url?: string
+  posted_at?: string
+  employment_type?: string
+  industry_category?: string
+  application_volume?: string
 }
 
 export interface JobListResponse {

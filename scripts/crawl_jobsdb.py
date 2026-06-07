@@ -152,6 +152,7 @@ async def search_jobsdb(page, keyword, max_pages=3):
                         const sa = c.querySelector('[data-automation="jobSalary"]');
                         const de = c.querySelector('[data-automation="jobShortDescription"]');
                         const dt = c.querySelector('[data-automation="jobListingDate"]');
+                        const et = c.querySelector('[data-automation="jobCardWorkType"]');
                         const url = t ? t.href : '';
                         return {
                             idx: i,
@@ -160,7 +161,8 @@ async def search_jobsdb(page, keyword, max_pages=3):
                             location: (lo ? lo.textContent.trim() : 'Hong Kong'),
                             salary: (sa ? sa.textContent.trim() : ''),
                             desc: (de ? de.textContent.trim() : ''),
-                            date: (dt ? dt.textContent.trim() : ''),
+                            posted_at: (dt ? dt.textContent.trim() : ''),
+                            employment_type: (et ? et.textContent.trim() : ''),
                             url: url,
                         };
                     }).filter(j => j.title);
@@ -177,6 +179,8 @@ async def search_jobsdb(page, keyword, max_pages=3):
                     page_card_count += 1
 
                     # 点击卡片打开右侧详情面板
+                    jd_full = ""
+                    extra_info = {}
                     try:
                         card = page.locator('[data-automation="normalJob"]').nth(j["idx"])
                         if await card.count() == 0:
@@ -185,27 +189,77 @@ async def search_jobsdb(page, keyword, max_pages=3):
                         await page.wait_for_timeout(2000)
 
                         # 等待详情面板出现
-                        try:
-                            await page.wait_for_selector('[data-automation="jobAdDetails"]', timeout=10000)
-                        except:
-                            pass
+                        for retry in range(3):
+                            try:
+                                await page.wait_for_selector('[data-automation="jobAdDetails"]', timeout=5000)
+                                panel_data = await page.evaluate("""() => {
+                                    const el = document.querySelector('[data-automation="jobAdDetails"]');
+                                    const jdText = el ? (el.innerText || '').trim() : '';
+                                    
+                                    const panel = document.querySelector('[data-automation="jobDetailsPage"]');
+                                    const fullText = panel ? (panel.innerText || '').trim() : '';
+                                    
+                                    // 提取额外信息
+                                    const workTypeEl = document.querySelector('[data-automation="jobDetailWorkType"]');
+                                    const classEl = document.querySelector('[data-automation="jobClassification"]');
+                                    const volEl = document.querySelector('[data-automation="jobAppicationVolume"]');
+                                    
+                                    return {
+                                        jd_text: jdText.length > 100 ? jdText : (fullText.length > 100 ? fullText : ''),
+                                        employment_type: workTypeEl ? workTypeEl.textContent.trim() : '',
+                                        industry_category: classEl ? classEl.textContent.trim() : '',
+                                        application_volume: volEl ? volEl.textContent.trim() : '',
+                                    };
+                                }""")
+                                jd_full = panel_data.get("jd_text", "")
+                                extra_info = {
+                                    "employment_type": panel_data.get("employment_type", ""),
+                                    "industry_category": panel_data.get("industry_category", ""),
+                                    "application_volume": panel_data.get("application_volume", ""),
+                                }
+                                if len(jd_full.strip()) > 100:
+                                    break
+                            except:
+                                pass
+                            await page.wait_for_timeout(2000)
 
-                        # 从右侧面板提取完整 JD
-                        jd_full = await page.evaluate("""() => {
-                            const el = document.querySelector('[data-automation="jobAdDetails"]');
-                            if (el) {
-                                const t = (el.innerText || '').trim();
-                                if (t.length > 100) return t;
-                            }
-                            const panel = document.querySelector('[data-automation="jobDetailsPage"]');
-                            if (panel) {
-                                const t = (panel.innerText || '').trim();
-                                if (t.length > 100) return t;
-                            }
-                            return '';
-                        }""")
+                        # 侧面板获取失败 → 直接用 URL 打开详情页获取完整 JD
+                        if not jd_full or len(jd_full.strip()) <= 100:
+                            job_url = j.get("url", "")
+                            if job_url:
+                                try:
+                                    await page.goto(job_url, wait_until="domcontentloaded", timeout=30000)
+                                    await page.wait_for_timeout(3000)
+                                    panel_data = await page.evaluate("""() => {
+                                        const el = document.querySelector('[data-automation="jobAdDetails"]');
+                                        const jdText = el ? (el.innerText || '').trim() : '';
+                                        const main = document.querySelector('[data-automation="jobDetailsPage"]');
+                                        const fullText = main ? (main.innerText || '').trim() : '';
+                                        const body = document.body;
+                                        const bodyText = body ? (body.innerText || '').trim() : '';
+                                        
+                                        const workTypeEl = document.querySelector('[data-automation="jobDetailWorkType"]');
+                                        const classEl = document.querySelector('[data-automation="jobClassification"]');
+                                        const volEl = document.querySelector('[data-automation="jobAppicationVolume"]');
+                                        
+                                        return {
+                                            jd_text: jdText.length > 100 ? jdText : (fullText.length > 100 ? fullText : (bodyText.length > 200 ? bodyText : '')),
+                                            employment_type: workTypeEl ? workTypeEl.textContent.trim() : '',
+                                            industry_category: classEl ? classEl.textContent.trim() : '',
+                                            application_volume: volEl ? volEl.textContent.trim() : '',
+                                        };
+                                    }""")
+                                    jd_full = panel_data.get("jd_text", "")
+                                    extra_info = {
+                                        "employment_type": panel_data.get("employment_type", ""),
+                                        "industry_category": panel_data.get("industry_category", ""),
+                                        "application_volume": panel_data.get("application_volume", ""),
+                                    }
+                                except:
+                                    pass
                     except:
                         jd_full = ""
+
 
                     jd_final = jd_full.strip() if jd_full and len(jd_full.strip()) > 100 else j["desc"][:500]
                     if len(jd_final) > 300:
@@ -236,6 +290,10 @@ async def search_jobsdb(page, keyword, max_pages=3):
                         "source": "jobsdb",
                         "is_insurance_sales": is_ins,
                         "insurance_score": ins_score,
+                        "posted_at": extra_info.get("posted_at") or j.get("posted_at", ""),
+                        "employment_type": extra_info.get("employment_type") or j.get("employment_type", ""),
+                        "industry_category": extra_info.get("industry_category", ""),
+                        "application_volume": extra_info.get("application_volume", ""),
                     }
                     if is_ins:
                         print(f"        ⚠ 疑似保险销售: 得分={ins_score} {ins_reasons[:2]}")

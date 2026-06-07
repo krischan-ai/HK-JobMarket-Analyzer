@@ -139,12 +139,14 @@ async def scrape_indeed(page, keyword, max_pages=MAX_PAGES_PER_KW):
                     const lo = c.querySelector('[data-testid=text-location], .companyLocation, [class*=companyLocation]');
                     const sa = c.querySelector('.salary-snippet, [class*=salary]');
                     const de = c.querySelector('[class*=job-snippet], .underShelfFooter, ul');
+                    const link = c.querySelector('h2 a, a[data-jk], a.jcs-JobTitle');
                     return {
                         title: (t ? t.textContent.trim() : ''),
                         company: (co ? co.textContent.trim() : ''),
                         location: (lo ? lo.textContent.trim() : 'Hong Kong'),
                         salary: (sa ? sa.textContent.trim() : ''),
-                        desc: (de ? de.textContent.trim() : '')
+                        desc: (de ? de.textContent.trim() : ''),
+                        url: (link ? link.href : '')
                     };
                 }).filter(j => j.title);
             }""")
@@ -170,12 +172,14 @@ async def scrape_indeed(page, keyword, max_pages=MAX_PAGES_PER_KW):
                         const lo = c.querySelector('[data-testid=text-location], .companyLocation, [class*=companyLocation]');
                         const sa = c.querySelector('.salary-snippet, [class*=salary]');
                         const de = c.querySelector('[class*=job-snippet], .underShelfFooter, ul');
+                        const link = c.querySelector('h2 a, a[data-jk], a.jcs-JobTitle');
                         return {
                             title: (t ? t.textContent.trim() : ''),
                             company: (co ? co.textContent.trim() : ''),
                             location: (lo ? lo.textContent.trim() : 'Hong Kong'),
                             salary: (sa ? sa.textContent.trim() : ''),
-                            desc: (de ? de.textContent.trim() : '')
+                            desc: (de ? de.textContent.trim() : ''),
+                            url: (link ? link.href : '')
                         };
                     }).filter(j => j.title);
                 }""")
@@ -190,6 +194,11 @@ async def scrape_indeed(page, keyword, max_pages=MAX_PAGES_PER_KW):
                         "salary_raw": j["salary"],
                         "jd_raw": j["desc"][:500],
                         "source": "indeed",
+                        "url": j["url"],
+                        "posted_at": "",
+                        "employment_type": "",
+                        "industry_category": "",
+                        "application_volume": "",
                     })
 
             page_titles = [j["title"][:50] for j in jobs[-5:]] if jobs else []

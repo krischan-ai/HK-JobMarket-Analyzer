@@ -7,7 +7,11 @@
     "jd_raw": "",
     "url": "",
     "source": "indeed",
-    "job_id": "indeed_0"
+    "job_id": "indeed_0",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "title": "",
@@ -17,7 +21,11 @@
     "jd_raw": "",
     "url": "",
     "source": "indeed",
-    "job_id": "indeed_1"
+    "job_id": "indeed_1",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "title": "",
@@ -27,7 +35,11 @@
     "jd_raw": "",
     "url": "",
     "source": "indeed",
-    "job_id": "indeed_2"
+    "job_id": "indeed_2",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "title": "",
@@ -37,7 +49,11 @@
     "jd_raw": "",
     "url": "",
     "source": "indeed",
-    "job_id": "indeed_3"
+    "job_id": "indeed_3",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "title": "",
@@ -47,7 +63,11 @@
     "jd_raw": "",
     "url": "",
     "source": "indeed",
-    "job_id": "indeed_4"
+    "job_id": "indeed_4",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "title": "",
@@ -57,7 +77,11 @@
     "jd_raw": "",
     "url": "",
     "source": "indeed",
-    "job_id": "indeed_5"
+    "job_id": "indeed_5",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "title": "",
@@ -67,7 +91,11 @@
     "jd_raw": "",
     "url": "",
     "source": "indeed",
-    "job_id": "indeed_6"
+    "job_id": "indeed_6",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "title": "",
@@ -77,7 +105,11 @@
     "jd_raw": "",
     "url": "",
     "source": "indeed",
-    "job_id": "indeed_7"
+    "job_id": "indeed_7",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "title": "",
@@ -87,7 +119,11 @@
     "jd_raw": "",
     "url": "",
     "source": "indeed",
-    "job_id": "indeed_8"
+    "job_id": "indeed_8",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "title": "",
@@ -97,7 +133,11 @@
     "jd_raw": "",
     "url": "",
     "source": "indeed",
-    "job_id": "indeed_9"
+    "job_id": "indeed_9",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "title": "",
@@ -107,7 +147,11 @@
     "jd_raw": "",
     "url": "",
     "source": "indeed",
-    "job_id": "indeed_10"
+    "job_id": "indeed_10",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "title": "",
@@ -117,7 +161,11 @@
     "jd_raw": "",
     "url": "",
     "source": "indeed",
-    "job_id": "indeed_11"
+    "job_id": "indeed_11",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "title": "",
@@ -127,7 +175,11 @@
     "jd_raw": "",
     "url": "",
     "source": "indeed",
-    "job_id": "indeed_12"
+    "job_id": "indeed_12",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "title": "",
@@ -137,7 +189,11 @@
     "jd_raw": "",
     "url": "",
     "source": "indeed",
-    "job_id": "indeed_13"
+    "job_id": "indeed_13",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "title": "",
@@ -147,7 +203,11 @@
     "jd_raw": "",
     "url": "",
     "source": "indeed",
-    "job_id": "indeed_14"
+    "job_id": "indeed_14",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   },
   {
     "title": "",
@@ -157,6 +217,10 @@
     "jd_raw": "",
     "url": "",
     "source": "indeed",
-    "job_id": "indeed_15"
+    "job_id": "indeed_15",
+    "posted_at": "",
+    "employment_type": "",
+    "industry_category": "",
+    "application_volume": ""
   }
 ]
