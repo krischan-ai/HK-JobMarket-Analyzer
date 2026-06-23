@@ -5,6 +5,7 @@ from pathlib import Path
 from urllib.parse import quote
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from scripts.crawl_utils import is_insurance_sales, parse_job_fields
 
 PROXY = "http://127.0.0.1:10808"
 HEADLESS = False
@@ -325,6 +326,12 @@ async def main():
         if key not in seen:
             seen.add(key)
             unique.append(j)
+
+    for j in unique:
+        is_ins, score, _ = is_insurance_sales(j)
+        j["is_insurance_sales"] = is_ins
+        j["insurance_score"] = score
+        parse_job_fields(j)
 
     print(f"\n{'=' * 60}")
     print(f"Total: {len(all_jobs)} raw -> {len(unique)} unique IT/tech jobs")

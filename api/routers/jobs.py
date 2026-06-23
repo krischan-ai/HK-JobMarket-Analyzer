@@ -5,8 +5,47 @@ import pandas as pd
 import math
 from pathlib import Path
 from datetime import datetime
+import ast
 
 router = APIRouter(prefix="/api/jobs", tags=["jobs"])
+
+
+def _safe_str(row, field: str) -> str:
+    value = row.get(field, "")
+    return str(value) if pd.notna(value) else ""
+
+
+def _safe_int(row, field: str):
+    value = row.get(field, None)
+    return int(value) if pd.notna(value) else None
+
+
+def _safe_bool(row, field: str) -> bool:
+    value = row.get(field, False)
+    if pd.isna(value):
+        return False
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() in {"true", "1", "yes"}
+
+
+def _safe_list(row, field: str) -> list[str]:
+    value = row.get(field, [])
+    if isinstance(value, list):
+        return value
+    if pd.isna(value):
+        return []
+    if isinstance(value, str):
+        text = value.strip()
+        if not text:
+            return []
+        try:
+            parsed = ast.literal_eval(text)
+            if isinstance(parsed, list):
+                return [str(item) for item in parsed]
+        except (ValueError, SyntaxError):
+            return [part.strip() for part in text.split(";") if part.strip()]
+    return []
 
 
 @router.get("")
@@ -73,6 +112,14 @@ def list_jobs(
             "employment_type": str(row.get("employment_type", "")) if pd.notna(row.get("employment_type")) else "",
             "industry_category": str(row.get("industry_category", "")) if pd.notna(row.get("industry_category")) else "",
             "application_volume": str(row.get("application_volume", "")) if pd.notna(row.get("application_volume")) else "",
+            "employer_questions": _safe_list(row, "employer_questions"),
+            "is_insurance_sales": _safe_bool(row, "is_insurance_sales"),
+            "insurance_score": _safe_int(row, "insurance_score"),
+            "work_mode": _safe_str(row, "work_mode"),
+            "posted_days_ago": _safe_int(row, "posted_days_ago"),
+            "company_size": _safe_str(row, "company_size"),
+            "education_required": _safe_str(row, "education_required"),
+            "languages_required": _safe_list(row, "languages_required"),
             "import_time": import_time,
         })
 

@@ -3,7 +3,7 @@
 import json
 import re
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 
 # ─── JD 内容判定（方案二：基于完整 JD 判断是否 IT 岗位）────────────
@@ -362,3 +362,181 @@ def print_progress_status(all_keywords: list[str]):
         print(f"  最后完成: {progress['last_completed']} ({progress.get('last_completed_at', '')[:19]})")
     if remaining:
         print(f"  剩余 {len(remaining)} 个: {', '.join(remaining[:5])}{'...' if len(remaining) > 5 else ''}")
+
+
+# ─── 岗位字段解析工具（工作模式/类型/时间/技术栈等）──────────────
+
+_WORK_MODE_PATTERNS = [
+    (re.compile(r"\bhybrid\b", re.I), "hybrid"),
+    (re.compile(r"\bremote\b", re.I), "remote"),
+    (re.compile(r"\b(on[- ]?site|work\s+from\s+office)\b", re.I), "on_site"),
+]
+
+_JOB_TYPE_PATTERNS = [
+    (re.compile(r"\bintern(ship)?\b", re.I), "internship"),
+    (re.compile(r"\bfull[- ]?time\b", re.I), "full_time"),
+    (re.compile(r"\bpart[- ]?time\b", re.I), "part_time"),
+    (re.compile(r"\bcontract\b", re.I), "contract"),
+    (re.compile(r"\btemp(orary)?\b", re.I), "temporary"),
+    (re.compile(r"\bfreelance\b", re.I), "freelance"),
+]
+
+_POSTED_AGO_RE = re.compile(
+    r"(?:posted\s+)?(\d+)\+?\s*(mo|month|months|minute|minutes|min|m|hour|hours|h|day|days|d|week|weeks|w)\+?\s+ago",
+    re.I,
+)
+
+_COMPANY_SIZE_RE = re.compile(
+    r"(\d[\d,]*)\s*[-–~]\s*(\d[\d,]*)\s*(?:employees?|staff)",
+    re.I,
+)
+
+_EDUCATION_PATTERNS = [
+    (re.compile(r"\bph\.?d\b", re.I), "phd"),
+    (re.compile(r"\bmaster'?s?(?:\s+degree)?\b", re.I), "master"),
+    (re.compile(r"\bbachelor'?s?(?:\s+degree)?\b", re.I), "bachelor"),
+    (re.compile(r"\bdiploma\b", re.I), "diploma"),
+    (re.compile(r"\b(high\s+school|secondary)\b", re.I), "high_school"),
+]
+
+_LANGUAGE_PATTERNS = [
+    (re.compile(r"\bmandarin\b", re.I), "mandarin"),
+    (re.compile(r"\bcantonese\b", re.I), "cantonese"),
+    (re.compile(r"\benglish\b", re.I), "english"),
+    (re.compile(r"普通话", re.I), "mandarin"),
+    (re.compile(r"广东话|粵語", re.I), "cantonese"),
+    (re.compile(r"流利英語|英文", re.I), "english"),
+]
+
+
+def parse_work_mode(location: str, jd_text: str = "") -> Optional[str]:
+    """从 location 或 JD 文本中识别 hybrid/remote/on_site 工作模式。"""
+    text = f"{location or ''} {jd_text or ''}"
+    for pattern, mode in _WORK_MODE_PATTERNS:
+        if pattern.search(text):
+            return mode
+    return None
+
+
+def parse_job_type(*texts: str) -> Optional[str]:
+    """从多个文本字段中识别实习、全职、兼职、合同等工作类型。"""
+    combined = " ".join(t for t in texts if t)
+    for pattern, job_type in _JOB_TYPE_PATTERNS:
+        if pattern.search(combined):
+            return job_type
+    return None
+
+
+def parse_posted_date(posted_str: str, ref_time: Optional[datetime] = None) -> tuple[Optional[str], Optional[int]]:
+    """解析 JobsDB/Indeed 常见的相对发布时间，例如 6h ago、19d ago。"""
+    if not posted_str:
+        return None, None
+
+    match = _POSTED_AGO_RE.search(posted_str)
+    if not match:
+        return None, None
+
+    value = int(match.group(1))
+    unit = match.group(2).lower()
+    base = ref_time or datetime.now()
+
+    if unit.startswith("mo"):
+        delta = timedelta(days=value * 30)
+    elif unit.startswith("m") or unit.startswith("min"):
+        delta = timedelta(minutes=value)
+    elif unit.startswith("h"):
+        delta = timedelta(hours=value)
+    elif unit.startswith("d"):
+        delta = timedelta(days=value)
+    elif unit.startswith("w"):
+        delta = timedelta(weeks=value)
+    else:
+        return None, None
+
+    posted_dt = base - delta
+    days_ago = max(1, delta.days) if delta.total_seconds() > 0 else 0
+    return posted_dt.strftime("%Y-%m-%d %H:%M"), days_ago
+
+
+def parse_company_size(size_str: str) -> Optional[str]:
+    """将 101-1,000 employees 这类字符串标准化为 101-1000。"""
+    if not size_str:
+        return None
+    match = _COMPANY_SIZE_RE.search(size_str)
+    if not match:
+        return None
+    low = match.group(1).replace(",", "")
+    high = match.group(2).replace(",", "")
+    return f"{low}-{high}"
+
+
+def extract_tech_stack(jd_text: str) -> list[str]:
+    """从 JD 文本中抽取命中的技术关键词。"""
+    if not jd_text:
+        return []
+    jd_lower = jd_text.lower()
+    hits = []
+    for kw in TECH_KEYWORDS:
+        if kw in jd_lower and kw not in hits:
+            hits.append(kw)
+    return hits
+
+
+def extract_languages(jd_text: str) -> list[str]:
+    """从 JD 文本中抽取语言要求。"""
+    if not jd_text:
+        return []
+    hits = []
+    for pattern, lang in _LANGUAGE_PATTERNS:
+        if pattern.search(jd_text) and lang not in hits:
+            hits.append(lang)
+    return hits
+
+
+def extract_education(jd_text: str) -> Optional[str]:
+    """从 JD 文本中抽取最高学历要求。"""
+    if not jd_text:
+        return None
+    for pattern, level in _EDUCATION_PATTERNS:
+        if pattern.search(jd_text):
+            return level
+    return None
+
+
+def parse_job_fields(job: dict, crawl_time: Optional[datetime] = None) -> dict:
+    """从原始爬虫字段补充工作模式、发布时间、公司规模、语言和学历等增强字段。"""
+    location = job.get("location", "")
+    jd = job.get("jd_raw") or job.get("jd_text", "")
+    title = job.get("title", "")
+
+    if not job.get("work_mode"):
+        job["work_mode"] = parse_work_mode(location, jd)
+
+    if not job.get("job_type"):
+        job_type_raw = job.get("job_type_raw", "") or job.get("employment_type", "")
+        job["job_type"] = parse_job_type(job_type_raw, title, jd)
+
+    posted_raw = job.get("posted_raw", "") or ""
+    posted_at = job.get("posted_at", "") or ""
+    source_str = posted_raw if _POSTED_AGO_RE.search(posted_raw) else (
+        posted_at if _POSTED_AGO_RE.search(posted_at) else ""
+    )
+    if source_str:
+        dt_str, days_ago = parse_posted_date(source_str, ref_time=crawl_time)
+        if dt_str:
+            job["posted_at"] = dt_str
+            job["posted_days_ago"] = days_ago
+
+    if not job.get("company_size"):
+        job["company_size"] = parse_company_size(job.get("company_size_raw", ""))
+
+    if not job.get("tech_stack"):
+        job["tech_stack"] = extract_tech_stack(jd)
+
+    if not job.get("languages_required"):
+        job["languages_required"] = extract_languages(jd)
+
+    if not job.get("education_required"):
+        job["education_required"] = extract_education(jd)
+
+    return job
