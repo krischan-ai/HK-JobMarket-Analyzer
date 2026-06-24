@@ -21,6 +21,9 @@ config/llm_config.json
 
 # Vite cache
 .vite/
+*.tsbuildinfo
+web/vite.config.d.ts
+web/vite.config.js
 
 # Node
 node_modules/

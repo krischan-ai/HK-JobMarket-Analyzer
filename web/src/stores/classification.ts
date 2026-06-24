@@ -145,7 +145,7 @@ export const useClassificationStore = defineStore('classification', () => {
       }
       message.value = data.message
     } catch (e: unknown) {
-      const err = e as { response?: { data?: { detail?: string } }; message?: string }
+      const err = e as { response?: { status?: number; data?: { detail?: string } }; message?: string }
       message.value = err?.response?.data?.detail || err?.message || 'LLM 復審失敗'
     } finally {
       reviewing.value = false
@@ -192,7 +192,7 @@ export const useClassificationStore = defineStore('classification', () => {
       message.value = '分類中...'
       _startPolling()
     } catch (e: unknown) {
-      const err = e as { response?: { data?: { detail?: string } }; message?: string }
+      const err = e as { response?: { status?: number; data?: { detail?: string } }; message?: string }
       if (err?.response?.status === 409) {
         message.value = '已有任務正在運行，正在恢復監聽...'
         _startPolling()

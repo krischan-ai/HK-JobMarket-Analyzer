@@ -13,6 +13,10 @@
       <el-icon><Document /></el-icon>
       <span>崗位瀏覽</span>
     </el-menu-item>
+    <el-menu-item index="/resume">
+      <el-icon><DocumentChecked /></el-icon>
+      <span>簡歷潤色</span>
+    </el-menu-item>
     <el-menu-item index="/tech-trends">
       <el-icon><TrendCharts /></el-icon>
       <span>技術趨勢</span>
