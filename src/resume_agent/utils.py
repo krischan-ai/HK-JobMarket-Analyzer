@@ -48,6 +48,47 @@ def parse_llm_json(content: str) -> Any:
     raise ResumeAgentError("Unable to parse JSON from LLM response")
 
 
+def extract_json_objects(text: str) -> list[dict]:
+    """从文本中扫描出所有完整的顶层 JSON 对象。
+
+    用于在 LLM 数组响应被截断时，抢救已完整生成的对象（忽略末尾不完整的那个）。
+    """
+    objects: list[dict] = []
+    depth = 0
+    start: int | None = None
+    in_str = False
+    escaped = False
+
+    for index, char in enumerate(text or ""):
+        if in_str:
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == '"':
+                in_str = False
+            continue
+        if char == '"':
+            in_str = True
+        elif char == "{":
+            if depth == 0:
+                start = index
+            depth += 1
+        elif char == "}":
+            if depth > 0:
+                depth -= 1
+                if depth == 0 and start is not None:
+                    fragment = text[start:index + 1]
+                    try:
+                        parsed = json.loads(fragment)
+                    except json.JSONDecodeError:
+                        parsed = None
+                    if isinstance(parsed, dict):
+                        objects.append(parsed)
+                    start = None
+    return objects
+
+
 def ensure_list(value: Any) -> list:
     if value is None:
         return []

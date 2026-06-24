@@ -10,12 +10,21 @@
       </div>
     </template>
 
-    <el-empty v-if="!store.result && !store.loading" description="提交簡歷和 JD 後，這裡會顯示分析結果" />
-    <div v-else-if="store.loading" class="loading-box">
+    <el-empty
+      v-if="!store.result && !store.loading && !store.streaming"
+      description="提交簡歷後，這裡會流式顯示分析結果"
+    />
+    <div v-else-if="!store.result && store.loading" class="loading-box">
       <el-skeleton :rows="10" animated />
     </div>
 
-    <el-tabs v-else v-model="store.activeTab">
+    <template v-else>
+      <div v-if="store.streaming" class="stage-banner">
+        <el-icon class="is-loading"><Loading /></el-icon>
+        <span>{{ store.stageMessage || '分析中…' }}</span>
+      </div>
+
+      <el-tabs v-model="store.activeTab">
       <el-tab-pane label="整體評分" name="score">
         <div v-if="score" class="score-layout">
           <div class="overall-score">
@@ -24,11 +33,26 @@
           </div>
           <div class="score-bars">
             <div v-for="item in scoreItems" :key="item.label" class="score-row">
-              <span>{{ item.label }}</span>
-              <el-progress :percentage="item.value * 10" :format="() => item.value.toFixed(1)" />
+              <div class="score-row-head">
+                <span>{{ item.label }}</span>
+                <el-progress :percentage="item.value * 10" :format="() => item.value.toFixed(1)" />
+              </div>
+              <div v-if="item.reason" class="score-reason">{{ item.reason }}</div>
             </div>
           </div>
         </div>
+
+        <el-alert
+          v-if="score?.overall_comment"
+          type="success"
+          :closable="false"
+          show-icon
+          class="suggestion-alert"
+          title="评分说明"
+        >
+          <template #default>{{ score.overall_comment }}</template>
+        </el-alert>
+
         <el-alert
           v-for="suggestion in score?.suggestions || []"
           :key="suggestion"
@@ -103,6 +127,50 @@
           class="suggestion-alert"
         />
 
+        <el-alert
+          v-if="marketDemandAnalysis"
+          type="success"
+          :closable="false"
+          show-icon
+          class="suggestion-alert"
+          title="市場需求分析（基於知識庫岗位數據）"
+        >
+          <template #default>{{ marketDemandAnalysis }}</template>
+        </el-alert>
+
+        <div v-if="roleDemandRanking.length || techStackRanking.length" class="gap-grid">
+          <el-card v-if="roleDemandRanking.length" shadow="never">
+            <template #header>需求量最大的岗位方向 Top {{ roleDemandRanking.length }}</template>
+            <el-table :data="roleDemandRanking" size="small">
+              <el-table-column type="index" label="#" width="48" />
+              <el-table-column prop="role_name" label="岗位方向" min-width="140" />
+              <el-table-column prop="count" label="岗位数" width="80" align="right" />
+            </el-table>
+          </el-card>
+
+          <el-card v-if="techStackRanking.length" shadow="never">
+            <template #header>JD 技術棧提及次數 Top {{ techStackRanking.length }}</template>
+            <el-table :data="techStackRanking" size="small">
+              <el-table-column type="index" label="#" width="48" />
+              <el-table-column prop="skill" label="技術棧" min-width="140" />
+              <el-table-column prop="count" label="次數" width="80" align="right" />
+            </el-table>
+          </el-card>
+        </div>
+
+        <el-card v-if="marketSkills.length" shadow="never" class="jobs-card">
+          <template #header>香港市場高頻技能（來自知識庫相似崗位）</template>
+          <el-tag
+            v-for="item in marketSkills"
+            :key="item.skill"
+            type="info"
+            effect="plain"
+            class="market-tag"
+          >
+            {{ item.skill }} · {{ item.count }}
+          </el-tag>
+        </el-card>
+
         <el-card shadow="never" class="jobs-card">
           <template #header>相似香港崗位</template>
           <el-table :data="store.result?.matched_jobs || []" size="small" empty-text="暫無相似崗位">
@@ -113,13 +181,15 @@
           </el-table>
         </el-card>
       </el-tab-pane>
-    </el-tabs>
+      </el-tabs>
+    </template>
   </el-card>
 </template>
 
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { ElMessage } from 'element-plus'
+import { Loading } from '@element-plus/icons-vue'
 import { useResumeStore } from '@/stores/resume'
 
 const store = useResumeStore()
@@ -127,13 +197,18 @@ const store = useResumeStore()
 const score = computed(() => store.result?.score || null)
 const sections = computed(() => store.result?.polish_suggestions || [])
 const keywordSuggestions = computed(() => store.result?.gap_analysis?.keyword_suggestions || [])
+const marketSkills = computed(() => store.result?.market_context?.top_skills || [])
+const marketDemandAnalysis = computed(() => store.result?.gap_analysis?.market_demand_analysis || '')
+const roleDemandRanking = computed(() => store.result?.market_insights?.role_demand_ranking || [])
+const techStackRanking = computed(() => store.result?.market_insights?.tech_stack_ranking || [])
 const scoreItems = computed(() => {
   if (!score.value) return []
+  const reasons = score.value.dimension_reasons || {}
   return [
-    { label: '關鍵詞覆蓋', value: score.value.keyword_coverage },
-    { label: '經驗匹配', value: score.value.experience_alignment },
-    { label: '技能相關', value: score.value.skill_relevance },
-    { label: '語言質量', value: score.value.language_quality },
+    { label: '關鍵詞覆蓋', value: score.value.keyword_coverage, reason: reasons.keyword_coverage },
+    { label: '經驗匹配', value: score.value.experience_alignment, reason: reasons.experience_alignment },
+    { label: '技能相關', value: score.value.skill_relevance, reason: reasons.skill_relevance },
+    { label: '語言質量', value: score.value.language_quality, reason: reasons.language_quality },
   ]
 })
 
@@ -195,6 +270,18 @@ function downloadMarkdown() {
   padding: 16px 0;
 }
 
+.stage-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  background: var(--el-color-primary-light-9);
+  color: var(--el-color-primary);
+  font-size: 13px;
+}
+
 .score-layout {
   display: grid;
   grid-template-columns: 150px 1fr;
@@ -227,11 +314,21 @@ function downloadMarkdown() {
 }
 
 .score-row {
+  margin-bottom: 14px;
+}
+
+.score-row-head {
   display: grid;
   grid-template-columns: 90px 1fr;
   gap: 12px;
   align-items: center;
-  margin-bottom: 14px;
+}
+
+.score-reason {
+  font-size: 12px;
+  color: #909399;
+  line-height: 1.5;
+  margin: 4px 0 0 102px;
 }
 
 .suggestion-alert {
@@ -284,6 +381,10 @@ pre {
 
 .jobs-card {
   margin-top: 12px;
+}
+
+.market-tag {
+  margin: 0 6px 6px 0;
 }
 
 @media (max-width: 900px) {

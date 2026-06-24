@@ -30,6 +30,7 @@ class GapAnalysis(TypedDict, total=False):
     weak_skills: list[str]
     experience_gap: Optional[str]
     keyword_suggestions: list[dict]
+    market_demand_analysis: Optional[str]
 
 
 class PolishSuggestion(TypedDict, total=False):
@@ -46,6 +47,8 @@ class ScoreReport(TypedDict, total=False):
     experience_alignment: float
     skill_relevance: float
     language_quality: float
+    overall_comment: str
+    dimension_reasons: dict[str, str]
     suggestions: list[str]
 
 
@@ -57,6 +60,9 @@ class AgentState(TypedDict):
     resume: Optional[ResumeAnalysis]
     jd: Optional[JDAnalysis]
     matched_jobs: Optional[list[dict]]
+    rerank_used: Optional[bool]
+    market_context: Optional[dict]
+    market_insights: Optional[dict]
     gap: Optional[GapAnalysis]
     polish_suggestions: Optional[list[PolishSuggestion]]
     score: Optional[ScoreReport]
