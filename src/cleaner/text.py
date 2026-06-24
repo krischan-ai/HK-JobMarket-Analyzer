@@ -42,6 +42,21 @@ class JDTextCleaner:
     def normalize_unicode(text: str) -> str:
         if not text:
             return ""
+        replacements = {
+            "聽": " ",
+            "鈥檚": "'s",
+            "鈥檙e": "'re",
+            "鈥檒l": "'ll",
+            "鈥檝e": "'ve",
+            "鈥檇": "'d",
+            "鈥檛": "n't",
+            "鈥?": " ",
+            "鈥": "'",
+            "鈩": "",
+            "路": "\n",
+        }
+        for bad, good in replacements.items():
+            text = text.replace(bad, good)
         text = text.replace("\u3000", " ")
         text = text.replace("\xa0", " ")
         return text

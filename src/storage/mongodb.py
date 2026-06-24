@@ -1,15 +1,15 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from typing import Any, Optional
 
-from pymongo import ASCENDING, TEXT, IndexModel
+from pymongo import ASCENDING, TEXT
 
 from config.settings import settings
 from src.logger import get_logger
 
 
 class JobDatabase:
-    """岗位数据 MongoDB 持久化管理器"""
+    """宀椾綅鏁版嵁 MongoDB 鎸佷箙鍖栫鐞嗗櫒"""
 
     def __init__(self, uri: str = None, db_name: str = None):
         self.uri = uri or settings.mongodb_uri
@@ -36,20 +36,44 @@ class JobDatabase:
     def _ensure_indexes(self):
         if self._collection is None:
             return
-        indexes = [
-            IndexModel([("job_id", ASCENDING), ("source", ASCENDING)], unique=True, sparse=True),
-            IndexModel([("source", ASCENDING), ("crawled_at", -1)]),
-            IndexModel([("location", ASCENDING), ("salary_min", ASCENDING)]),
-            IndexModel([("jd_text", TEXT), ("title", TEXT)]),
-        ]
+
         try:
             existing = self._collection.index_information()
-            existing_keys = {info["key"][0][0] for info in existing.values() if isinstance(info, dict) and "key" in info}
-            for idx in indexes:
-                key_name = idx.document["key"][0][0]
-                if key_name not in existing_keys:
-                    self._collection.create_indexes([idx])
-                    self.logger.info("Created index on %s", key_name)
+            expected_text_keys = [
+                ("kb_document_text", "text"),
+                ("jd_text", "text"),
+                ("title", "text"),
+                ("company", "text"),
+            ]
+            for name, info in existing.items():
+                keys = info.get("key", []) if isinstance(info, dict) else []
+                if any(kind == "text" for _, kind in keys) and keys != expected_text_keys:
+                    self._collection.drop_index(name)
+                    self.logger.info("Dropped outdated text index: %s", name)
+                    existing = self._collection.index_information()
+                    break
+            self._collection.create_index(
+                [("job_id", ASCENDING), ("source", ASCENDING)],
+                unique=True,
+                sparse=True,
+                name="job_source_unique",
+            )
+            self._collection.create_index(
+                [("source", ASCENDING), ("crawled_at", -1)],
+                name="source_crawled_at_idx",
+            )
+            self._collection.create_index(
+                [("location", ASCENDING), ("salary_min", ASCENDING)],
+                name="location_salary_idx",
+            )
+            existing_text = any(
+                any(kind == "text" for _, kind in info.get("key", []))
+                for info in self._collection.index_information().values()
+                if isinstance(info, dict)
+            )
+            if not existing_text:
+                self._collection.create_index(expected_text_keys)
+                self.logger.info("Created text index for knowledge search")
         except Exception as e:
             self.logger.warning("Index creation warning: %s", e)
 
@@ -112,7 +136,11 @@ class JobDatabase:
         result = self._collection.delete_many(query)
         return result.deleted_count
 
+    def clear_all(self) -> int:
+        return self.delete_many({})
+
     def close(self):
         if self._client:
             self._client.close()
             self.logger.info("MongoDB connection closed")
+

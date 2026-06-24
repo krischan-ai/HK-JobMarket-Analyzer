@@ -22,6 +22,12 @@ class TestJDTextCleaner:
         result = JDTextCleaner.normalize_unicode("Hello\u3000World\xa0Test")
         assert result == "Hello World Test"
 
+    def test_normalize_jobsdb_artifacts(self):
+        result = JDTextCleaner().clean("Python聽developer 鈥檚 role 路 Build APIs")
+        assert "Python developer" in result
+        assert "Build APIs" in result
+        assert "聽" not in result
+
     def test_normalize_whitespace(self):
         result = JDTextCleaner.normalize_whitespace("  Hello   World  ")
         assert result == "Hello World"

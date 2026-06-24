@@ -3,13 +3,24 @@ from __future__ import annotations
 from pathlib import Path
 
 from fastapi import APIRouter, Query
+from pydantic import BaseModel
 
 from api.dependencies import load_jobs_df, load_skills_df
+from config.settings import settings
 from src.embeddings.vector_store import VectorStore
+from src.knowledge_base.hybrid_search import HybridJobSearch, HybridSearchOptions
+from src.storage.mongodb import JobDatabase
 
 router = APIRouter(prefix="/api/knowledge", tags=["knowledge"])
 
 _vector_store: VectorStore | None = None
+_hybrid_search: HybridJobSearch | None = None
+
+
+class JobsDBRebuildRequest(BaseModel):
+    raw_path: str = r"E:\文档\Project\HK-Job-Crawler\data\raw\jobsdb_raw.json"
+    confirm_clear: bool = False
+    review_insurance: bool = False
 
 
 def _get_vector_store() -> VectorStore:
@@ -17,6 +28,13 @@ def _get_vector_store() -> VectorStore:
     if _vector_store is None:
         _vector_store = VectorStore()
     return _vector_store
+
+
+def _get_hybrid_search() -> HybridJobSearch:
+    global _hybrid_search
+    if _hybrid_search is None:
+        _hybrid_search = HybridJobSearch(vector_store=_get_vector_store())
+    return _hybrid_search
 
 
 @router.get("/skill-frequency")
@@ -104,6 +122,26 @@ def semantic_search(q: str = Query(..., description="搜索查詢文本")):
     return {"available": True, "results": results, "query": q}
 
 
+@router.get("/hybrid-search")
+def hybrid_search(
+    q: str = Query(..., description="Search query"),
+    top_k: int = Query(default=10, ge=1, le=100),
+    candidate_k: int = Query(default=50, ge=1, le=200),
+    semantic_weight: float = Query(default=settings.hybrid_semantic_weight, ge=0, le=1),
+    keyword_weight: float = Query(default=settings.hybrid_keyword_weight, ge=0, le=1),
+    use_rerank: bool = Query(default=True),
+):
+    searcher = _get_hybrid_search()
+    options = HybridSearchOptions(
+        top_k=top_k,
+        candidate_k=candidate_k,
+        semantic_weight=semantic_weight,
+        keyword_weight=keyword_weight,
+        use_rerank=use_rerank,
+    )
+    return searcher.search(q, options)
+
+
 @router.get("/vector-status")
 def vector_status():
     """向量索引狀態"""
@@ -112,7 +150,46 @@ def vector_status():
         "available": store.available,
         "doc_count": store.count(),
         "persist_path": store.persist_path,
+        "embedding_model": settings.embedding_model,
+        "rerank_model": settings.rerank_model,
     }
+
+
+@router.get("/index-status")
+def index_status():
+    store = _get_vector_store()
+    db = JobDatabase()
+    return {
+        "mongo_connected": db.is_connected,
+        "mongo_count": db.count() if db.is_connected else 0,
+        "vector_available": store.available,
+        "vector_count": store.count(),
+        "csv_records": len(load_jobs_df()),
+        "embedding_model": settings.embedding_model,
+        "rerank_model": settings.rerank_model,
+        "hybrid_semantic_weight": settings.hybrid_semantic_weight,
+        "hybrid_keyword_weight": settings.hybrid_keyword_weight,
+    }
+
+
+@router.post("/rebuild-jobsdb")
+def rebuild_jobsdb(req: JobsDBRebuildRequest):
+    from scripts.rebuild_jobsdb_knowledge_base import rebuild
+
+    if not req.confirm_clear:
+        return {"success": False, "message": "confirm_clear=true is required"}
+    try:
+        result = rebuild(
+            raw_path=Path(req.raw_path),
+            csv_path=Path(__file__).resolve().parent.parent.parent / "data" / "cleaned" / "jobs.csv",
+            confirm_clear=req.confirm_clear,
+            review_insurance=req.review_insurance,
+        )
+        global _hybrid_search
+        _hybrid_search = None
+        return {"success": True, **result}
+    except Exception as e:
+        return {"success": False, "message": str(e)}
 
 
 @router.post("/vector-rebuild")
