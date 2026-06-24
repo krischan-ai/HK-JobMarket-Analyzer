@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import Counter
 from typing import Any
 
+from src.analyzer.role_prompt import ROLE_DEFINITIONS
 from src.analyzer.role_classifier import RoleClassifier
 from src.analyzer.rule_engine import RuleBasedSkillExtractor
 from src.embeddings.vector_store import VectorStore
@@ -14,8 +15,14 @@ from .market_insights import compute_market_insights
 from .prompts import (
     GAP_ANALYSIS_PROMPT,
     GAP_ANALYSIS_SYSTEM_PROMPT,
+    INTERVIEW_PREP_PROMPT,
+    INTERVIEW_PREP_SYSTEM_PROMPT,
     JD_ANALYSIS_PROMPT,
     JD_ANALYSIS_SYSTEM_PROMPT,
+    JOB_MATCH_RERANK_PROMPT,
+    JOB_MATCH_RERANK_SYSTEM_PROMPT,
+    MARKET_INSIGHTS_SUMMARY_PROMPT,
+    MARKET_INSIGHTS_SUMMARY_SYSTEM_PROMPT,
     MARKET_JD_SYNTHESIS_PROMPT,
     MARKET_JD_SYNTHESIS_SYSTEM_PROMPT,
     POLISH_PROMPT,
@@ -24,6 +31,10 @@ from .prompts import (
     RESUME_PARSE_SYSTEM_PROMPT,
     SCORE_PROMPT,
     SCORE_SYSTEM_PROMPT,
+    TARGET_ROLE_UNDERSTANDING_PROMPT,
+    TARGET_ROLE_UNDERSTANDING_SYSTEM_PROMPT,
+    TECH_STACK_SUMMARY_PROMPT,
+    TECH_STACK_SUMMARY_SYSTEM_PROMPT,
     as_json,
 )
 from .state import AgentState
@@ -33,10 +44,77 @@ logger = get_logger(__name__)
 
 # JD 文本达到该长度才视为「用户已提供目标 JD」，否则进入知识库模式。
 JD_MIN_LENGTH = 30
+TECH_SKILL_CATEGORIES = {"programming_languages", "frameworks_libraries", "ai_concepts", "cloud_devops", "databases"}
+OTHER_COMPETENCY_TERMS = (
+    "cantonese",
+    "english",
+    "mandarin",
+    "communication",
+    "cross-functional",
+    "collaboration",
+    "stakeholder",
+    "leadership",
+    "teamwork",
+)
 
 
 def has_target_jd(state: AgentState) -> bool:
     return len((state.get("target_jd_text") or "").strip()) >= JD_MIN_LENGTH
+
+
+def _role_definition(state: AgentState) -> dict[str, str]:
+    role_id = (state.get("target_role_id") or "").strip()
+    if role_id in ROLE_DEFINITIONS:
+        return {"role_id": role_id, **ROLE_DEFINITIONS[role_id]}
+    role_name = (state.get("target_role") or "").strip()
+    if role_name:
+        for candidate_id, definition in ROLE_DEFINITIONS.items():
+            if definition.get("name") == role_name:
+                return {"role_id": candidate_id, **definition}
+    return {"role_id": "", "name": role_name, "keywords": ""}
+
+
+def _normalise_theme(item: Any) -> dict[str, Any] | None:
+    if not isinstance(item, dict):
+        return None
+    theme = str(item.get("theme") or "").strip()
+    if not theme:
+        return None
+    return {
+        "theme": theme,
+        "items": [str(v) for v in ensure_list(item.get("items")) if v],
+        "evidence": [str(v) for v in ensure_list(item.get("evidence")) if v][:3],
+    }
+
+
+def _fallback_tech_stack_from_context(context: dict[str, Any] | None) -> dict[str, Any]:
+    skills = [str(item.get("skill") or "") for item in ((context or {}).get("top_skills") or []) if item.get("skill")]
+    buckets: dict[str, list[str]] = {
+        "编程语言与后端开发": [],
+        "云平台与交付自动化": [],
+        "数据与存储": [],
+        "AI / 数据应用": [],
+        "工程框架与工具": [],
+    }
+    for skill in skills:
+        lower = skill.lower()
+        if lower in {"python", "java", "javascript", "typescript", "go", "c#", "php", "ruby"}:
+            buckets["编程语言与后端开发"].append(skill)
+        elif lower in {"aws", "azure", "gcp", "docker", "kubernetes", "k8s", "ci/cd", "jenkins", "terraform"}:
+            buckets["云平台与交付自动化"].append(skill)
+        elif lower in {"sql", "mysql", "postgresql", "mongodb", "redis", "snowflake", "oracle"}:
+            buckets["数据与存储"].append(skill)
+        elif lower in {"machine learning", "deep learning", "llm", "rag", "tensorflow", "pytorch", "langchain"}:
+            buckets["AI / 数据应用"].append(skill)
+        else:
+            buckets["工程框架与工具"].append(skill)
+
+    themes = [
+        {"theme": theme, "items": values[:8], "evidence": []}
+        for theme, values in buckets.items()
+        if values
+    ]
+    return {"tech_stack_themes": themes, "other_competencies": [], "core_capabilities": []}
 
 
 def build_search_query(state: AgentState) -> str:
@@ -46,6 +124,11 @@ def build_search_query(state: AgentState) -> str:
     """
     if has_target_jd(state):
         return (state.get("target_jd_text") or "").strip()
+
+    understanding = state.get("target_role_understanding") or {}
+    expanded_query = str(understanding.get("expanded_query") or "").strip()
+    if expanded_query:
+        return expanded_query
 
     parts: list[str] = []
     role = (state.get("target_role") or "").strip()
@@ -60,6 +143,51 @@ def build_search_query(state: AgentState) -> str:
     if query:
         return query
     return compact_text(state.get("resume_text") or "", 2000)
+
+
+def understand_target_role(state: AgentState, llm: ResumeLLMClient) -> dict[str, Any]:
+    """用 LLM 把选定目标职位转成语义检索画像。失败时回退到标准角色定义。"""
+    role_def = _role_definition(state)
+    role_id = role_def.get("role_id") or ""
+    target_role = (state.get("target_role") or role_def.get("name") or "").strip()
+    if not role_id and not target_role:
+        return {"target_role_understanding": None}
+
+    try:
+        content = llm.chat_json(
+            TARGET_ROLE_UNDERSTANDING_SYSTEM_PROMPT,
+            TARGET_ROLE_UNDERSTANDING_PROMPT.format(
+                role_id=role_id or "custom",
+                role_name=role_def.get("name") or target_role,
+                role_keywords=role_def.get("keywords") or "",
+                target_role=target_role or "未填写",
+                resume=as_json(state.get("resume") or {}),
+            ),
+            temperature=0.2,
+        )
+        parsed = parse_llm_json(content)
+        if not isinstance(parsed, dict):
+            raise ResumeAgentError("Target role understanding returned non-object JSON")
+        understanding = {
+            "role_id": str(parsed.get("role_id") or role_id or ""),
+            "role_name": str(parsed.get("role_name") or role_def.get("name") or target_role),
+            "role_summary": str(parsed.get("role_summary") or ""),
+            "expanded_query": str(parsed.get("expanded_query") or ""),
+            "core_tech": [str(v) for v in ensure_list(parsed.get("core_tech")) if v],
+            "responsibilities": [str(v) for v in ensure_list(parsed.get("responsibilities")) if v],
+        }
+    except Exception as exc:
+        logger.warning("Target role understanding skipped, using role definition fallback: %s", exc)
+        keywords = role_def.get("keywords") or ""
+        understanding = {
+            "role_id": role_id,
+            "role_name": role_def.get("name") or target_role,
+            "role_summary": role_def.get("name") or target_role,
+            "expanded_query": " ".join(part for part in [target_role, role_def.get("name") or "", keywords] if part),
+            "core_tech": [item.strip() for item in keywords.split(",") if item.strip()][:8],
+            "responsibilities": [],
+        }
+    return {"target_role_understanding": understanding}
 
 
 def parse_resume(state: AgentState, llm: ResumeLLMClient) -> dict[str, Any]:
@@ -166,6 +294,56 @@ def match_jobs(state: AgentState, top_k: int = 5) -> dict[str, Any]:
     return {"matched_jobs": matched, "rerank_used": rerank_used}
 
 
+def llm_match_jobs(state: AgentState, llm: ResumeLLMClient) -> dict[str, Any]:
+    """在真实召回岗位内用 LLM 做语义排序和定位建议，不新增虚构岗位。"""
+    matched = state.get("matched_jobs") or []
+    if not matched:
+        return {"matched_jobs": matched, "match_advice": None}
+
+    try:
+        content = llm.chat_json(
+            JOB_MATCH_RERANK_SYSTEM_PROMPT,
+            JOB_MATCH_RERANK_PROMPT.format(
+                target_role_understanding=as_json(state.get("target_role_understanding") or {}),
+                target_role=state.get("target_role") or "",
+                resume=as_json(state.get("resume") or {}),
+                matched_jobs=as_json(matched),
+            ),
+            temperature=0.15,
+            max_tokens=4096,
+        )
+        parsed = parse_llm_json(content)
+        if not isinstance(parsed, dict):
+            raise ResumeAgentError("Job matcher returned non-object JSON")
+
+        by_id = {str(job.get("job_id")): dict(job) for job in matched if job.get("job_id") is not None}
+        reasons = parsed.get("match_reasons") if isinstance(parsed.get("match_reasons"), dict) else {}
+        ordered: list[dict[str, Any]] = []
+        seen: set[str] = set()
+        for raw_id in ensure_list(parsed.get("ranked_job_ids")):
+            job_id = str(raw_id)
+            if job_id in by_id and job_id not in seen:
+                item = by_id[job_id]
+                if reasons.get(job_id):
+                    item["match_reason"] = str(reasons[job_id])
+                ordered.append(item)
+                seen.add(job_id)
+        for job in matched:
+            job_id = str(job.get("job_id"))
+            if job_id not in seen:
+                ordered.append(dict(job))
+
+        advice = parsed.get("match_advice") if isinstance(parsed.get("match_advice"), dict) else {}
+        match_advice = {
+            "summary": str(advice.get("summary") or ""),
+            "suggestions": [str(v) for v in ensure_list(advice.get("suggestions")) if v],
+        }
+        return {"matched_jobs": ordered[: len(matched)], "match_advice": match_advice}
+    except Exception as exc:
+        logger.warning("LLM job matching skipped, keeping retrieval order: %s", exc)
+        return {"matched_jobs": matched, "match_advice": None}
+
+
 def build_market_insights(state: AgentState) -> dict[str, Any]:
     """整库岗位数据分析：需求量最大的岗位方向排名 + 技术栈次数排名。"""
     try:
@@ -173,6 +351,31 @@ def build_market_insights(state: AgentState) -> dict[str, Any]:
     except Exception as exc:
         logger.warning("Market insights skipped: %s", exc)
         return {"market_insights": None}
+
+
+def conceptualize_market_insights(state: AgentState, llm: ResumeLLMClient) -> dict[str, Any]:
+    insights = state.get("market_insights") or {}
+    if not insights:
+        return {"market_insights": insights}
+    try:
+        content = llm.chat_json(
+            MARKET_INSIGHTS_SUMMARY_SYSTEM_PROMPT,
+            MARKET_INSIGHTS_SUMMARY_PROMPT.format(market_insights=as_json(insights)),
+            temperature=0.15,
+            max_tokens=2048,
+        )
+        parsed = parse_llm_json(content)
+        if not isinstance(parsed, dict):
+            raise ResumeAgentError("Market insight conceptualizer returned non-object JSON")
+        themes = [_normalise_theme(item) for item in ensure_list(parsed.get("tech_stack_themes"))]
+        insights = dict(insights)
+        insights["tech_stack_themes"] = [item for item in themes if item]
+    except Exception as exc:
+        logger.warning("Market insight conceptualization skipped: %s", exc)
+        fallback = _fallback_tech_stack_from_context({"top_skills": insights.get("tech_stack_ranking") or []})
+        insights = dict(insights)
+        insights["tech_stack_themes"] = fallback["tech_stack_themes"]
+    return {"market_insights": insights}
 
 
 def build_market_context(state: AgentState) -> dict[str, Any]:
@@ -186,6 +389,7 @@ def build_market_context(state: AgentState) -> dict[str, Any]:
 
     extractor = RuleBasedSkillExtractor()
     skill_counter: Counter[str] = Counter()
+    other_counter: Counter[str] = Counter()
     titles: list[str] = []
     phrases: list[str] = []
 
@@ -196,16 +400,243 @@ def build_market_context(state: AgentState) -> dict[str, Any]:
             titles.append(title)
         if snippet:
             phrases.append(compact_text(snippet, 240))
-        for skill in extractor.extract_flat(f"{title}\n{snippet}"):
-            skill_counter[skill] += 1
+        extracted = extractor.extract(f"{title}\n{snippet}")
+        for category, skills in extracted.items():
+            target = skill_counter if category in TECH_SKILL_CATEGORIES else other_counter
+            for skill in skills:
+                target[str(skill)] += 1
+        for term in OTHER_COMPETENCY_TERMS:
+            if term in f"{title}\n{snippet}".lower():
+                other_counter[term] += 1
 
     context = {
         "job_count": len(matched),
         "top_skills": [{"skill": skill, "count": count} for skill, count in skill_counter.most_common(15)],
+        "other_competencies": [{"name": name, "count": count} for name, count in other_counter.most_common(12)],
         "common_titles": [title for title, _ in Counter(titles).most_common(8)],
         "sample_phrases": phrases[:5],
     }
     return {"market_context": context}
+
+
+def summarize_tech_stack(state: AgentState, llm: ResumeLLMClient) -> dict[str, Any]:
+    matched = state.get("matched_jobs") or []
+    context = state.get("market_context") or {}
+    if not matched:
+        return {"tech_stack_summary": _fallback_tech_stack_from_context(context)}
+    try:
+        content = llm.chat_json(
+            TECH_STACK_SUMMARY_SYSTEM_PROMPT,
+            TECH_STACK_SUMMARY_PROMPT.format(
+                target_role_understanding=as_json(state.get("target_role_understanding") or {}),
+                market_context=as_json(context),
+                matched_jobs=as_json(matched),
+            ),
+            temperature=0.15,
+            max_tokens=4096,
+        )
+        parsed = parse_llm_json(content)
+        if not isinstance(parsed, dict):
+            raise ResumeAgentError("Tech stack summarizer returned non-object JSON")
+        themes = [_normalise_theme(item) for item in ensure_list(parsed.get("tech_stack_themes"))]
+        summary = {
+            "tech_stack_themes": [item for item in themes if item],
+            "other_competencies": [str(v) for v in ensure_list(parsed.get("other_competencies")) if v],
+            "core_capabilities": [str(v) for v in ensure_list(parsed.get("core_capabilities")) if v],
+        }
+        if not summary["tech_stack_themes"]:
+            summary.update(_fallback_tech_stack_from_context(context))
+        return {"tech_stack_summary": summary}
+    except Exception as exc:
+        logger.warning("Tech stack summarization skipped, using filtered rule fallback: %s", exc)
+        return {"tech_stack_summary": _fallback_tech_stack_from_context(context)}
+
+
+# 简历原文达到该长度才视为「完整」，低于则视为「片段」。
+RESUME_PROVIDED_LENGTH = 200
+RESUME_MIN_LENGTH = 50
+
+
+def run_input_health(state: AgentState) -> dict[str, Any]:
+    """Stage 0 输入体检：判断输入是否足够、哪些可自动补齐、哪些必须问用户。
+
+    确定性逻辑，不调用 LLM：
+    - blocked：简历正文不足，继续会误导，只问最少必要问题。
+    - workable：有缺口（如缺 JD）但可用知识库补齐，低置信继续。
+    - complete：目标、JD、简历、投递状态都足够明确。
+    """
+    resume_len = len((state.get("resume_text") or "").strip())
+    if resume_len >= RESUME_PROVIDED_LENGTH:
+        resume_status = "provided"
+    elif resume_len >= RESUME_MIN_LENGTH:
+        resume_status = "partial"
+    else:
+        resume_status = "missing"
+
+    jd_len = len((state.get("target_jd_text") or "").strip())
+    if jd_len >= JD_MIN_LENGTH:
+        jd_status = "provided"
+    elif jd_len > 0:
+        jd_status = "partial"
+    else:
+        jd_status = "missing"
+
+    target_role = (state.get("target_role") or "").strip() or None
+    target_market = (state.get("target_market") or "").strip() or None
+    application_status = (state.get("application_status") or "").strip() or "unknown"
+
+    assumptions: list[str] = []
+    gaps: list[str] = []
+    blocking_questions: list[str] = []
+
+    if jd_status != "provided":
+        if target_role:
+            assumptions.append(f"未提供完整 JD，将基于知识库相似岗位为「{target_role}」合成市场画像。")
+        else:
+            assumptions.append("未提供 JD 与目标职位，将基于简历技能从知识库召回相似岗位推断目标方向。")
+        gaps.append("缺少目标 JD，市场画像为知识库推断结果，置信度有限。")
+    if not target_market:
+        assumptions.append("未指定目标市场，默认按香港 IT 市场分析。")
+    if application_status == "applied":
+        assumptions.append("简历已投递，建议聚焦面试准备而非改写已投版本。")
+
+    if resume_status == "missing":
+        status = "blocked"
+        blocking_questions.append("请粘贴简历正文或上传 PDF 简历后再继续。")
+    elif resume_status == "partial":
+        status = "workable"
+        gaps.append("简历内容偏少，只处理已提供片段，可能影响润色完整度。")
+    elif jd_status == "provided" and application_status != "unknown":
+        status = "complete"
+    else:
+        status = "workable"
+
+    health = {
+        "status": status,
+        "target_role": target_role,
+        "target_role_id": (state.get("target_role_id") or "").strip() or None,
+        "target_market": target_market,
+        "jd_status": jd_status,
+        "resume_status": resume_status,
+        "application_status": application_status,
+        "assumptions": assumptions,
+        "gaps": gaps,
+        "blocking_questions": blocking_questions,
+    }
+    return {"input_health": health}
+
+
+def build_job_research(state: AgentState) -> dict[str, Any]:
+    """Stage 1 岗位调研：把召回 + 市场上下文/洞察提炼为可见的调研报告。
+
+    确定性聚合（不额外调用 LLM），复用 matched_jobs / market_context /
+    market_insights / jd，作为简历改写与面试准备的共同靶心。
+    """
+    matched = state.get("matched_jobs") or []
+    context = state.get("market_context") or {}
+    jd = state.get("jd") or {}
+    tech_summary = state.get("tech_stack_summary") or {}
+
+    sample_count = len(matched)
+    if sample_count == 0:
+        return {"job_research": None}
+
+    top_skills = context.get("top_skills") or []
+    high_freq = [
+        {"skill": str(item.get("skill")), "count": int(item.get("count") or 0)}
+        for item in top_skills
+        if item.get("skill")
+    ]
+    tech_stack_themes = [
+        item for item in ensure_list(tech_summary.get("tech_stack_themes"))
+        if isinstance(item, dict) and item.get("theme")
+    ]
+    other_competencies = [str(item) for item in ensure_list(tech_summary.get("other_competencies")) if item]
+    if not other_competencies:
+        other_competencies = [
+            str(item.get("name"))
+            for item in ensure_list(context.get("other_competencies"))
+            if isinstance(item, dict) and item.get("name")
+        ]
+
+    # 核心能力靶心：优先 LLM 语义概括，其次 JD 硬技能，最后回退到市场技术主题/技能。
+    core = [str(s) for s in ensure_list(tech_summary.get("core_capabilities")) if s][:5]
+    if not core:
+        core = [str(s) for s in (jd.get("required_skills") or []) if s][:5]
+    if not core:
+        for theme in tech_stack_themes[:3]:
+            items = theme.get("items") if isinstance(theme, dict) else []
+            label = str(theme.get("theme") or "")
+            values = [str(v) for v in ensure_list(items) if v]
+            if label and values:
+                core.append(f"{label}（{', '.join(values[:3])}）")
+        core = core[:5]
+    if not core:
+        core = [item["skill"] for item in high_freq[:5]]
+
+    hidden = [str(s) for s in (jd.get("preferred_skills") or []) if s][:5]
+    hidden.extend(str(s) for s in (jd.get("key_requirements") or []) if s)
+
+    source = "jd" if has_target_jd(state) else "knowledge_base"
+    if source == "jd":
+        confidence = "high"
+    else:
+        # 知识库模式是市场共性画像而非具体公司 JD，置信度封顶 medium，
+        # 避免把市场推断伪装成确定结论。
+        confidence = "medium" if sample_count >= 2 else "low"
+
+    advice = []
+    if core:
+        advice.append("简历置顶突出以下核心能力：" + "、".join(core[:5]) + "。")
+    if tech_stack_themes:
+        advice.append(
+            "围绕目标岗位技术主题组织技能区："
+            + "、".join(str(item.get("theme")) for item in tech_stack_themes[:4] if item.get("theme"))
+            + "。"
+        )
+    elif high_freq:
+        advice.append(
+            "对照市场高频技术线索补齐关键词："
+            + "、".join(item["skill"] for item in high_freq[:8])
+            + "。"
+        )
+    if other_competencies:
+        advice.append("语言、协作和业务沟通能力单独呈现，不混入技术栈：" + "、".join(other_competencies[:5]) + "。")
+    if source == "knowledge_base":
+        advice.append("当前为知识库市场画像（非具体公司 JD），定位建议偏共性，拿到真实 JD 后请二次校准。")
+
+    note = (
+        f"基于知识库召回的 {sample_count} 条香港相似岗位"
+        + ("，并结合用户提供的目标 JD" if source == "jd" else "（未提供具体 JD，为市场共性画像）")
+        + f"，置信度 {confidence}。"
+    )
+
+    report = {
+        "target_role": (state.get("target_role") or jd.get("role_name") or None),
+        "source": source,
+        "confidence": confidence,
+        "sample_count": sample_count,
+        "core_capabilities": core,
+        "high_frequency_skills": high_freq[:15],
+        "tech_stack_themes": tech_stack_themes[:8],
+        "other_competencies": other_competencies[:12],
+        "common_titles": context.get("common_titles") or [],
+        "common_responsibilities": [str(r) for r in (jd.get("responsibilities") or []) if r][:8],
+        "hidden_requirements": hidden[:8],
+        "similar_jobs": [
+            {
+                "title": job.get("title") or "",
+                "company": job.get("company") or "",
+                "location": job.get("location") or "",
+                "url": job.get("url") or "",
+                "match_reason": job.get("match_reason") or "",
+            }
+            for job in matched[:10]
+        ],
+        "resume_positioning_advice": advice,
+        "source_coverage_note": note,
+    }
+    return {"job_research": report}
 
 
 def gap_analysis(state: AgentState, llm: ResumeLLMClient) -> dict[str, Any]:
@@ -302,3 +733,49 @@ def score_and_verify(state: AgentState, llm: ResumeLLMClient) -> dict[str, Any]:
         "suggestions": [str(item) for item in ensure_list(score.get("suggestions")) if item],
     }
     return {"score": normalized}
+
+
+def build_interview_prep(state: AgentState, llm: ResumeLLMClient) -> dict[str, Any]:
+    """Stage 8 面试深挖：把润色后的每条 bullet 转为可被追问的讲法。"""
+    suggestions = state.get("polish_suggestions") or []
+    if not suggestions:
+        return {"bullet_inventory": []}
+
+    content = llm.chat_json(
+        INTERVIEW_PREP_SYSTEM_PROMPT,
+        INTERVIEW_PREP_PROMPT.format(
+            jd=as_json(state.get("jd") or {}),
+            suggestions=as_json(suggestions),
+        ),
+        temperature=0.3,
+        max_tokens=8192,  # 逐条讲法输出较长，避免 JSON 被截断
+    )
+    try:
+        items = parse_llm_json(content)
+    except ResumeAgentError:
+        items = None
+    if not isinstance(items, list):
+        # 数组被截断时抢救已完整生成的条目，不让整个面试准备失败。
+        salvaged = extract_json_objects(content)
+        if salvaged:
+            logger.warning("Interview prep JSON not a clean array; salvaged %d item(s)", len(salvaged))
+            items = salvaged
+        else:
+            raise ResumeAgentError("Interview prep returned non-array JSON")
+
+    inventory = []
+    for index, item in enumerate(items):
+        if not isinstance(item, dict):
+            continue
+        inventory.append({
+            "bullet_id": str(item.get("bullet_id") or f"b{index + 1}"),
+            "final_text": str(item.get("final_text") or ""),
+            "target_capability": str(item.get("target_capability") or ""),
+            "evidence_source": str(item.get("evidence_source") or ""),
+            "evidence_confidence": str(item.get("evidence_confidence") or "medium"),
+            "talk_track_30s": str(item.get("talk_track_30s") or ""),
+            "follow_up_questions": [str(q) for q in ensure_list(item.get("follow_up_questions")) if q],
+            "risk_notes": [str(r) for r in ensure_list(item.get("risk_notes")) if r],
+            "fallback_answer": str(item.get("fallback_answer") or ""),
+        })
+    return {"bullet_inventory": inventory}

@@ -5,7 +5,7 @@ from collections import Counter
 from typing import Any
 
 from config.settings import settings
-from src.analyzer.role_classifier import RoleClassifier
+from src.analyzer.role_classifier import RoleClassifier, RoleResult
 from src.logger import get_logger
 
 logger = get_logger(__name__)
@@ -73,7 +73,18 @@ def _build(top_n: int) -> dict[str, Any]:
         text = f"{row.get('title', '')} {row.get('jd_text', '') or row.get('jd_raw', '')}".strip()
         if not text:
             continue
-        result = classifier._classify_with_rules(text)
+        cache_key = classifier._make_cache_key(text)
+        cached = classifier._cache.get(cache_key)
+        if cached:
+            result = RoleResult(
+                role_id=cached.get("role_id", "other"),
+                role_name=cached.get("role_name", "其他"),
+                confidence=cached.get("confidence", "low"),
+            )
+        else:
+            # 整库洞察在用户请求链路里不能逐条实时调用 LLM；未缓存项使用规则兜底，
+            # 后台批量分类写入 role_cache.json 后会自动复用语义结果。
+            result = classifier._classify_with_rules(text)
         if result.role_id and result.role_id != "other":
             role_counter[result.role_id] += 1
             role_names[result.role_id] = result.role_name

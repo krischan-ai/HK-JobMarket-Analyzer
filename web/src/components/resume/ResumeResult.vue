@@ -24,7 +24,108 @@
         <span>{{ store.stageMessage || '分析中…' }}</span>
       </div>
 
+      <div v-if="store.streaming && store.streamingText" class="live-output">
+        <div class="live-label">模型實時輸出</div>
+        <pre ref="liveRef" class="live-pre">{{ store.streamingText }}</pre>
+      </div>
+
       <el-tabs v-model="store.activeTab">
+      <el-tab-pane label="崗位調研" name="research">
+        <template v-if="jobResearch">
+          <el-alert
+            :type="researchConfidenceType"
+            :closable="false"
+            show-icon
+            class="suggestion-alert"
+            :title="`數據來源：${researchSourceLabel} · 樣本 ${jobResearch.sample_count} 條 · 置信度 ${jobResearch.confidence}`"
+          >
+            <template #default>{{ jobResearch.source_coverage_note }}</template>
+          </el-alert>
+
+          <el-alert
+            v-if="matchAdviceSummary || matchAdviceSuggestions.length"
+            type="success"
+            :closable="false"
+            show-icon
+            class="suggestion-alert"
+            title="大模型匹配建議"
+          >
+            <template #default>
+              <div v-if="matchAdviceSummary">{{ matchAdviceSummary }}</div>
+              <ul v-if="matchAdviceSuggestions.length" class="plain-list compact-list">
+                <li v-for="item in matchAdviceSuggestions" :key="item">{{ item }}</li>
+              </ul>
+            </template>
+          </el-alert>
+
+          <el-card v-if="jobResearch.core_capabilities.length" shadow="never" class="jobs-card">
+            <template #header>核心能力靶心</template>
+            <el-tag
+              v-for="cap in jobResearch.core_capabilities"
+              :key="cap"
+              type="primary"
+              effect="dark"
+              class="market-tag"
+            >
+              {{ cap }}
+            </el-tag>
+          </el-card>
+
+          <div class="gap-grid">
+            <el-card v-if="techStackThemes.length" shadow="never">
+              <template #header>語義技術棧主題</template>
+              <div v-for="theme in techStackThemes" :key="theme.theme" class="theme-block">
+                <div class="theme-title">{{ theme.theme }}</div>
+                <el-tag
+                  v-for="item in theme.items"
+                  :key="`${theme.theme}-${item}`"
+                  type="info"
+                  effect="plain"
+                  class="market-tag"
+                >
+                  {{ item }}
+                </el-tag>
+              </div>
+            </el-card>
+
+            <el-card v-if="otherCompetencies.length" shadow="never">
+              <template #header>其他能力（非技術棧）</template>
+              <el-tag
+                v-for="item in otherCompetencies"
+                :key="item"
+                type="warning"
+                effect="plain"
+                class="market-tag"
+              >
+                {{ item }}
+              </el-tag>
+            </el-card>
+
+            <el-card v-if="jobResearch.hidden_requirements.length" shadow="never">
+              <template #header>隱性門檻 / 加分項</template>
+              <ul class="plain-list">
+                <li v-for="req in jobResearch.hidden_requirements" :key="req">{{ req }}</li>
+              </ul>
+            </el-card>
+          </div>
+
+          <el-card v-if="jobResearch.common_responsibilities.length" shadow="never" class="jobs-card">
+            <template #header>常見職責</template>
+            <ul class="plain-list">
+              <li v-for="resp in jobResearch.common_responsibilities" :key="resp">{{ resp }}</li>
+            </ul>
+          </el-card>
+
+          <el-card v-if="jobResearch.resume_positioning_advice.length" shadow="never" class="jobs-card">
+            <template #header>簡歷改寫靶心</template>
+            <ul class="plain-list">
+              <li v-for="advice in jobResearch.resume_positioning_advice" :key="advice">{{ advice }}</li>
+            </ul>
+          </el-card>
+        </template>
+        <el-empty v-else description="暫無崗位調研數據" />
+      </el-tab-pane>
+
       <el-tab-pane label="整體評分" name="score">
         <div v-if="score" class="score-layout">
           <div class="overall-score">
@@ -138,7 +239,7 @@
           <template #default>{{ marketDemandAnalysis }}</template>
         </el-alert>
 
-        <div v-if="roleDemandRanking.length || techStackRanking.length" class="gap-grid">
+        <div v-if="roleDemandRanking.length || marketInsightThemes.length" class="gap-grid">
           <el-card v-if="roleDemandRanking.length" shadow="never">
             <template #header>需求量最大的岗位方向 Top {{ roleDemandRanking.length }}</template>
             <el-table :data="roleDemandRanking" size="small">
@@ -148,18 +249,25 @@
             </el-table>
           </el-card>
 
-          <el-card v-if="techStackRanking.length" shadow="never">
-            <template #header>JD 技術棧提及次數 Top {{ techStackRanking.length }}</template>
-            <el-table :data="techStackRanking" size="small">
-              <el-table-column type="index" label="#" width="48" />
-              <el-table-column prop="skill" label="技術棧" min-width="140" />
-              <el-table-column prop="count" label="次數" width="80" align="right" />
-            </el-table>
+          <el-card v-if="marketInsightThemes.length" shadow="never">
+            <template #header>整庫技術棧語義主題</template>
+            <div v-for="theme in marketInsightThemes" :key="theme.theme" class="theme-block">
+              <div class="theme-title">{{ theme.theme }}</div>
+              <el-tag
+                v-for="item in theme.items"
+                :key="`${theme.theme}-${item}`"
+                type="info"
+                effect="plain"
+                class="market-tag"
+              >
+                {{ item }}
+              </el-tag>
+            </div>
           </el-card>
         </div>
 
         <el-card v-if="marketSkills.length" shadow="never" class="jobs-card">
-          <template #header>香港市場高頻技能（來自知識庫相似崗位）</template>
+          <template #header>香港市場技術線索（規則兜底）</template>
           <el-tag
             v-for="item in marketSkills"
             :key="item.skill"
@@ -167,7 +275,7 @@
             effect="plain"
             class="market-tag"
           >
-            {{ item.skill }} · {{ item.count }}
+            {{ item.skill }}
           </el-tag>
         </el-card>
 
@@ -178,8 +286,55 @@
             <el-table-column prop="company" label="公司" min-width="140" />
             <el-table-column prop="location" label="地點" width="120" />
             <el-table-column prop="score" label="相似度" width="90" />
+            <el-table-column prop="match_reason" label="語義匹配理由" min-width="220" />
           </el-table>
         </el-card>
+      </el-tab-pane>
+
+      <el-tab-pane label="面試深挖" name="interview">
+        <div v-if="bulletInventory.length" class="section-list">
+          <el-card
+            v-for="item in bulletInventory"
+            :key="item.bullet_id"
+            shadow="never"
+            class="section-card"
+          >
+            <template #header>
+              <div class="section-title">
+                <span>{{ item.target_capability || item.bullet_id }}</span>
+                <el-tag :type="confidenceTagType(item.evidence_confidence)" size="small">
+                  證據 {{ item.evidence_confidence }}
+                </el-tag>
+              </div>
+            </template>
+            <pre>{{ item.final_text }}</pre>
+            <div v-if="item.talk_track_30s" class="bullet-block">
+              <div class="diff-label">30 秒講法</div>
+              <div>{{ item.talk_track_30s }}</div>
+            </div>
+            <div v-if="item.follow_up_questions.length" class="bullet-block">
+              <div class="diff-label">可能追問</div>
+              <ul class="plain-list">
+                <li v-for="q in item.follow_up_questions" :key="q">{{ q }}</li>
+              </ul>
+            </div>
+            <div v-if="item.evidence_source" class="bullet-block">
+              <div class="diff-label">證據口徑</div>
+              <div>{{ item.evidence_source }}</div>
+            </div>
+            <div v-if="item.risk_notes.length" class="bullet-block">
+              <div class="diff-label">風險點</div>
+              <el-tag v-for="risk in item.risk_notes" :key="risk" type="danger" effect="plain" class="change-tag">
+                {{ risk }}
+              </el-tag>
+            </div>
+            <div v-if="item.fallback_answer" class="bullet-block">
+              <div class="diff-label">兜底話術</div>
+              <div>{{ item.fallback_answer }}</div>
+            </div>
+          </el-card>
+        </div>
+        <el-empty v-else description="潤色完成後，這裡會逐條生成面試講法與追問" />
       </el-tab-pane>
       </el-tabs>
     </template>
@@ -187,20 +342,55 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Loading } from '@element-plus/icons-vue'
 import { useResumeStore } from '@/stores/resume'
 
 const store = useResumeStore()
 
+const liveRef = ref<HTMLElement | null>(null)
+// 模型实时输出滚动到底部，让最新 token 始终可见。
+watch(
+  () => store.streamingText,
+  () => {
+    nextTick(() => {
+      if (liveRef.value) liveRef.value.scrollTop = liveRef.value.scrollHeight
+    })
+  },
+)
+
 const score = computed(() => store.result?.score || null)
 const sections = computed(() => store.result?.polish_suggestions || [])
+const jobResearch = computed(() => store.result?.job_research || null)
+const bulletInventory = computed(() => store.result?.bullet_inventory || [])
+
+const researchSourceLabel = computed(() => {
+  const source = jobResearch.value?.source
+  if (source === 'jd') return '目標 JD'
+  if (source === 'mixed') return 'JD + 知識庫'
+  return '知識庫市場畫像'
+})
+const researchConfidenceType = computed(() => {
+  const c = jobResearch.value?.confidence
+  return c === 'high' ? 'success' : c === 'medium' ? 'warning' : 'info'
+})
+
+function confidenceTagType(level: string) {
+  if (level === 'strong') return 'success'
+  if (level === 'weak') return 'warning'
+  if (level === 'risky') return 'danger'
+  return 'info'
+}
 const keywordSuggestions = computed(() => store.result?.gap_analysis?.keyword_suggestions || [])
 const marketSkills = computed(() => store.result?.market_context?.top_skills || [])
 const marketDemandAnalysis = computed(() => store.result?.gap_analysis?.market_demand_analysis || '')
 const roleDemandRanking = computed(() => store.result?.market_insights?.role_demand_ranking || [])
-const techStackRanking = computed(() => store.result?.market_insights?.tech_stack_ranking || [])
+const techStackThemes = computed(() => jobResearch.value?.tech_stack_themes || [])
+const otherCompetencies = computed(() => jobResearch.value?.other_competencies || [])
+const marketInsightThemes = computed(() => store.result?.market_insights?.tech_stack_themes || [])
+const matchAdviceSummary = computed(() => store.result?.match_advice?.summary || '')
+const matchAdviceSuggestions = computed(() => store.result?.match_advice?.suggestions || [])
 const scoreItems = computed(() => {
   if (!score.value) return []
   const reasons = score.value.dimension_reasons || {}
@@ -280,6 +470,32 @@ function downloadMarkdown() {
   background: var(--el-color-primary-light-9);
   color: var(--el-color-primary);
   font-size: 13px;
+}
+
+.live-output {
+  margin-bottom: 12px;
+}
+
+.live-label {
+  font-size: 12px;
+  color: #909399;
+  margin-bottom: 4px;
+}
+
+.live-pre {
+  margin: 0;
+  max-height: 220px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #4b5563;
+  background: #f7f8fa;
+  border: 1px dashed var(--el-border-color);
+  border-radius: 6px;
+  padding: 10px;
 }
 
 .score-layout {
@@ -385,6 +601,41 @@ pre {
 
 .market-tag {
   margin: 0 6px 6px 0;
+}
+
+.theme-block {
+  margin-bottom: 12px;
+}
+
+.theme-block:last-child {
+  margin-bottom: 0;
+}
+
+.theme-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 6px;
+}
+
+.compact-list {
+  margin-top: 6px;
+}
+
+.plain-list {
+  margin: 0;
+  padding-left: 18px;
+  line-height: 1.7;
+  color: #303133;
+}
+
+.bullet-block {
+  margin-top: 12px;
+}
+
+.bullet-block > div:last-child {
+  margin-top: 4px;
+  line-height: 1.6;
 }
 
 @media (max-width: 900px) {

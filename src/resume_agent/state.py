@@ -52,19 +52,98 @@ class ScoreReport(TypedDict, total=False):
     suggestions: list[str]
 
 
+class SkillStat(TypedDict, total=False):
+    skill: str
+    count: int
+
+
+class TechStackTheme(TypedDict, total=False):
+    theme: str
+    items: list[str]
+    evidence: list[str]
+
+
+class TargetRoleUnderstanding(TypedDict, total=False):
+    role_id: Optional[str]
+    role_name: Optional[str]
+    role_summary: str
+    expanded_query: str
+    core_tech: list[str]
+    responsibilities: list[str]
+
+
+class MatchAdvice(TypedDict, total=False):
+    summary: str
+    suggestions: list[str]
+
+
+class InputHealth(TypedDict, total=False):
+    """Stage 0 输入体检：判断输入是否足够进入后续阶段。"""
+    status: str                       # complete | workable | blocked
+    target_role: Optional[str]
+    target_role_id: Optional[str]
+    target_market: Optional[str]
+    jd_status: str                    # provided | partial | missing
+    resume_status: str                # provided | partial | missing
+    application_status: str           # not_applied | applied | unknown
+    assumptions: list[str]
+    gaps: list[str]
+    blocking_questions: list[str]
+
+
+class JobResearchReport(TypedDict, total=False):
+    """Stage 1 岗位调研：把市场上下文/洞察提炼为可见的调研产物。"""
+    target_role: Optional[str]
+    source: str                       # jd | knowledge_base | mixed
+    confidence: str                   # high | medium | low
+    sample_count: int
+    core_capabilities: list[str]
+    high_frequency_skills: list[SkillStat]
+    tech_stack_themes: list[TechStackTheme]
+    other_competencies: list[str]
+    common_titles: list[str]
+    common_responsibilities: list[str]
+    hidden_requirements: list[str]
+    similar_jobs: list[dict]
+    resume_positioning_advice: list[str]
+    source_coverage_note: str
+
+
+class ResumeBulletInventory(TypedDict, total=False):
+    """Stage 8 面试深挖：把最终简历 bullet 转为可被追问的讲法。"""
+    bullet_id: str
+    final_text: str
+    target_capability: str
+    evidence_source: str
+    evidence_confidence: str          # strong | medium | weak | risky
+    talk_track_30s: str
+    follow_up_questions: list[str]
+    risk_notes: list[str]
+    fallback_answer: str
+
+
 class AgentState(TypedDict):
     resume_text: str
     target_jd_text: str
     target_jd_url: Optional[str]
     target_role: Optional[str]
+    target_role_id: Optional[str]
+    target_role_understanding: Optional[TargetRoleUnderstanding]
+    match_advice: Optional[MatchAdvice]
+    target_market: Optional[str]
+    application_status: Optional[str]
     resume: Optional[ResumeAnalysis]
     jd: Optional[JDAnalysis]
     matched_jobs: Optional[list[dict]]
     rerank_used: Optional[bool]
     market_context: Optional[dict]
     market_insights: Optional[dict]
+    tech_stack_summary: Optional[dict]
+    input_health: Optional[InputHealth]
+    job_research: Optional[JobResearchReport]
     gap: Optional[GapAnalysis]
     polish_suggestions: Optional[list[PolishSuggestion]]
+    bullet_inventory: Optional[list[ResumeBulletInventory]]
     score: Optional[ScoreReport]
     retry_count: int
     max_retries: int

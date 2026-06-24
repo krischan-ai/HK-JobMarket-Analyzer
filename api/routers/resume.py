@@ -5,11 +5,24 @@ import json
 from fastapi import APIRouter, File, HTTPException, UploadFile
 from fastapi.responses import StreamingResponse
 
-from src.resume_agent import analyze_resume_only, match_jobs_only, run_resume_agent
+from src.resume_agent import (
+    analyze_resume_only,
+    check_input_health,
+    match_jobs_only,
+    research_jobs,
+    run_interview_prep,
+    run_resume_agent,
+)
 from src.resume_agent.graph import run_resume_agent_stream
 from src.resume_agent.models import (
+    InputHealthEndpointResponse,
+    InputHealthRequest,
+    InterviewPrepRequest,
+    InterviewPrepResponse,
     JobMatchRequest,
     JobMatchResponse,
+    JobResearchEndpointResponse,
+    JobResearchRequest,
     PdfExtractResponse,
     ResumeAnalyzeRequest,
     ResumeAnalyzeResponse,
@@ -33,6 +46,9 @@ async def polish_resume(request: ResumePolishRequest):
             jd_text=request.jd_text,
             jd_url=request.jd_url,
             target_role=request.target_role,
+            target_role_id=request.target_role_id,
+            target_market=request.target_market,
+            application_status=request.application_status,
             max_retries=request.max_retries,
         )
         return ResumePolishResponse(
@@ -43,6 +59,11 @@ async def polish_resume(request: ResumePolishRequest):
             matched_jobs=result.get("matched_jobs") or [],
             market_context=result.get("market_context"),
             market_insights=result.get("market_insights"),
+            target_role_understanding=result.get("target_role_understanding"),
+            match_advice=result.get("match_advice"),
+            input_health=result.get("input_health"),
+            job_research=result.get("job_research"),
+            bullet_inventory=result.get("bullet_inventory") or [],
             rerank_used=result.get("rerank_used"),
         )
     except ResumeAgentError as exc:
@@ -66,6 +87,9 @@ async def polish_resume_stream(request: ResumePolishRequest):
                 jd_text=request.jd_text,
                 jd_url=request.jd_url,
                 target_role=request.target_role,
+                target_role_id=request.target_role_id,
+                target_market=request.target_market,
+                application_status=request.application_status,
                 max_retries=request.max_retries,
             ):
                 yield _sse(event)
@@ -92,6 +116,7 @@ async def analyze_resume(request: ResumeAnalyzeRequest):
             resume_text=request.resume_text,
             jd_text=request.jd_text,
             target_role=request.target_role,
+            target_role_id=request.target_role_id,
         )
         return ResumeAnalyzeResponse(
             success=True,
@@ -101,12 +126,73 @@ async def analyze_resume(request: ResumeAnalyzeRequest):
             matched_jobs=result.get("matched_jobs") or [],
             market_context=result.get("market_context"),
             market_insights=result.get("market_insights"),
+            target_role_understanding=result.get("target_role_understanding"),
+            match_advice=result.get("match_advice"),
+            input_health=result.get("input_health"),
+            job_research=result.get("job_research"),
             rerank_used=result.get("rerank_used"),
         )
     except ResumeAgentError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Resume analysis failed: {exc}") from exc
+
+
+@router.post("/input-health", response_model=InputHealthEndpointResponse)
+async def input_health(request: InputHealthRequest):
+    """Stage 0 输入体检：确定性判断输入是否足够、缺口与必须追问的问题。"""
+    try:
+        health = check_input_health(
+            resume_text=request.resume_text or "",
+            jd_text=request.jd_text,
+            target_role=request.target_role,
+            target_role_id=request.target_role_id,
+            target_market=request.target_market,
+            application_status=request.application_status,
+        )
+        return InputHealthEndpointResponse(success=True, input_health=health)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Input health check failed: {exc}") from exc
+
+
+@router.post("/job-research", response_model=JobResearchEndpointResponse)
+async def job_research(request: JobResearchRequest):
+    """Stage 1 岗位调研：知识库混合检索 + 市场画像 → 岗位调研报告。"""
+    try:
+        result = research_jobs(
+            resume_text=request.resume_text,
+            jd_text=request.jd_text,
+            target_role=request.target_role,
+            target_role_id=request.target_role_id,
+            top_k=request.top_k,
+        )
+        return JobResearchEndpointResponse(
+            success=True,
+            job_research=result.get("job_research"),
+            matched_jobs=result.get("matched_jobs") or [],
+            rerank_used=result.get("rerank_used"),
+        )
+    except ResumeAgentError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Job research failed: {exc}") from exc
+
+
+@router.post("/interview-prep", response_model=InterviewPrepResponse)
+async def interview_prep(request: InterviewPrepRequest):
+    """Stage 8 面试深挖：把润色后的每条 bullet 转为可被追问的讲法。"""
+    try:
+        inventory = run_interview_prep(
+            resume_text=request.resume_text,
+            polish_suggestions=[item.model_dump() for item in request.polish_suggestions],
+            jd_text=request.jd_text,
+            target_role=request.target_role,
+        )
+        return InterviewPrepResponse(success=True, bullet_inventory=inventory)
+    except ResumeAgentError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Interview prep failed: {exc}") from exc
 
 
 @router.post("/match-jobs", response_model=JobMatchResponse)

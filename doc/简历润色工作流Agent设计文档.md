@@ -1,8 +1,8 @@
 # 简历润色工作流 Agent 设计文档
 
-**版本**: v1.0  
-**日期**: 2026-06-23  
-**状态**: 初稿
+**版本**: v1.1  
+**日期**: 2026-06-24  
+**状态**: 规划增强
 
 ---
 
@@ -11,6 +11,7 @@
 | 版本 | 日期 | 修订内容 | 修订人 |
 |------|------|---------|--------|
 | v1.0 | 2026-06-23 | 初始版本 | - |
+| v1.1 | 2026-06-24 | 增补 JobResearch、输入体检、证据审计、面试深挖、质量闸门与求职全链路工作流设计 | - |
 
 ---
 
@@ -27,6 +28,7 @@
 9. [可复用基础设施清单](#9-可复用基础设施清单)
 10. [文件清单](#10-文件清单)
 11. [里程碑规划](#11-里程碑规划)
+12. [v2.9 增强工作流设计](#12-v29-增强工作流设计)
 
 ---
 
@@ -1144,6 +1146,405 @@ ResumePage.vue
 | **M8** 集成测试 | pytest 测试 + 前端 Vitest 测试 | 0.5 天 | M7 |
 
 **总计预估工时：7.5 天**
+
+---
+
+## 12. v2.9 增强工作流设计
+
+### 12.1 设计背景
+
+v2.8 已将简历 Agent 从 MVP 推进到可用的智能润色工作流：
+
+- PDF 简历读取与前端上传回填。
+- 目标 JD 选填，缺省时基于知识库合成目标岗位画像。
+- MongoDB 全文检索 + ChromaDB 向量检索 + Qwen3 rerank 的混合召回。
+- 市场上下文、整库岗位需求洞察、评分讲解。
+- SSE 流式输出，先完成阶段先展示。
+
+但当前工作流仍主要集中于“简历润色 / 岗位匹配”，缺少完整求职链路中的几个关键环节：
+
+- 开工前的输入体检与降级策略。
+- 简历润色前的独立岗位调研阶段。
+- 对每个简历 claim 的证据化审计。
+- 从最终简历 bullet 到面试准备的闭环。
+- 质量闸门与回归评测。
+- 用户长期素材库，包括基础简历、个人档案、项目库。
+
+v2.9 目标是把现有简历 Agent 从“润色工具”升级为“香港 IT 求职全链路工作流”：先理解岗位，再选择和翻译真实经历，最后生成可被面试追问的安全表达。
+
+### 12.2 总体增强链路
+
+```text
+Stage 0 输入体检
+→ Stage 1 JobResearch 岗位 / 市场调研
+→ Stage 2 简历解析与项目素材抽取
+→ Stage 3 JD / 市场画像分析
+→ Stage 4 经历 - 岗位能力匹配矩阵
+→ Stage 5 简历 bullet 改写
+→ Stage 6 证据审计与风险降级
+→ Stage 7 评分与质量闸门
+→ Stage 8 面试准备：逐 bullet 深挖 + 风险地图 + 自我介绍
+```
+
+与现有 v2.8 的衔接：
+
+- `HybridJobSearch` 继续作为 `JobResearch` 与 `match_jobs` 的召回底座。
+- `market_context` / `market_insights` 从内部辅助上下文前置为可见的岗位调研产物。
+- `run_resume_agent_stream` 扩展事件：`input_health` / `job_research` / `evidence_audit` / `interview_prep`。
+- 前端结果区新增：`岗位调研`、`证据审计`、`面试深挖`。
+
+### 12.3 Stage 0：输入体检
+
+目标：在进入调研和改写前，先判断输入是否足够、哪些可自动补齐、哪些必须提示用户。
+
+建议新增数据结构：
+
+```python
+class InputHealth(BaseModel):
+    status: Literal["complete", "workable", "blocked"]
+    target_company: str | None = None
+    target_role: str | None = None
+    target_market: str | None = None
+    jd_status: Literal["provided", "missing", "partial"]
+    resume_status: Literal["provided", "missing", "partial", "parse_failed"]
+    application_status: Literal["not_applied", "applied", "unknown"]
+    interview_stage: str | None = None
+    assumptions: list[str] = []
+    gaps: list[str] = []
+    blocking_questions: list[str] = []
+```
+
+状态定义：
+
+| 状态 | 说明 | 处理 |
+|------|------|------|
+| `complete` | 目标岗位、市场/JD、简历、投递状态足够明确 | 直接进入后续阶段 |
+| `workable` | 有缺口但不阻塞 | 自动推断、知识库补齐、低置信标注后继续 |
+| `blocked` | 缺少目标岗位或简历正文等硬输入 | 停止生成，只问最少必要问题 |
+
+自动恢复策略：
+
+- 缺 JD：有目标岗位时用知识库生成市场岗位画像；后续可选 WebSearch 找官方 / 同岗 JD。
+- 缺市场：优先从岗位语言、地点、平台、公司实体推断；推不出时标记 `target_market=unknown`。
+- 简历只有片段：只处理已提供内容，并输出素材缺口清单。
+- 已投递：不再建议改动已投版本，转入面试准备与风险兜底。
+- 轮次未知：不硬生成 HR 面 / 二面 / 三面，只输出通用面试深挖和待确认轮次。
+
+### 12.4 Stage 1：JobResearch 知识库岗位调研
+
+目标：将现有岗位知识库能力前置，形成独立的岗位调研报告，为简历改写和面试准备提供共同靶心。
+
+推荐分层：
+
+```text
+JobResearch
+├─ KB Research：基于本地 MongoDB / ChromaDB / HybridSearch 分析香港 IT 市场共性需求
+└─ Web Research：后续可选，补公司官网、最新 JD、面经、新闻与产品动态
+```
+
+知识库可支撑的调研内容：
+
+- 目标岗位画像：同类岗位常见 title、职责、年限、学历、语言要求。
+- 核心能力关键词：从 `skills`、`jd_text`、`kb_document_text` 聚合高频技能。
+- 技术栈趋势：Python、AWS、Azure、LangChain、RAG、MLOps 等出现频次。
+- 角色方向判断：AI 应用开发、后端、DevOps、数据、Technical PM 等。
+- 香港市场措辞：常见英文 JD 表达、responsibilities / requirements 句式。
+- 相似岗位样本：召回 5-10 条代表性岗位作为依据。
+- 简历改写靶心：收敛成 3-5 个核心能力关键词。
+- 置信度与缺口：样本少时标注低置信，不把市场画像伪装成具体公司结论。
+
+边界：
+
+- 知识库能回答“香港市场类似岗位通常要什么”。
+- 单靠知识库不能回答“某公司这个具体岗位最新要求是什么”。
+- 用户提供 JD 时，JD 是最高优先级；未提供 JD 时，知识库生成“市场岗位画像”。
+
+建议流程：
+
+```text
+输入：target_role / target_company / jd_text 可选
+
+1. build_search_query
+   优先级：JD 文本 > 目标岗位 + 公司 > 目标岗位 > 简历技能
+
+2. HybridJobSearch
+   使用 MongoDB 全文 + ChromaDB 向量 + rerank 召回相似岗位
+
+3. aggregate_market_profile
+   聚合 skills、title、role_category、experience、education、language、salary、JD snippets
+
+4. extract_core_capabilities
+   输出 3-5 个核心能力关键词
+
+5. build_research_report
+   生成岗位调研报告：
+   - 样本数量
+   - 相似岗位
+   - 高频技能
+   - 常见职责
+   - 隐性门槛
+   - 简历改写建议
+   - 来源覆盖说明
+```
+
+建议数据结构：
+
+```python
+class SkillStat(BaseModel):
+    name: str
+    count: int
+    ratio: float | None = None
+
+
+class JobResearchReport(BaseModel):
+    target_role: str | None
+    target_company: str | None
+    source: Literal["jd", "knowledge_base", "mixed"]
+    confidence: Literal["high", "medium", "low"]
+    sample_count: int
+    core_capabilities: list[str]
+    high_frequency_skills: list[SkillStat]
+    common_titles: list[str]
+    common_responsibilities: list[str]
+    hidden_requirements: list[str]
+    similar_jobs: list[dict]
+    resume_positioning_advice: list[str]
+    source_coverage_note: str
+```
+
+### 12.5 Stage 2：长期素材库与项目素材抽取
+
+参考 `job-hunt-copilot-public.skill`，建议为 Agent 增加长期素材层：
+
+```text
+resources/
+├─ self_profile.md      # 用户背景、求职偏好、技能标签
+├─ resume_base.md       # 全量基础简历
+└─ projects/            # 项目素材库
+   └─ {project_name}.md
+```
+
+项目模板字段：
+
+- 项目名称、组织、时间周期、角色与团队规模。
+- 背景与问题。
+- 从 0 到 1 的关键过程。
+- 结果与数据。
+- 原始素材区。
+- 能力标签。
+
+用途：
+
+- 按 JD / JobResearch 从项目库中选择 2-4 个最相关项目。
+- 将真实经历翻译成目标岗位语言。
+- 为每条 bullet 提供证据来源。
+- 支撑面试项目讲稿和 STAR 结构回答。
+
+隐私策略：
+
+- 默认不自动持久化用户上传的简历原文。
+- 项目库 / 基础简历保存前应由用户确认。
+- 生成版本可保存摘要、结构化字段和用户确认后的内容，不保存未经确认的敏感原文。
+
+### 12.6 Stage 4：经历 - 岗位能力匹配矩阵
+
+目标：把 JobResearch 产出的岗位能力要求，与用户真实经历和项目素材建立映射，决定哪些经历应放大、弱化或删除。
+
+建议数据结构：
+
+```python
+class ExperienceCapabilityMatch(BaseModel):
+    capability: str
+    source_basis: str
+    matched_experiences: list[str]
+    evidence_strength: Literal["strong", "medium", "weak", "missing"]
+    suggested_resume_angle: str
+    risk_note: str | None = None
+```
+
+匹配原则：
+
+- 每个核心能力必须尽量找到真实经历支撑。
+- 没有真实锚点的能力不能写成用户已具备，只能放入“补强建议”。
+- 最相关项目 / 经历优先前置。
+- 跨背景表达要自然融入 bullet，不输出“迁移句:”等工作痕迹。
+
+### 12.7 Stage 6：证据审计与风险降级
+
+目标：对最终简历中的数字、强动词、职责边界和成果 claim 做结构化审计，避免过度包装和面试追问崩塌。
+
+建议新增数据结构：
+
+```python
+class ClaimEvidence(BaseModel):
+    claim: str
+    claim_type: Literal["number", "role", "skill", "achievement", "education", "employment"]
+    source: Literal["resume", "project_library", "user_confirmed", "inferred"]
+    confidence: Literal["strong", "medium", "weak", "risky"]
+    action: Literal["keep", "soften", "remove", "ask_user"]
+    interview_strategy: str
+```
+
+处理原则：
+
+- 每个数字、强动词、成果 claim 都要有来源或降级策略。
+- 讲不清来源的数字模糊化或删除。
+- 学历、在职时间、职位名称、公司名等背调硬信息不改。
+- 市场 JD 中出现的技能不能直接写成用户经历，除非用户简历或项目素材中已有证据。
+- `risky` claim 如果简历未投，应建议删除或改弱；如果已投，应生成诚实兜底话术。
+
+### 12.8 Stage 8：面试准备与 bullet 深挖
+
+目标：将最终简历每一条 bullet 转成可被面试追问的讲法，形成简历到面试的下游闭环。
+
+建议新增数据结构：
+
+```python
+class ResumeBulletInventory(BaseModel):
+    bullet_id: str
+    final_text: str
+    target_capability: str
+    evidence_source: str
+    evidence_confidence: Literal["strong", "medium", "weak", "risky"]
+    talk_track_30s: str
+    expanded_talk_track_90s: str | None = None
+    follow_up_questions: list[str]
+    deep_follow_up: str | None = None
+    risk_notes: list[str]
+    fallback_answer: str
+    forbidden_claims: list[str] = []
+```
+
+每条 bullet 至少覆盖：
+
+- 30 秒口语讲法。
+- 2-4 个高概率追问。
+- 1 个二三层追问或兜底。
+- 证据口径：数字怎么算、样本哪来、基线是什么。
+- 不能说什么：容易露馅或过度包装的表达。
+- 处理策略：放大、正常讲、降级、转场。
+
+前端展示建议：
+
+- 新增 `面试深挖` Tab。
+- 按 bullet ID 展示“原文 / 证明能力 / 讲法 / 追问 / 证据 / 风险”。
+- 高风险 bullet 使用醒目但克制的风险标记。
+- 支持导出 `面试准备/01-简历bullet逐条深挖.md`。
+
+### 12.9 质量闸门与回归评测
+
+目标：把“简历写得好”拆成可执行、可测试的质量标准。
+
+质量闸门：
+
+| 级别 | 检查重点 |
+|------|----------|
+| P0 红线 | 造假、背调硬信息改动、低质量来源冒充事实、过度包装、标签泄漏 |
+| P1 核心质量 | JD 核心能力映射到真实经历；每条最终 bullet 有面试讲法和证据状态；低置信内容明确标注 |
+| P2 体验质量 | 文件名、结构、扫读体验、语言自然度、前端可读性 |
+
+建议回归场景：
+
+- 完整 JD + 完整简历。
+- 无 JD，仅目标岗位。
+- 简历已投，不允许改写，只准备面试。
+- 用户承认某个数字记不清。
+- PDF 简历 + 知识库模式。
+- 香港岗位 + 英文 JD。
+- 轮次未知，不能硬生成 HR 面 / 二面 / 三面。
+
+机器检查可先从结构层做起：
+
+- 正式简历中不得出现 `迁移句:`、`旧版`、`半成品`、`保留作参考` 等工作痕迹。
+- 面试准备必须覆盖最终简历的所有 bullet。
+- `JobResearchReport` 必须包含来源覆盖说明与置信度。
+- `ClaimEvidence` 中 `risky` 项必须有处理策略。
+
+### 12.10 API 与流式事件扩展
+
+建议新增 / 扩展端点：
+
+| 方法 | 路径 | 用途 |
+|------|------|------|
+| `POST` | `/api/resume/input-health` | 输入体检 |
+| `POST` | `/api/resume/job-research` | 独立岗位调研 |
+| `POST` | `/api/resume/evidence-audit` | 对润色结果做证据审计 |
+| `POST` | `/api/resume/interview-prep` | 生成 bullet 面试深挖 |
+| `POST` | `/api/resume/polish-stream` | 扩展现有 SSE 全链路输出 |
+
+SSE 事件建议：
+
+```text
+input_health
+job_research
+resume_analysis
+matched_jobs
+market_context
+market_insights
+target_profile
+gap
+polish
+evidence_audit
+score
+interview_prep
+done
+error
+```
+
+### 12.11 前端增强
+
+现有结果展示建议扩展为：
+
+- `岗位调研`：展示样本数量、核心能力、高频技能、相似岗位、来源覆盖说明。
+- `评分`：保留综合评分和逐维原因。
+- `逐段对比`：保留原文 / 润色建议 / 修改理由。
+- `差距分析`：保留技能差距、市场需求分析、补强建议。
+- `证据审计`：展示 claim、来源、置信度、处理建议。
+- `面试深挖`：逐 bullet 展示讲法、追问、证据口径、风险和兜底。
+
+输入区建议增加：
+
+- 投递状态：未投 / 已投 / 未确认。
+- 目标市场：香港 / 中国大陆 / 美国 / 其他 / 自动判断。
+- 工作流模式：只润色 / 岗位调研 + 润色 / 面试准备 / 全链路。
+- 是否允许保存到长期素材库。
+
+### 12.12 v2.9 优先级拆解
+
+P0：
+
+- 新增 `InputHealth`、`JobResearchReport`、`ClaimEvidence`、`ResumeBulletInventory` 数据结构。
+- 将现有 `market_context` / `market_insights` 提炼为独立 `JobResearch` 阶段。
+- 在无 JD 时明确输出“知识库市场画像”，不伪装成具体公司 JD。
+
+P1：
+
+- 简历润色后生成 bullet inventory。
+- 每条最终 bullet 生成 30 秒讲法、追问、证据口径、风险等级和兜底话术。
+- 前端新增 `岗位调研` 与 `面试深挖` Tab。
+
+P2：
+
+- 增加证据审计与风险地图。
+- 对讲不清来源的数字 / 强 claim 进行自动降级建议。
+- 增加求职质量闸门测试。
+
+P3：
+
+- 引入用户长期素材库：基础简历、个人档案、项目库。
+- 支持按 JD 选择项目、解释选用 / 排除原因。
+- 支持生成面试项目讲稿和自我介绍关键字卡。
+
+P4：
+
+- 可选接入 WebSearch：补具体公司官网、最新招聘页、面经、产品动态。
+- 支持 Markdown / docx 交付包：
+  - `岗位调研.md`
+  - `改后简历.docx`
+  - `面试准备/00-总览.md`
+  - `面试准备/01-简历bullet逐条深挖.md`
+  - `面试准备/02-表达状态与自我介绍.md`
+  - `面试准备/99-面后复盘题库.md`
 
 ---
 

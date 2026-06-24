@@ -38,9 +38,10 @@ class RoleClassifier:
 
         file_config = LLMConfigManager().build_kwargs()
 
-        self.api_key = api_key or file_config.get("api_key") or settings.llm_api_key or ""
-        self.api_base = (api_base or file_config.get("api_base") or settings.llm_base_url or "").rstrip("/")
-        self.model = model or file_config.get("model") or settings.llm_model or "deepseek-chat"
+        self.api_key = api_key if api_key is not None else (file_config.get("api_key") or settings.llm_api_key or "")
+        base = api_base if api_base is not None else (file_config.get("api_base") or settings.llm_base_url or "")
+        self.api_base = base.rstrip("/")
+        self.model = model if model is not None else (file_config.get("model") or settings.llm_model or "deepseek-chat")
         self.timeout = timeout or file_config.get("timeout", 30)
 
         self._cache: dict[str, dict] = {}

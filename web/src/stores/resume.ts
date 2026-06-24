@@ -12,6 +12,11 @@ function emptyResult(): ResumeResult {
     matched_jobs: [],
     market_context: null,
     market_insights: null,
+    target_role_understanding: null,
+    match_advice: null,
+    input_health: null,
+    job_research: null,
+    bullet_inventory: [],
     rerank_used: null,
   }
 }
@@ -21,10 +26,14 @@ export const useResumeStore = defineStore('resume', () => {
   const jdText = ref('')
   const jdUrl = ref('')
   const targetRole = ref('')
+  const targetRoleId = ref('')
+  const targetMarket = ref('')
+  const applicationStatus = ref('')
   const maxRetries = ref(1)
   const loading = ref(false)
   const streaming = ref(false)
   const stageMessage = ref('')
+  const streamingText = ref('')  // 当前阶段模型实时输出的原始 token
   const uploading = ref(false)
   const resumeFileName = ref('')
   const result = ref<ResumeResult | null>(null)
@@ -44,9 +53,12 @@ export const useResumeStore = defineStore('resume', () => {
         jd_text: jdText.value,
         jd_url: jdUrl.value || undefined,
         target_role: targetRole.value || undefined,
+        target_role_id: targetRoleId.value || undefined,
+        target_market: targetMarket.value || undefined,
+        application_status: applicationStatus.value || undefined,
         max_retries: maxRetries.value,
       })
-      activeTab.value = 'score'
+      activeTab.value = result.value?.job_research ? 'research' : 'score'
     } catch (exc: any) {
       error.value = exc?.response?.data?.detail || exc?.message || '潤色失敗，請檢查 LLM 配置'
     } finally {
@@ -60,14 +72,29 @@ export const useResumeStore = defineStore('resume', () => {
     switch (ev.stage) {
       case 'status':
         stageMessage.value = ev.message || ''
+        streamingText.value = ''  // 进入新阶段，清空上一阶段的实时输出
+        break
+      case 'token':
+        streamingText.value += ev.delta || ''
+        break
+      case 'input_health':
+        r.input_health = ev.input_health || null
         break
       case 'matched_jobs':
         r.matched_jobs = ev.matched_jobs || []
         r.rerank_used = ev.rerank_used
+        r.match_advice = ev.match_advice || null
+        break
+      case 'target_understanding':
+        r.target_role_understanding = ev.target_role_understanding || null
         break
       case 'market_insights':
         r.market_insights = ev.market_insights || null
         r.market_context = ev.market_context || null
+        break
+      case 'job_research':
+        r.job_research = ev.job_research || null
+        activeTab.value = 'research'
         break
       case 'gap':
         r.gap_analysis = ev.gap_analysis || null
@@ -78,6 +105,9 @@ export const useResumeStore = defineStore('resume', () => {
       case 'score':
         r.score = ev.score || null
         activeTab.value = 'score'
+        break
+      case 'interview_prep':
+        r.bullet_inventory = ev.bullet_inventory || []
         break
       case 'done':
         if (ev.result) result.value = ev.result
@@ -93,6 +123,7 @@ export const useResumeStore = defineStore('resume', () => {
     loading.value = true
     error.value = ''
     stageMessage.value = '正在啟動…'
+    streamingText.value = ''
     result.value = emptyResult()
     activeTab.value = 'gap'
     try {
@@ -104,6 +135,9 @@ export const useResumeStore = defineStore('resume', () => {
           jd_text: jdText.value || undefined,
           jd_url: jdUrl.value || undefined,
           target_role: targetRole.value || undefined,
+          target_role_id: targetRoleId.value || undefined,
+          target_market: targetMarket.value || undefined,
+          application_status: applicationStatus.value || undefined,
           max_retries: maxRetries.value,
         }),
       })
@@ -139,6 +173,7 @@ export const useResumeStore = defineStore('resume', () => {
       streaming.value = false
       loading.value = false
       stageMessage.value = ''
+      streamingText.value = ''
     }
   }
 
@@ -163,10 +198,14 @@ export const useResumeStore = defineStore('resume', () => {
     jdText.value = ''
     jdUrl.value = ''
     targetRole.value = ''
+    targetRoleId.value = ''
+    targetMarket.value = ''
+    applicationStatus.value = ''
     resumeFileName.value = ''
     result.value = null
     error.value = ''
     stageMessage.value = ''
+    streamingText.value = ''
     activeTab.value = 'score'
   }
 
@@ -175,10 +214,14 @@ export const useResumeStore = defineStore('resume', () => {
     jdText,
     jdUrl,
     targetRole,
+    targetRoleId,
+    targetMarket,
+    applicationStatus,
     maxRetries,
     loading,
     streaming,
     stageMessage,
+    streamingText,
     uploading,
     resumeFileName,
     result,
