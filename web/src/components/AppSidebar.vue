@@ -1,7 +1,9 @@
-﻿<template>
+<template>
   <el-menu
     :default-active="route.path"
     router
+    :collapse="collapse"
+    class="app-sidebar-menu"
     style="border: none"
     background-color="#f5f7fa"
   >
@@ -71,5 +73,21 @@
 <script lang="ts" setup>
 import { useRoute } from 'vue-router'
 const route = useRoute()
+defineProps<{ collapse?: boolean }>()
 </script>
+
+<style scoped>
+/* 折叠状态下隐藏分组标题文字 */
+.app-sidebar-menu.el-menu--collapse :deep(.el-menu-item-group__title) {
+  display: none;
+}
+/* 折叠状态下菜单不显示文字 */
+.app-sidebar-menu.el-menu--collapse :deep(.el-menu-item span) {
+  display: none;
+}
+/* 确保折叠菜单宽度 */
+.app-sidebar-menu.el-menu--collapse {
+  width: 64px;
+}
+</style>
 

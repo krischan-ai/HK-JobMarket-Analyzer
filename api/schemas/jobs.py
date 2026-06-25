@@ -23,6 +23,9 @@ class JobSummary(BaseModel):
     company_size: Optional[str] = None
     education_required: Optional[str] = None
     languages_required: Optional[list[str]] = None
+    tech_stack: Optional[list[str]] = None
+    job_type: Optional[str] = None
+    insurance_reasons: Optional[list[str]] = None
 
 
 class JobDetail(JobSummary):

@@ -19,11 +19,14 @@ export interface JobItem {
   employer_questions?: string[]
   is_insurance_sales?: boolean
   insurance_score?: number | null
+  insurance_reasons?: string[]
   work_mode?: string
   posted_days_ago?: number | null
   company_size?: string
   education_required?: string
   languages_required?: string[]
+  tech_stack?: string[]
+  job_type?: string
 }
 
 export interface JobListResponse {

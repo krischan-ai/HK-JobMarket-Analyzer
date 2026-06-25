@@ -115,11 +115,14 @@ def list_jobs(
             "employer_questions": _safe_list(row, "employer_questions"),
             "is_insurance_sales": _safe_bool(row, "is_insurance_sales"),
             "insurance_score": _safe_int(row, "insurance_score"),
+            "insurance_reasons": _safe_list(row, "insurance_reasons"),
             "work_mode": _safe_str(row, "work_mode"),
             "posted_days_ago": _safe_int(row, "posted_days_ago"),
             "company_size": _safe_str(row, "company_size"),
             "education_required": _safe_str(row, "education_required"),
             "languages_required": _safe_list(row, "languages_required"),
+            "tech_stack": _safe_list(row, "tech_stack"),
+            "job_type": _safe_str(row, "job_type"),
             "import_time": import_time,
         })
 
