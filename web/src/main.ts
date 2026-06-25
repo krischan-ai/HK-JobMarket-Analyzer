@@ -9,10 +9,10 @@ import { CanvasRenderer } from 'echarts/renderers'
 import { BarChart, LineChart, PieChart } from 'echarts/charts'
 import {
   GridComponent, TooltipComponent, TitleComponent,
-  LegendComponent,
+  LegendComponent, DataZoomComponent,
 } from 'echarts/components'
 
-use([CanvasRenderer, BarChart, LineChart, PieChart, GridComponent, TooltipComponent, TitleComponent, LegendComponent])
+use([CanvasRenderer, BarChart, LineChart, PieChart, GridComponent, TooltipComponent, TitleComponent, LegendComponent, DataZoomComponent])
 
 import App from './App.vue'
 import router from './router'

@@ -11,5 +11,7 @@ export const statsApi = {
   roleDistribution: () => api.get('/stats/role-distribution'),
   roleSalary: () => api.get('/stats/role-salary'),
   llmStatus: () => api.get('/stats/llm-status'),
+  techTrendAnalysis: (refresh = false) => api.get('/stats/tech-trend-analysis', { params: { refresh } }),
+  salaryAnalysis: (refresh = false) => api.get('/stats/salary-analysis', { params: { refresh } }),
   runClassification: (batchSize: number = 5) => api.post('/stats/run-classification', { mode: 'full', batch_size: batchSize }),
 }

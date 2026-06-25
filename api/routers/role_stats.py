@@ -32,13 +32,79 @@ def _get_classifier() -> RoleClassifier:
     return RoleClassifier()
 
 
+def _safe_role_text(row) -> str:
+    parts = [
+        str(row.get("title", "") or ""),
+        str(row.get("jd_text", "") or ""),
+        str(row.get("jd_raw", "") or ""),
+    ]
+    return " ".join(part for part in parts if part and part != "nan").strip()
+
+
+def _role_from_cache_or_rules(classifier: RoleClassifier, row) -> RoleResult:
+    job_id = str(row.get("job_id", "") or "")
+
+    for entry in classifier._cache.values():
+        if entry.get("_job_id") == job_id:
+            role_id = entry.get("role_id", "other")
+            if role_id not in ROLE_DEFS:
+                role_id = "other"
+            return RoleResult(
+                role_id=role_id,
+                role_name=ROLE_DEFS.get(role_id, {}).get("name", "其他"),
+                confidence=entry.get("confidence", "low"),
+            )
+
+    for text in (
+        str(row.get("jd_raw", "") or ""),
+        str(row.get("jd_text", "") or ""),
+        _safe_role_text(row),
+    ):
+        if not text or text == "nan":
+            continue
+        cached = classifier._cache.get(classifier._make_cache_key(text))
+        if cached:
+            role_id = cached.get("role_id", "other")
+            if role_id not in ROLE_DEFS:
+                role_id = "other"
+            return RoleResult(
+                role_id=role_id,
+                role_name=ROLE_DEFS.get(role_id, {}).get("name", "其他"),
+                confidence=cached.get("confidence", "low"),
+            )
+
+    text = _safe_role_text(row)
+    if not text:
+        return RoleResult(role_id="other", role_name="其他", confidence="low")
+    return classifier._classify_with_rules(text)
+
+
 @router.get("/role-distribution")
 def role_distribution():
     classifier = _get_classifier()
-    stats = classifier.get_statistics()
-    # 排除「其他」类别，未分类的岗位不显示在分布图中
-    filtered = [item for item in stats["distribution"] if item["role_id"] != "other"]
-    return filtered
+    df = load_jobs_df()
+    if df.empty:
+        return []
+
+    distribution: dict[str, dict] = {}
+    total = 0
+    for _, row in df.iterrows():
+        role_result = _role_from_cache_or_rules(classifier, row)
+        if role_result.role_id == "other":
+            continue
+        total += 1
+        if role_result.role_id not in distribution:
+            distribution[role_result.role_id] = {
+                "role_id": role_result.role_id,
+                "role_name": ROLE_DEFS.get(role_result.role_id, {}).get("name", role_result.role_name),
+                "count": 0,
+            }
+        distribution[role_result.role_id]["count"] += 1
+
+    result = sorted(distribution.values(), key=lambda x: x["count"], reverse=True)
+    for item in result:
+        item["percentage"] = round(item["count"] / total * 100, 1) if total > 0 else 0.0
+    return result
 
 
 @router.get("/role-salary")
@@ -49,29 +115,24 @@ def role_salary():
     if df.empty:
         return []
 
-    cache_entries = classifier._cache
-
     groups: dict[str, dict] = {}
     for _, row in df.iterrows():
-        job_id = str(row.get("job_id", ""))
-        role_id = "other"
-
-        for cache_key, entry in cache_entries.items():
-            if entry.get("_job_id") == job_id:
-                role_id = entry.get("role_id", "other")
-                break
-
-        if role_id not in ROLE_DEFS:
-            role_id = "other"
+        role_result = _role_from_cache_or_rules(classifier, row)
+        role_id = role_result.role_id
 
         salary_min = row.get("salary_min")
         salary_max = row.get("salary_max")
         if salary_min is None or (isinstance(salary_min, float) and salary_min != salary_min):
             continue
         salary_val = float(salary_min)
+        if salary_val <= 0:
+            continue
+
+        if role_id == "other":
+            continue
 
         if role_id not in groups:
-            groups[role_id] = {"role_id": role_id, "role_name": ROLE_DEFS.get(role_id, {}).get("name", "其他"), "values": []}
+            groups[role_id] = {"role_id": role_id, "role_name": ROLE_DEFS.get(role_id, {}).get("name", role_result.role_name), "values": []}
         groups[role_id]["values"].append(salary_val)
 
     result = []

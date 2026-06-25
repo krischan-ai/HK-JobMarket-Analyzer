@@ -130,3 +130,21 @@ export interface ClassificationResult {
   duration_ms: number
   message: string
 }
+
+export interface TechTrendSection {
+  key: string
+  title: string
+  summary: string
+  evidence?: Array<string | Record<string, unknown>>
+}
+
+export interface TechTrendAnalysis {
+  llm_used: boolean
+  from_cache?: boolean
+  analysis_status?: 'cached' | 'completed' | 'fallback' | string
+  warning?: string
+  sections: TechTrendSection[]
+  context?: Record<string, unknown>
+}
+
+export type SalaryAnalysis = TechTrendAnalysis
