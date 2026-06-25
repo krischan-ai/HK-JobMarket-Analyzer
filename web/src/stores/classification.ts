@@ -8,6 +8,7 @@ export interface ClassifiedJob {
   company: string
   location: string
   source: string
+  industry_category?: string
   role_id: string
   role_name: string
   role_confidence: string

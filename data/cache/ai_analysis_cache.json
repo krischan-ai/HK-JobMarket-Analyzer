@@ -1,6 +1,6 @@
 {
   "salary": {
-    "signature": "v1:1782267381.0341861:244",
+    "signature": "v3:1782267381.0341861:244",
     "data": {
       "llm_used": true,
       "from_cache": false,
@@ -9,26 +9,32 @@
         {
           "key": "salary_overview",
           "title": "薪资总体分析",
-          "summary": "基于42个有薪资数据的岗位，香港IT招聘平均月薪为50,556 HKD/月，中位数为45,416 HKD/月，最低9,000 HKD/月，最高105,000 HKD/月。样本量仅占总岗位的17.2%，可能存在选择偏差，且极值可明显拉高平均数，参考时需注意异常值风险。",
-          "evidence": "avg: 50556.0, median: 45416.0, min: 9000.0, max: 105000.0, count: 42"
+          "summary": "基于42个有效薪资样本（占总岗位的17%），香港IT岗位平均月薪为50,556 HKD，中位数45,416 HKD，最低9,000 HKD，最高105,000 HKD。样本量较小，且高薪岗位占比较高，可能导致平均值偏高，实际市场薪资水平可能略低于此。",
+          "evidence": "样本数42，平均值50556 HKD/月，中位数45416 HKD/月，最小值9000 HKD/月，最大值105000 HKD/月。"
         },
         {
           "key": "salary_by_location",
           "title": "地区薪资分析",
-          "summary": "不同地区薪资差异显著，香港島平均高达70,767 HKD/月（5个样本），中環为54,167 HKD/月（6个样本），九龍灣仅37,250 HKD/月（4个样本）。多数地区样本极少，如Southern District仅1个样本9,000 HKD/月，可能导致统计偏差。",
-          "evidence": "香港島: avg 70767, count 5; 中環: avg 54167, count 6; 九龍灣: avg 37250, count 4; Southern District: min 9000, count 1"
+          "summary": "平均薪资最高地区为鰂魚涌（80,000 HKD，仅1样本）和香港島（70,767 HKD，5样本），但样本量稀少使可靠性存疑。中環有9个样本，平均52,084 HKD，显示核心金融区薪资较高。九龍及新界多数地区样本仅1个，薪资波动大，南區仅一個样本9,000 HKD可能存在异常。",
+          "evidence": "鰂魚涌(1样本, 80000 HKD/月)，香港島(5样本, 平均70767 HKD/月)，科學園(1样本, 67500)，大埔(1, 65000)，九龍(1, 65000)，新蒲崗(1, 65000)，紅磡(1, 60000)，太古(1, 58000)，中環(9样本, 平均52084, 范围0-105000)，觀塘(5, 平均47500)，北角(1, 45000)，九龍城(1, 45000)，尖沙咀(4, 平均40500)，沙田(1, 40000)，荔枝角(1, 40000)，灣仔(2, 平均39000)，荃灣(1, 38000)，九龍灣(4, 平均37250)，啟德(1, 28000)，南區(1, 9000)。"
         },
         {
           "key": "salary_by_role",
           "title": "角色薪资分析",
-          "summary": "前端开发平均月薪最高达83,000 HKD/月，但仅1个样本，异常值风险极高。DevOps/SRE平均67,500 HKD/月（4个样本），解决方案架构师70,000 HKD/月（3个样本），显示技术运维和架构类岗位薪资较高。移动开发平均27,500 HKD/月（2个样本）最低，多数角色样本量不足，结论需谨慎。",
-          "evidence": "frontend: avg 83000, count 1; devops: avg 67500, count 4; solution_architect: avg 70000, count 3; mobile: avg 27500, count 2"
+          "summary": "高薪角色集中在前端开发（1样本，83,000 HKD）、机器学习工程师（1样本，80,000 HKD）、解决方案架构师（3样本，平均70,000 HKD）和AI Agent开发（2样本，平均70,000 HKD）。传统岗位如IT分析师/系统分析师平均42,600 HKD，全栈开发平均40,833 HKD，移动开发仅27,500 HKD。部分角色样本极少，如前端开发仅1个岗位，薪资代表性不足。",
+          "evidence": "解决方案架构师(3样本, 平均70000 HKD/月)，AI Agent開發(2, 70000)，机器学习工程师(1, 80000)，前端开发(1, 83000)，工程经理/技术主管(1, 60000)，DevOps/SRE(4, 平均67500)，安全工程(1, 65000)，后端开发(3, 平均60167)，AI應用開發(2, 50000)，数据工程(1, 45833)，IT 分析师/系统分析师(5, 平均42600)，全栈开发(6, 平均40833)，设计师(2, 37000)，质量保证(2, 34000)，产品管理(4, 平均32250)，移动开发(2, 27500)。"
         },
         {
           "key": "top_salary_jobs",
           "title": "高薪岗位分析",
-          "summary": "高薪岗位集中在企业架构、AI和DevOps领域，最高月薪为Enterprise Architect的105,000 HKD/月，其次AI Software Engineer 100,000 HKD/月，CTO 83,000 HKD/月。这些岗位多分布于香港島和中環，但薪资信息仅提供最低值，可能无法反映全额。",
-          "evidence": "Enterprise Architect: 105000 HKD/月; AI Software Engineer: 100000 HKD/月; CTO: 83000 HKD/月"
+          "summary": "高薪岗位（月薪≥80,000 HKD）集中在金融科技和互联网软件行业，岗位方向包括AI/ML研发、企业架构与信息安全、SRE/DevOps。核心工作为构建AI代理和大模型平台、设计企业安全架构、保障分布式系统可靠性。技术栈强调Python、Go、RAG、LLM、Docker/Kubernetes及AWS/Azure/GCP等云原生工具。地理位置聚集在香港岛核心商业区（中環、香港島、鰂魚涌）。这反映出市场对尖端AI和基础设施人才的旺盛需求，求职者若掌握AI工程化、云架构与系统可靠性技能，在金融科技领域将具备显著优势。",
+          "evidence": [
+            "信息安全架构师（中環，105,000 HKD，行业：其他，技术栈：Go）",
+            "AI Agent开发（香港島，100,000 HKD，互联网/软件服务，技术栈：Python, Go, RAG, ML, LLM, AWS/Azure/GCP, Docker）",
+            "首席技术官/前端开发（香港島，83,000 HKD，金融服务/金融科技，技术栈：Java, Go, Scala, RAG, React, Vue, Node.js, SQL, MongoDB, PostgreSQL）",
+            "SRE分析师（鰂魚涌，80,000 HKD，金融服务/金融科技，技术栈：Python, Go, Scala, RAG, Elasticsearch, CI/CD, Linux, API, 分布式系统）",
+            "AI平台负责人/机器学习工程师（中環，80,000 HKD，金融服务/金融科技，技术栈：Python, Scala, RAG, ML, LLM, SQL, Docker, Kubernetes, Terraform, API）"
+          ]
         }
       ],
       "context": {
@@ -42,18 +48,11 @@
         },
         "salary_by_location": [
           {
-            "location": "中環",
-            "min": 30000.0,
-            "max": 105000.0,
-            "avg": 54167.0,
-            "count": 6
-          },
-          {
-            "location": "中西區",
-            "min": 0.0,
+            "location": "鰂魚涌",
+            "min": 80000.0,
             "max": 80000.0,
-            "avg": 50000.0,
-            "count": 3
+            "avg": 80000.0,
+            "count": 1
           },
           {
             "location": "香港島",
@@ -63,17 +62,17 @@
             "count": 5
           },
           {
-            "location": "紅磡",
-            "min": 60000.0,
-            "max": 60000.0,
-            "avg": 60000.0,
+            "location": "科學園",
+            "min": 67500.0,
+            "max": 67500.0,
+            "avg": 67500.0,
             "count": 1
           },
           {
-            "location": "Kai Tak",
-            "min": 28000.0,
-            "max": 28000.0,
-            "avg": 28000.0,
+            "location": "大埔",
+            "min": 65000.0,
+            "max": 65000.0,
+            "avg": 65000.0,
             "count": 1
           },
           {
@@ -84,39 +83,39 @@
             "count": 1
           },
           {
-            "location": "九龍灣",
-            "min": 27000.0,
-            "max": 42000.0,
-            "avg": 37250.0,
-            "count": 4
-          },
-          {
-            "location": "Kowloon City",
-            "min": 45000.0,
-            "max": 45000.0,
-            "avg": 45000.0,
+            "location": "新蒲崗",
+            "min": 65000.0,
+            "max": 65000.0,
+            "avg": 65000.0,
             "count": 1
           },
           {
-            "location": "觀塘",
-            "min": 25000.0,
-            "max": 50000.0,
-            "avg": 35000.0,
-            "count": 4
-          },
-          {
-            "location": "Kwun Tong District",
+            "location": "紅磡",
             "min": 60000.0,
             "max": 60000.0,
             "avg": 60000.0,
             "count": 1
           },
           {
-            "location": "荔枝角",
-            "min": 40000.0,
-            "max": 40000.0,
-            "avg": 40000.0,
+            "location": "太古",
+            "min": 58000.0,
+            "max": 58000.0,
+            "avg": 58000.0,
             "count": 1
+          },
+          {
+            "location": "中環",
+            "min": 0.0,
+            "max": 105000.0,
+            "avg": 52084.0,
+            "count": 9
+          },
+          {
+            "location": "觀塘",
+            "min": 25000.0,
+            "max": 60000.0,
+            "avg": 47500.0,
+            "count": 5
           },
           {
             "location": "北角",
@@ -126,52 +125,10 @@
             "count": 1
           },
           {
-            "location": "鰂魚涌",
-            "min": 80000.0,
-            "max": 80000.0,
-            "avg": 80000.0,
-            "count": 1
-          },
-          {
-            "location": "San Po Kong",
-            "min": 65000.0,
-            "max": 65000.0,
-            "avg": 65000.0,
-            "count": 1
-          },
-          {
-            "location": "科學園",
-            "min": 67500.0,
-            "max": 67500.0,
-            "avg": 67500.0,
-            "count": 1
-          },
-          {
-            "location": "Sha Tin District",
-            "min": 40000.0,
-            "max": 40000.0,
-            "avg": 40000.0,
-            "count": 1
-          },
-          {
-            "location": "Southern District",
-            "min": 9000.0,
-            "max": 9000.0,
-            "avg": 9000.0,
-            "count": 1
-          },
-          {
-            "location": "Tai Koo",
-            "min": 58000.0,
-            "max": 58000.0,
-            "avg": 58000.0,
-            "count": 1
-          },
-          {
-            "location": "Tai Po District",
-            "min": 65000.0,
-            "max": 65000.0,
-            "avg": 65000.0,
+            "location": "九龍城",
+            "min": 45000.0,
+            "max": 45000.0,
+            "avg": 45000.0,
             "count": 1
           },
           {
@@ -182,24 +139,52 @@
             "count": 4
           },
           {
-            "location": "Tsuen Wan District",
+            "location": "沙田",
+            "min": 40000.0,
+            "max": 40000.0,
+            "avg": 40000.0,
+            "count": 1
+          },
+          {
+            "location": "荔枝角",
+            "min": 40000.0,
+            "max": 40000.0,
+            "avg": 40000.0,
+            "count": 1
+          },
+          {
+            "location": "灣仔",
+            "min": 30000.0,
+            "max": 48000.0,
+            "avg": 39000.0,
+            "count": 2
+          },
+          {
+            "location": "荃灣",
             "min": 38000.0,
             "max": 38000.0,
             "avg": 38000.0,
             "count": 1
           },
           {
-            "location": "灣仔",
-            "min": 48000.0,
-            "max": 48000.0,
-            "avg": 48000.0,
+            "location": "九龍灣",
+            "min": 27000.0,
+            "max": 42000.0,
+            "avg": 37250.0,
+            "count": 4
+          },
+          {
+            "location": "啟德",
+            "min": 28000.0,
+            "max": 28000.0,
+            "avg": 28000.0,
             "count": 1
           },
           {
-            "location": "Wan Chai District",
-            "min": 30000.0,
-            "max": 30000.0,
-            "avg": 30000.0,
+            "location": "南區",
+            "min": 9000.0,
+            "max": 9000.0,
+            "avg": 9000.0,
             "count": 1
           }
         ],
@@ -338,113 +323,314 @@
             "title": "Enterprise Architect - Information Security & Risk Assurance",
             "company": "TEKsystems",
             "location": "中環",
+            "industry_category": "其他",
+            "role_name": "解决方案架构师",
+            "role_id": "solution_architect",
+            "tech_stack": [
+              "go"
+            ],
+            "work_summary": "Role Overview Support the development and consolidation of enterprise architecture views, ensuring a clear and consistent understanding of systems, services, and technology components across the organisation. Key Respons",
             "salary_min": 105000.0,
-            "salary_max": 0
+            "salary_max": 0,
+            "display_name": "信息安全架构师"
           },
           {
             "title": "AI Software Engineer - Strategic Office - Toptier MNC",
             "company": "Ignite Recruitment Hong Kong Limited",
             "location": "香港島",
+            "industry_category": "互联网/软件服务",
+            "role_name": "AI Agent開發",
+            "role_id": "ai_agent_dev",
+            "tech_stack": [
+              "python",
+              "go",
+              "rag",
+              "machine learning",
+              "llm",
+              "data pipeline",
+              "aws",
+              "azure",
+              "gcp",
+              "docker"
+            ],
+            "work_summary": "Key Responsibilities As the AI Solutions Engineer, Office of the Group CEO, you will be the primary technical partner responsible for building practical AI tools and workflows that reduce information latency and support ",
             "salary_min": 100000.0,
-            "salary_max": 0
+            "salary_max": 0,
+            "display_name": "AI Agent开发"
           },
           {
             "title": "CTO (Web3 Payments)",
             "company": "Cornerstone Global Partners",
             "location": "香港島",
+            "industry_category": "金融服务/金融科技",
+            "role_name": "前端开发",
+            "role_id": "frontend",
+            "tech_stack": [
+              "java",
+              "go",
+              "scala",
+              "rag",
+              "react",
+              "vue",
+              "node.js",
+              "sql",
+              "mongodb",
+              "postgresql"
+            ],
+            "work_summary": "CTO (Web3 Payments) Compensation Benefits Equity: High-proportion Options / Equity Incentives Location: Hong Kong (Assistance with Hong Kong work visas for top talent) Company Overview We are a Licensed Web3 Payment Inst",
             "salary_min": 83000.0,
-            "salary_max": 0
+            "salary_max": 0,
+            "display_name": "首席技术官"
           },
           {
             "title": "Production Support Analyst, SRE/ ITRS/ DR, IT (Leading iBank, up to 80K)",
             "company": "Recruit Logic Limited",
             "location": "鰂魚涌",
+            "industry_category": "金融服务/金融科技",
+            "role_name": "DevOps/SRE",
+            "role_id": "devops",
+            "tech_stack": [
+              "python",
+              "go",
+              "scala",
+              "rag",
+              "elasticsearch",
+              "ci/cd",
+              "linux",
+              "api",
+              "distributed system",
+              "high availability"
+            ],
+            "work_summary": "Position Description We are seeking an experienced Support Analyst who will be responsible and accountable for both build and shared services operations, including monitoring, site reliability engineering (SRE), and ensu",
             "salary_min": 80000.0,
-            "salary_max": 0
+            "salary_max": 0,
+            "display_name": "SRE分析师"
           },
           {
             "title": "AI Platform Lead | GenAI & MLOps | Top Financial Firm - J12838",
             "company": "Pinpoint Asia",
-            "location": "中西區",
+            "location": "中環",
+            "industry_category": "金融服务/金融科技",
+            "role_name": "机器学习工程师",
+            "role_id": "ml_engineer",
+            "tech_stack": [
+              "python",
+              "scala",
+              "rag",
+              "machine learning",
+              "llm",
+              "sql",
+              "docker",
+              "kubernetes",
+              "terraform",
+              "api"
+            ],
+            "work_summary": "About the Client: Our client is a highly prestigious, tier-one financial institution based in Hong Kong, renowned for overseeing and maintaining the stability of the regional monetary and financial ecosystems. They are c",
             "salary_min": 80000.0,
-            "salary_max": 0
+            "salary_max": 0,
+            "display_name": "AI平台负责人"
           },
           {
             "title": "Data Architect | FSI Data Platform Transformation & Modernization | Up to HKD70k",
             "company": "Techforce Group Limited",
-            "location": "中西區",
+            "location": "中環",
+            "industry_category": "互联网/软件服务",
+            "role_name": "解决方案架构师",
+            "role_id": "solution_architect",
+            "tech_stack": [
+              "aws",
+              "azure",
+              "api"
+            ],
+            "work_summary": "Data Architect (Data Platform Transformation Modernization) Role purpose You will be a Data Architect(design-focused with development understanding and background) responsible for shaping the data platform transformation",
             "salary_min": 70000.0,
-            "salary_max": 0
+            "salary_max": 0,
+            "display_name": "数据架构师"
           },
           {
             "title": "Web3.0 Back-end development engineer/Web3后端开发工程师",
             "company": "QUANTUM BAY INNOVATIONS LIMITED",
             "location": "科學園",
+            "industry_category": "互联网/软件服务",
+            "role_name": "后端开发",
+            "role_id": "backend",
+            "tech_stack": [
+              "python",
+              "go",
+              "docker",
+              "kubernetes"
+            ],
+            "work_summary": "一 工作职责 1 负责公司内部公共基础框架 服务和平台的研发工作 2 负责量化交易及系统开发 保证生产环境服务和资源的可用性 3 关注研发全流程的效率提升 实现持续构建 持续集成 持续交付等 二 任职要求 1 本科学历或更高 计算机 数学 通信等相关理工科专业毕业 工作经验3年及以上 2 精通 Python / Go 开发 (至少一种) 3 熟悉 Docker Kubernetes等优先 4 有服务监控系统设计和研发经验者优先 5 有互",
             "salary_min": 67500.0,
-            "salary_max": 0
+            "salary_max": 0,
+            "display_name": "Web3后端开发"
           },
           {
             "title": "Hotel Business Analyst (Hospitality industry)",
             "company": "Optimum Solutions (Hong Kong) Limited",
             "location": "中環",
+            "industry_category": "医疗健康",
+            "role_name": "IT 分析师/系统分析师",
+            "role_id": "it_analyst",
+            "tech_stack": [
+              "go",
+              "agile"
+            ],
+            "work_summary": "Job Title- HOTEL BUSINESS ANALYST (Hospitality industry) POSITION SUMMARY: The Business Analyst should demonstrate strong business acumen and excellent analytical communication skills. He or she should be able to bridge ",
             "salary_min": 65000.0,
-            "salary_max": 0
+            "salary_max": 0,
+            "display_name": "酒店业务分析师"
           },
           {
             "title": "Information Security Manager - IT Security & GRC (HKD52k - 63k)",
             "company": "Lloyd Karson International Limited",
-            "location": "Tai Po District",
+            "location": "大埔",
+            "industry_category": "人工智能/数据服务",
+            "role_name": "安全工程",
+            "role_id": "security",
+            "tech_stack": [
+              "go",
+              "aws"
+            ],
+            "work_summary": "Our client is a Property Management Group with investment and funded to nurture the world s leading research institutes, startups and tech-driven enterprises, is now seeking an Information Security Manager - IT GRC (HKD5",
             "salary_min": 65000.0,
-            "salary_max": 0
+            "salary_max": 0,
+            "display_name": "信息安全经理"
           },
           {
             "title": "DevOps Engineer",
             "company": "OAC Group Limited",
             "location": "九龍",
+            "industry_category": "其他",
+            "role_name": "DevOps/SRE",
+            "role_id": "devops",
+            "tech_stack": [
+              "python",
+              "go",
+              "scala",
+              "langchain",
+              "llm",
+              "vue",
+              "spring boot",
+              "fastapi",
+              "sql",
+              "etl"
+            ],
+            "work_summary": "Responsibilities Design, maintain, and optimize pipelines for both structured and unstructured data, ensuring scalability, reliability, and high data quality. Build and maintain CI/CD pipelines for ETL processes, data as",
             "salary_min": 65000.0,
-            "salary_max": 0
+            "salary_max": 0,
+            "display_name": "DevOps工程师"
           },
           {
             "title": "Tech Lead / Lead Backend Developer (Node.js) – 8–15 Years Experience | Hybrid",
             "company": "TEKsystems",
             "location": "香港島",
+            "industry_category": "其他",
+            "role_name": "后端开发",
+            "role_id": "backend",
+            "tech_stack": [
+              "go",
+              "node.js",
+              "kafka",
+              "aws",
+              "azure",
+              "terraform",
+              "ci/cd",
+              "code review"
+            ],
+            "work_summary": "About the Company Our client is a large, well established enterprise organisation with a strong presence across the region. The business operates high volume, customer facing platforms and continues to invest heavily in ",
             "salary_min": 65000.0,
-            "salary_max": 0
+            "salary_max": 0,
+            "display_name": "后端技术主管"
           },
           {
             "title": "DevOps Technical Project Manager",
             "company": "WallStone Partners & Company Limited",
-            "location": "San Po Kong",
+            "location": "新蒲崗",
+            "industry_category": "其他",
+            "role_name": "DevOps/SRE",
+            "role_id": "devops",
+            "tech_stack": [
+              "go",
+              "rag",
+              "docker",
+              "kubernetes",
+              "jenkins",
+              "ci/cd",
+              "agile",
+              "devops"
+            ],
+            "work_summary": "Position Objective: Own the governance and lifecycle management of an enterprise DevOps platform, ensuring stability, compliance, and continuous improvement. Drive incremental enhancements, automation initiatives, and te",
             "salary_min": 65000.0,
-            "salary_max": 0
+            "salary_max": 0,
+            "display_name": "DevOps项目经理"
           },
           {
             "title": "Senior DevOps Engineer | Up to 60K",
             "company": "JobsApp Limited",
             "location": "尖沙咀",
+            "industry_category": "其他",
+            "role_name": "DevOps/SRE",
+            "role_id": "devops",
+            "tech_stack": [
+              "python",
+              "golang",
+              "go",
+              "scala",
+              "node.js",
+              "aws",
+              "azure",
+              "kubernetes",
+              "terraform",
+              "ci/cd"
+            ],
+            "work_summary": "Responsibilities : Design and implement cloud infrastructure solutions with a focus on scalability, efficiency, and CDN optimization. Develop and enhance CI/CD pipelines to support rapid, reliable content delivery and de",
             "salary_min": 60000.0,
-            "salary_max": 0
+            "salary_max": 0,
+            "display_name": "DevOps工程师"
           },
           {
             "title": "Sr. Project Engineer / Assistant Engineering Manager (Home Appliances OEM/ODM)",
             "company": "SmartHire by SEEK",
-            "location": "Kwun Tong District",
+            "location": "觀塘",
+            "industry_category": "其他",
+            "role_name": "其他",
+            "role_id": "other",
+            "tech_stack": [],
+            "work_summary": "Ready for a New Challenge? Our Client is Looking for You! Position: Senior Project Engineer / Assistant Engineering Manager (Home Electrical Appliances OEM/ODM) Location and Working Hours: Kowloon Bay/Shunde District; Mo",
             "salary_min": 60000.0,
-            "salary_max": 0
+            "salary_max": 0,
+            "display_name": "项目工程师"
           },
           {
             "title": "AI Application R&D Specialist",
             "company": "China Life Insurance (Overseas) Company Limited",
             "location": "紅磡",
+            "industry_category": "保险/财富管理",
+            "role_name": "AI應用開發",
+            "role_id": "ai_application",
+            "tech_stack": [
+              "go",
+              "scala",
+              "rag",
+              "machine learning",
+              "nlp",
+              "llm",
+              "fine-tuning",
+              "aws",
+              "ios"
+            ],
+            "work_summary": "Responsibilities Strategic Planning: Develop mid-to-long term AI R D strategies, technology roadmaps, and implementation plans aligned with company goals. System Architecture: Lead the design of an AI R D framework acros",
             "salary_min": 60000.0,
-            "salary_max": 0
+            "salary_max": 0,
+            "display_name": "AI应用开发"
           }
         ]
       }
     }
   },
   "tech_trend": {
-    "signature": "v6:1782267381.0341861:244",
+    "signature": "v7:1782267381.0341861:244",
     "data": {
       "llm_used": true,
       "from_cache": false,
@@ -453,7 +639,7 @@
         {
           "key": "tech_stack_demand",
           "title": "技术栈需求分析",
-          "summary": "Python 高居榜首，不仅是后端开发的核心语言，更是人工智能与数据分析的首选，候选人必须将 Python 熟练度作为简历第一关键词。云平台三巨头亚马逊云（AWS）、微软云（Azure）和谷歌云（GCP）合计出现上百次，显示多云与混合云已成香港 IT 基础设施常态，掌握至少一种云平台的认证能显著提高面试邀约率。结构化查询语言（SQL）紧随其后，证明即使在大数据时代，基于关系型数据库的取数、报表和简单分析仍是绝大多数业务岗位的硬性门槛。持续集成/持续交付（CI/CD）与 Kubernetes、Docker 共同构成的自动化容器交付链路，反映出企业对快速迭代和零宕机部署的极致追求，候选人应突出相关工具的项目经验。检索增强生成（RAG）作为新兴 AI 技能冲进前十，表明香港企业正从大模型实验快速转向将生成式 AI 真正嵌入业务系统，具备 RAG 调优能力将成为差异化优势。",
+          "summary": "Python以79次的高频出现稳居榜首，反映出香港IT市场对脚本自动化、数据处理和AI开发底层能力的普遍依赖，候选人必须将其作为简历核心关键词。亚马逊云（AWS）与微软云（Azure）各出现53次，加上谷歌云（GCP）26次，说明多云与混合云策略已成主流，掌握至少一个云平台的认证将显著提升竞争力。持续集成/持续交付（CI/CD）和Kubernetes的高需求标志着行业对自动化交付及容器编排的刚性依赖，简历中需具体体现搭建流水线和管理集群的经验。检索增强生成（RAG）和大语言模型相关技能的出现，预示着AI应用正从实验走向工程化落地，懂模型调优又懂后端部署的复合型人才更受青睐。样本来自244个岗位且大多经猎头发布，可能高估了前沿技术比重，传统行业内部需求未被完全捕获。",
           "evidence": [
             {
               "skill": "Python",
@@ -500,7 +686,7 @@
         {
           "key": "tech_category",
           "title": "细分技能类别分析",
-          "summary": "后端语言与服务端开发类别总量最高，说明市场对稳定、可维护的业务逻辑层能力始终保有刚性需求，候选人切勿因追逐 AI 而忽视 Java 或 Python 在后端工程上的深度。DevOps 与自动化交付类别位居第二，且远超纯容器编排类，这意味着企业更看重“文化+工具链”的整体落地，而非仅仅会写 Dockerfile。AI 应用与大模型类别已独立成极且数量接近百次，并非只留在实验室，它正快速与云平台、DevOps 融合，形成机器学习运维（MLOps）混合技能要求。前端与移动开发虽然排在第七位，但仍保有 72 次提及，说明全栈思维仍有市场，但纯前端岗位可能增长平缓。数据工程与分析和机器学习类别分开统计，提醒候选人需厘清自己是偏向数据管道建设还是模型训练，但两类基础技能如 Python 和 SQL 是共通必修项。",
+          "summary": "“后端语言与服务端开发”以213次位列类别之首，说明扎实的编程与系统构建能力仍是香港雇主选人的第一道门槛，Python和Java是绕不开的技术投资。“DevOps与自动化交付”和“云平台与基础设施”紧随其后，证明软件生命周期管理和云上架构设计已深度融合，单纯会写代码已不够，候选人必须提升对运维和云原生的理解。“AI应用与大模型”类别快速增长到91次，并单独构成显要需求，建议在技能组合中至少加入提示工程、RAG或模型微调等关键词。“数据工程与分析”（含SQL）和“机器学习与深度学习”共同支撑数据驱动决策，数据分析师和ML工程师都应突出SQL查询优化和特征工程能力。受限于抓取来源和分类交叉，该分布可能低估了安全合规等细分方向的专岗需求，但整体方向明确指向通才型专家。",
           "evidence": [
             {
               "category": "后端语言与服务端开发",
@@ -539,7 +725,7 @@
         {
           "key": "role_classification",
           "title": "角色分类分析",
-          "summary": "DevOps/SRE 以 24 个岗位高居需求榜首，且薪资上限与平均值均属第一梯队，印证了稳定可靠的云原生基础设施是各类 AI 应用的先决条件，从业者应重点展示在多云环境下的故障自愈和成本优化经验。解决方案架构师虽然岗位数略低，但薪资上限达 10.5 万，属于高价值技能，其核心在于技术选型与业务痛点的翻译能力，需要候选人在简历中以具体行业场景说明架构决策逻辑。AI 应用开发与机器学习工程师分立两侧，说明市场正分裂为“调用模型做产品”和“训练与优化模型本身”两条路径，候选人须在简历标题和摘要中明确自身定位。产品管理岗位数量与 IT 分析师持平，但薪资均值明显偏低且最低仅 9000 元，可能包含较多初级或合约岗位，请求职者注意甄别岗位级别与实质责任。",
+          "summary": "DevOps/SRE以24个岗位登顶，其平均薪资高达67,500港元，表明金融与云服务行业正急迫寻求能够保障系统高可用、自动扩缩容的可靠性工程师，薪酬回报丰厚。解决方案架构师（20个）和AI應用開發（18个）接近并列，反映企业同时需要顶层设计者与将AI嵌入产品的一线开发者，前者薪资区间极大（最高可达105k），经验溢价明显。IT分析师/系统分析师（18个）和产品管理（18个）需求持平原样，说明数字化转型中“技术翻译”和“需求定义”角色并未被削弱，懂粤语和英语的沟通者更有机会。机器学习工程师单独统计仅12个，但其职责常与AI应用开发重叠，候选人无需被岗位名称限制，实际工作中建模、部署与运维能力往往要集于一身。该分类基于JD标题推断，部分跨职能岗位可能被归入单一类别，导致全栈或数据工程角色可能被低估。",
           "evidence": [
             {
               "role_id": "devops",
@@ -586,7 +772,7 @@
         {
           "key": "role_distribution",
           "title": "角色分布分析",
-          "summary": "前八大岗位合计占样本总量的六成以上，集中度较高，其他未列出角色相对碎片化，求职者若不在热门类别中，可能需扩展关键字到相近领域。DevOps/SRE 占比 10.5%，与解决方案架构师、AI 应用开发等共同构成“平台+智能”的双引擎结构，而非单一技术主导。后端开发仅占 6.6%，说明纯粹的 CRUD 型后端外包或初级岗占比可能下降，企业更需懂云原生和性能调优的复合后端人才。质量保证占比 5.7%，在 DevOps 文化下测试左移成为趋势，传统手工测试岗位可能被自动化测试工程师或开发自测流程挤压，候选人需具备编码和持续集成（CI）配置能力。机器学习工程师占比 5.2% 看似不高，但其与 AI 应用开发、数据工程等角色存在大量技能交集，实际 AI 相关人才需求面更广，可合并视为核心增长极。",
+          "summary": "DevOps/SRE占岗位总量10.5%的分布比例证实，香港IT人才市场已进入“云原生运营”主导阶段，保障上线速度与稳定性的岗位成为刚需。解决方案架构师（8.7%）与三款并列7.9%的角色（AI应用开发、IT分析师、产品管理）共同构成第二大需求群，显示整个行业正向更高附加值的设计、分析与AI触点迁移。后端开发仅占6.6%且薪资中位数约60k，说明纯CRUD开发竞争激烈，候选人应从后端延伸至架构或DevOps以增强不可替代性。整体分布验证了“深度专精+横向扩展”的求职策略：优先瞄准需求占比大于8%的角色，并在简历中交叉补充次需技能（如架构师需具备MLOps认知）。244个个案样本有限，部分薪资数据样本量过小，薪酬结论须谨慎向小众角色推广。",
           "evidence": [
             {
               "role_id": "devops",
@@ -641,7 +827,7 @@
         {
           "key": "job_demand",
           "title": "岗位需求分析",
-          "summary": "样本中本科学历要求高达 91 次，硕士仅 18 次，博士仅 4 次，香港 IT 市场整体仍以实践经验为导向，除研究型 AI 科学家外，硕士并非普遍强制项，候选人不必因学历自我设限。语言要求中英文单列出现次数远超三语组合，少数明确要求粤语、普通话和英语的岗位很可能来自需要对接本地客户或政府项目的企业，懂粤语仍是本地求职的加分项，但对跨国团队或技术极客岗位则非必须。薪资数据显示 DevOps/SRE、架构师、AI Agent 开发等角色薪资上限可达 8 万至 10 万以上，而产品管理和部分分析师岗薪资跨度极大，这说明行业和公司类型对薪酬影响非常显著，求职者应优先瞄准金融科技或云基础设施行业以提高议价力。教育背景分布中“diploma”仍有 20 次，表明部分技术支持、运维或低代码开发岗位学历弹性较大，为自我转行者保留了窗口。",
+          "summary": "学历分布中本科占91个、硕士18个，表明香港IT岗位仍以学士为基本门槛，但持有硕士学位在AI、架构师等上升通道中具备明显敲门砖优势。语言要求里只有英文或附加粤语、普通话的岗位清晰，另有117个岗位未标注具体要求，实际香港职场对粤语和英语的隐形期望极高，候选人简历若缺失双语能力提示，极易在初筛失利。全栈开发和产品管理岗位的薪资范围宽、最低至9k，可能混杂了初级或实习岗位，求职者需要根据薪资区段反向甄别岗位职级。候选人应将“英语流利、粤语熟练”作为关键字置于简历首部，并主动标记自己熟悉香港本地合规（如HKMA、PCPD）的能力。样本集中在中环和九龙湾等商业区，对远程工作或新界科技园的岗位体现不足，可能错估了混合办公趋势下的语言与学历弹性。",
           "evidence": [
             {
               "role_id": "devops",
@@ -688,7 +874,7 @@
         {
           "key": "responsibility",
           "title": "岗位职责分析",
-          "summary": "AI 与数据能力落地以 237 次超越传统系统开发成为最高频职责，这意味着几乎所有 IT 角色都被期望能参与机器学习模型集成、Prompt 设计或数据看板构建，候选人需在传统技能外包裹一层“AI 落地故事”。需求分析与项目协作紧随其后，说明远程协作、敏捷迭代环境下，沟通和业务翻译能力是技术者的关键软技能，简历中必须用 STAR 法则体现跨部门推动成果。团队带领与技术指导出现 228 次，接近每岗一次，即使是中级岗位也可能需要辅导初级同事或带领小分队攻关，建议候选人提前准备领导力示例，哪怕是代码评审或内部技术分享。安全合规与质量保障类别被单独高频指出，香港作为金融和数据枢纽，对数据隐私、GDPR 或本地监管要求敏感，具备安全合规证书如 CISSP 或云安全认证的候选人将脱颖而出。",
+          "summary": "“AI/数据能力落地”以237次出现高居职责榜首，说明即便在非AI专岗，将模型结果整合进业务流程、构建数据产品的期待也已成普遍前提，候选人须准备过往项目中的量化业务影响。紧随其后的“需求分析与项目协作”及“系统开发与功能交付”揭示香港IT环境强调整体交付与跨团队沟通，简历里使用“主动与业务部门梳理需求并推动交付”等表述会更契合市场口味。“团队带领与技术指导”频次达228，即使中级岗位也频繁出现导师或小团队牵头要求，建议候选人积累代码评审、技术分享等领导力证明。“安全合规与质量保障”出现183次，凸显金融与数据敏感行业的合规烙印，知悉DevSecOps或ISO流程成为差异化因素。样本职责词条提取自动归类，职能界限偶有模糊，但高频词的压倒性优势足以反映市场对务实型技术骨干的真实期待。",
           "evidence": [
             {
               "name": "AI/数据能力落地",
@@ -723,7 +909,7 @@
         {
           "key": "company_industry",
           "title": "公司行业分析",
-          "summary": "人工智能和数据服务公司以 65 个岗位遥遥领先，证明香港正力图成为区域 AI 孵化与应用于金融、医疗等场景的枢纽，求职者应重点准备机器学习运维（MLOps）、大模型微调和检索增强生成（RAG）相关项目。互联网与软件服务居于第二，表明除原生 AI 公司外，大量企业的数字化转型和 SaaS 产品开发仍在创造大量通用技术岗位。金融与金融科技以 26 个岗位列第三，但这部分岗位薪资通常较高，且高度需求合规、高并发和低延迟技能，候选人若能结合金融领域知识与技术栈将极有竞争力。样本中 Robert Walters 等猎头公司出现频次居前，提醒我们这 244 个岗位可能有部分来自猎头发布的重复或高度相似职位，实际用人市场集中度可能更高，求职者应主动联系这些顾问以获取未公开机会。",
+          "summary": "“人工智能/数据服务”行业以65个岗位独占鳌头，超过了“互联网/软件服务”（46个），说明香港正逐渐形成AI应用和数据产品研发的集群，对待这类公司应突出模型落地和快速实验的能力。“金融服务/金融科技”与“电信/云与基础设施”合计45个岗位，构成第二梯队，它们较为稳定且对安全、高并发、监管合规有硬性要求，持牌金融机构背景或云网络认证极具吸引力。医疗健康、保险和咨询行业的IT岗位虽然零散，但单岗价值不低，尤其适合寻求行业转型的候选人做定向突破。由于样本主要来自猎头和科技岗位较多的发布渠道，对零售、物流、制造等传统产业内部IT部门的需求反映极弱，实际就业盘子可能比数据更多元。",
           "evidence": [
             {
               "name": "人工智能/数据服务",
@@ -762,7 +948,7 @@
         {
           "key": "tech_direction",
           "title": "技术方向分析",
-          "summary": "市场已形成“云原生基座 + AI 业务增值”的双螺旋技术方向：Kubernetes、Docker、CI/CD 与多云技能组成不可或缺的基座层，任何角色至少要具备自动化部署意识。AI 方向内部裂变为检索增强生成（RAG）、机器学习运维（MLOps）和通用 AI 应用开发三条关键分支，候选人应至少选一条深挖，并在简历中明确术语标签以通过简历筛选程序。全栈开发虽然直接岗位不多，但前端、后端加云端小技能的组合使得候选人能跨角色寻找机会，尤其在初创和中小公司中 T 型人才显然更受欢迎。数据工程和分析类的 SQL 仍然是基石，但与 Spark、Flink 等非高频词结合不够紧密，说明香港企业对流式计算和大数据平台的需求相比内地或硅谷可能尚在起步期，资深数据工程师若想进军香港可突出云数据仓库经验。样本可能来自特定招聘网站或时间窗口，未能囊括大型科技公司的基础研究和政府数字化项目，因此对深度学习科学家、数据工程师和网络安全分析师的真实需求可能被低估。",
+          "summary": "当前香港IT技术方向鲜明地汇聚于“云原生+AI工程化”双主轴，Kubernetes、Docker、CI/CD承载了应用生命周期的现代化，而RAG、MLOps则代表了AI从实验室走向产线的核心路径。技术栈和职责数据共同指向一个明确信号：单纯的数据科学家岗位在收缩，取而代之的是能设计端到端AI服务并监控其可靠性的工程能手，候选人应注重Python后端框架与模型服务化（如FastAPI+Triton）的组合。同时，安全合规、自动化运维监控与系统开发几乎在所有角色中穿插出现，反映出“安全左移”和“可观测性”成为默认技术基线，简历应提及Prometheus、Terraform或Wiz等工具。建议求职者将学习优先级设定为：熟悉任意主流云、熟练Kubernetes编排、具备至少一个AI应用（如RAG聊天机器人）落地经验。样本仅代表近期线上公开岗位，未包含内部晋升和校招，但趋势方向对持续教育和个人技能投资具有较高参考价值。",
           "evidence": [
             {
               "skill": "Python",
@@ -1405,44 +1591,44 @@
         ],
         "location_distribution": [
           {
-            "name": "Hong Kong Island",
+            "name": "中環",
+            "count": 33
+          },
+          {
+            "name": "九龍灣",
             "count": 22
           },
           {
-            "name": "Kowloon Bay",
+            "name": "香港島",
             "count": 22
           },
           {
-            "name": "Central and Western District",
-            "count": 19
+            "name": "觀塘",
+            "count": 15
           },
           {
-            "name": "Central",
-            "count": 14
-          },
-          {
-            "name": "Lai Chi Kok",
+            "name": "荔枝角",
             "count": 12
           },
           {
-            "name": "Sha Tin District",
+            "name": "沙田",
             "count": 11
           },
           {
-            "name": "Quarry Bay",
+            "name": "鰂魚涌",
             "count": 11
           },
           {
-            "name": "Hong Kong SAR",
+            "name": "灣仔",
+            "count": 10
+          },
+          {
+            "name": "尖沙咀",
             "count": 9
           },
           {
-            "name": "Tsim Sha Tsui",
+            "name": "香港",
             "count": 9
-          },
-          {
-            "name": "Hung Hom",
-            "count": 8
           }
         ],
         "education_distribution": [
@@ -1628,6 +1814,58 @@
           "count": 1
         }
       ]
+    }
+  },
+  "location_normalization": {
+    "signature": "v1:1782267381.0341861:244",
+    "mapping": {
+      "Admiralty": "金鐘",
+      "Central": "中環",
+      "Central and Western District": "中環",
+      "Cyberport": "數碼港",
+      "Fo Tan": "火炭",
+      "Hong Kong Island": "香港島",
+      "Hong Kong SAR": "香港",
+      "Hung Hom": "紅磡",
+      "Jordan": "佐敦",
+      "Kai Tak": "啟德",
+      "Kowloon": "九龍",
+      "Kowloon Bay": "九龍灣",
+      "Kowloon City": "九龍城",
+      "Kowloon Tong": "九龍塘",
+      "Kwai Chung": "葵涌",
+      "Kwai Fong": "葵芳",
+      "Kwai Hing": "葵興",
+      "Kwai Tsing District": "葵青",
+      "Kwun Tong": "觀塘",
+      "Kwun Tong District": "觀塘",
+      "Lai Chi Kok": "荔枝角",
+      "Mong Kok": "旺角",
+      "Ngau Tau Kok": "牛頭角",
+      "North Point": "北角",
+      "Others": "Others",
+      "Quarry Bay": "鰂魚涌",
+      "Sai Kung District": "西貢",
+      "San Po Kong": "新蒲崗",
+      "Science Park": "科學園",
+      "Sha Tin District": "沙田",
+      "Sheung Wan": "上環",
+      "Southern District": "南區",
+      "Tai Kok Tsui": "大角咀",
+      "Tai Koo": "太古",
+      "Tai Po District": "大埔",
+      "To Kwa Wan": "土瓜灣",
+      "Tseung Kwan O": "將軍澳",
+      "Tsim Sha Tsui": "尖沙咀",
+      "Tsing Yi": "青衣",
+      "Tsuen Wan": "荃灣",
+      "Tsuen Wan District": "荃灣",
+      "Wan Chai": "灣仔",
+      "Wan Chai District": "灣仔",
+      "Whampoa Garden": "黃埔花園",
+      "Wong Chuk Hang": "黃竹坑",
+      "Yau Tsim Mong District": "油尖旺",
+      "Yuen Long District": "元朗"
     }
   }
 }

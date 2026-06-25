@@ -319,6 +319,9 @@ const jdDisplay = computed(() => {
 // 岗位标签
 const jobTags = computed<{ label: string; type: '' | 'success' | 'warning' | 'danger' | 'info' }[]>(() => {
   const tags: { label: string; type: '' | 'success' | 'warning' | 'danger' | 'info' }[] = []
+  if (props.job?.industry_category) {
+    tags.push({ label: '行业：' + props.job.industry_category, type: 'info' })
+  }
   if (props.job?.work_mode) {
     tags.push({ label: '工作模式：' + workModeLabel(props.job.work_mode), type: 'success' })
   }

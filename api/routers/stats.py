@@ -1,3 +1,4 @@
+import re
 from collections import Counter
 from typing import Any
 
@@ -91,15 +92,170 @@ def _get_zh_location_map() -> dict[str, str]:
     return _ZH_LOCATION_MAP
 
 
+# ---- LLM 地名归一化（带磁盘缓存） ----
+_LOCATION_NORMALIZATION_VERSION = "v1"
+_location_normalization_cache: dict[str, str] | None = None
+
+
+def _location_normalization_signature(df: pd.DataFrame) -> str:
+    csv_path = Path(__file__).resolve().parent.parent.parent / "data" / "cleaned" / "jobs.csv"
+    stamp = csv_path.stat().st_mtime if csv_path.exists() else 0
+    return f"{_LOCATION_NORMALIZATION_VERSION}:{stamp}:{len(df)}"
+
+
+def _call_llm_for_location_normalization(locations: list[str]) -> dict[str, str]:
+    """调用 LLM 把原始英文地名映射到统一繁体中文地名，合并相同地区的不同写法"""
+    manager = LLMConfigManager()
+    if not manager.configured:
+        return {}
+    kwargs = manager.build_kwargs()
+    prompt = (
+        "你是香港地名翻譯與歸一化助手。請把以下英文地名（可能含拼寫差異、區域後綴 District/SAR 等）"
+        "映射到統一的繁體中文地名。相同地區的不同寫法必須合併為同一個中文名稱。\n"
+        "規則：\n"
+        "1. 輸出 JSON 對象，key 為原始地名（保持原樣），value 為統一中文地名。\n"
+        "2. 區域後綴（如 District、SAR）應去掉，歸一到具體地名。例如 Kwun Tong District → 觀塘。\n"
+        "3. Central 和 Central and Western District 都映射為 中環。\n"
+        "4. Hong Kong SAR 映射為 香港。\n"
+        "5. 如果地名已是中文或無法識別，原樣返回。\n"
+        f"地名列表：{json.dumps(locations, ensure_ascii=False)}"
+    )
+    payload = {
+        "model": kwargs["model"],
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0,
+        "max_tokens": 2048,
+        "response_format": {"type": "json_object"},
+    }
+    headers = {"Authorization": f"Bearer {kwargs['api_key']}", "Content-Type": "application/json"}
+    resp = requests.post(
+        f"{kwargs['api_base'].rstrip('/')}/chat/completions",
+        headers=headers,
+        json=payload,
+        timeout=min(max(int(kwargs.get("timeout", 30) or 30), 30), 60),
+        proxies={"http": None, "https": None},
+    )
+    resp.raise_for_status()
+    message = resp.json()["choices"][0]["message"]
+    content = (message.get("content") or message.get("reasoning_content") or "").strip()
+    if content.startswith("```"):
+        content = content.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
+    start_obj = content.find("{")
+    end_obj = content.rfind("}")
+    if start_obj >= 0 and end_obj > start_obj:
+        content = content[start_obj:end_obj + 1]
+    parsed = json.loads(content)
+    mapping: dict[str, str] = {}
+    if isinstance(parsed, dict):
+        for k, v in parsed.items():
+            if isinstance(v, str) and v.strip():
+                mapping[str(k)] = v.strip()
+    return mapping
+
+
+def _ensure_location_normalization() -> dict[str, str]:
+    """惰性载入 LLM 地名归一化映射（优先磁盘缓存，缺失时触发 LLM）"""
+    global _location_normalization_cache
+    if _location_normalization_cache is not None:
+        return _location_normalization_cache
+
+    df = load_jobs_df()
+    if df.empty or "location" not in df.columns:
+        _location_normalization_cache = {}
+        return _location_normalization_cache
+
+    sig = _location_normalization_signature(df)
+    cache = _load_analysis_cache()
+    cached = cache.get("location_normalization")
+    if isinstance(cached, dict) and cached.get("signature") == sig:
+        mapping = cached.get("mapping", {})
+        if isinstance(mapping, dict) and mapping:
+            _location_normalization_cache = mapping
+            return mapping
+
+    locations = sorted(df["location"].dropna().unique().tolist())
+    try:
+        mapping = _call_llm_for_location_normalization(locations)
+    except Exception:
+        mapping = {}
+
+    _location_normalization_cache = mapping
+    if mapping:
+        cache["location_normalization"] = {"signature": sig, "mapping": mapping}
+        _save_analysis_cache(cache)
+    return mapping
+
+
+def _get_cached_location_normalization() -> dict[str, str]:
+    """只读取内存/磁盘缓存，不在普通统计接口中同步触发 LLM。"""
+    global _location_normalization_cache
+    if _location_normalization_cache is not None:
+        return _location_normalization_cache
+
+    df = load_jobs_df()
+    if df.empty or "location" not in df.columns:
+        _location_normalization_cache = {}
+        return _location_normalization_cache
+
+    sig = _location_normalization_signature(df)
+    cached = _load_analysis_cache().get("location_normalization")
+    if isinstance(cached, dict) and cached.get("signature") == sig:
+        mapping = cached.get("mapping", {})
+        if isinstance(mapping, dict):
+            _location_normalization_cache = mapping
+            return mapping
+
+    _location_normalization_cache = {}
+    return _location_normalization_cache
+
+
+def _precompute_location_normalization(df: pd.DataFrame) -> dict[str, str]:
+    """在角色分类后台任务中提前调用，把映射写入磁盘缓存供后续统计复用"""
+    global _location_normalization_cache
+    if df.empty or "location" not in df.columns:
+        return {}
+    sig = _location_normalization_signature(df)
+    cache = _load_analysis_cache()
+    cached = cache.get("location_normalization")
+    if isinstance(cached, dict) and cached.get("signature") == sig:
+        mapping = cached.get("mapping", {})
+        if isinstance(mapping, dict) and mapping:
+            _location_normalization_cache = mapping
+            return mapping
+
+    locations = sorted(df["location"].dropna().unique().tolist())
+    try:
+        mapping = _call_llm_for_location_normalization(locations)
+    except Exception:
+        mapping = {}
+
+    _location_normalization_cache = mapping
+    if mapping:
+        cache["location_normalization"] = {"signature": sig, "mapping": mapping}
+        _save_analysis_cache(cache)
+    return mapping
+
+
 def location_to_zh(en: str) -> str:
-    """将英文地点名称翻译为中文"""
+    """将英文地点名称翻译为中文（优先 LLM 归一化缓存，再查静态映射）"""
     if not en or not isinstance(en, str):
         return en or "Hong Kong"
     loc = en.strip()
     loc_lower = loc.lower()
+
+    # 1. 先查 LLM 归一化缓存
+    norm = _get_cached_location_normalization()
+    if loc in norm:
+        return norm[loc]
+    for k, v in norm.items():
+        if k.lower() == loc_lower:
+            return v
+
+    # 2. 再查静态映射
     zh_map = _get_zh_location_map()
-    if loc_lower in {k.lower(): v for k, v in zh_map.items()}:
-        return {k.lower(): v for k, v in zh_map.items()}[loc_lower]
+    zh_lower = {k.lower(): v for k, v in zh_map.items()}
+    if loc_lower in zh_lower:
+        return zh_lower[loc_lower]
     if loc_lower == "remote":
         return "遠端工作"
     area_map = {
@@ -111,8 +267,7 @@ def location_to_zh(en: str) -> str:
     for suffix, area_zh in area_map.items():
         if loc_lower.endswith(f", {suffix}"):
             core = loc[:-(len(suffix) + 2)].strip()
-            core_lower = core.lower()
-            core_translated = {k.lower(): v for k, v in zh_map.items()}.get(core_lower, core)
+            core_translated = zh_lower.get(core.lower(), core)
             return f"{core_translated}, {area_zh}"
     return loc
 
@@ -220,6 +375,10 @@ def salary_by_location():
     g.columns = ["location", "min", "max", "avg", "count"]
     g["avg"] = g["avg"].round(0)
     g["location"] = g["location"].apply(location_to_zh)
+    # 翻译后合并同名地区（如 Kwun Tong + Kwun Tong District → 觀塘）
+    g = g.groupby("location", as_index=False).agg({"min": "min", "max": "max", "avg": "mean", "count": "sum"})
+    g["avg"] = g["avg"].round(0)
+    g = g.sort_values("avg", ascending=False)
     return g.to_dict(orient="records")
 
 
@@ -238,16 +397,16 @@ def location_distribution():
     df = load_jobs_df()
     if df.empty or "location" not in df.columns:
         return []
-    freq = df["location"].value_counts().head(30).reset_index()
+    # 先翻译再计数，合并同名地区（如 Kwun Tong + Kwun Tong District → 觀塘）
+    freq = df["location"].apply(location_to_zh).value_counts().head(30).reset_index()
     freq.columns = ["location", "count"]
-    freq["location"] = freq["location"].apply(location_to_zh)
     return freq.to_dict(orient="records")
 
 
 _trend_analysis_cache: dict[str, Any] = {}
-_TREND_ANALYSIS_CONTEXT_VERSION = "v6"
+_TREND_ANALYSIS_CONTEXT_VERSION = "v7"
 _salary_analysis_cache: dict[str, Any] = {}
-_SALARY_ANALYSIS_CONTEXT_VERSION = "v1"
+_SALARY_ANALYSIS_CONTEXT_VERSION = "v3"
 _INDUSTRY_DISTRIBUTION_VERSION = "v3"
 _ANALYSIS_CACHE_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "cache" / "ai_analysis_cache.json"
 
@@ -280,6 +439,9 @@ def _get_disk_cached_analysis(kind: str, signature: str) -> dict[str, Any] | Non
     if not isinstance(data, dict):
         return None
     data = dict(data)
+    # 旧缓存里 evidence 可能是字符串，规整成列表后再返回，避免前端对字符串调用 .map 出错。
+    if isinstance(data.get("sections"), list):
+        data["sections"] = _normalize_sections(data["sections"])
     data["from_cache"] = True
     data["analysis_status"] = "cached"
     return data
@@ -493,7 +655,7 @@ def _call_llm_for_industry_batch(records: list[dict[str, Any]]) -> dict[int, str
     return result
 
 
-def _collect_llm_industry_distribution(df: pd.DataFrame, top_n: int = 10) -> list[dict[str, Any]]:
+def _collect_llm_industry_distribution(df: pd.DataFrame, top_n: int = 10, use_llm: bool = True) -> list[dict[str, Any]]:
     if df.empty:
         return []
     signature = _industry_cache_signature(df)
@@ -504,16 +666,17 @@ def _collect_llm_industry_distribution(df: pd.DataFrame, top_n: int = 10) -> lis
     records = [_job_industry_record(row, idx) for idx, (_, row) in enumerate(df.iterrows())]
     assigned: dict[int, str] = {}
     llm_used = False
-    batch_size = 50
-    llm_records = records[:50]
-    for start in range(0, len(llm_records), batch_size):
-        batch = llm_records[start:start + batch_size]
-        try:
-            assigned.update(_call_llm_for_industry_batch(batch))
-            llm_used = True
-        except Exception:
-            for record in batch:
-                assigned[int(record["idx"])] = _infer_industry_with_rules(record)
+    if use_llm:
+        batch_size = 50
+        llm_records = records[:50]
+        for start in range(0, len(llm_records), batch_size):
+            batch = llm_records[start:start + batch_size]
+            try:
+                assigned.update(_call_llm_for_industry_batch(batch))
+                llm_used = True
+            except Exception:
+                for record in batch:
+                    assigned[int(record["idx"])] = _infer_industry_with_rules(record)
 
     counter = Counter()
     for record in records:
@@ -547,7 +710,7 @@ def _sample_jobs_for_analysis(df: pd.DataFrame, limit: int = 12) -> list[dict[st
     return samples
 
 
-def _build_trend_context(df: pd.DataFrame) -> dict[str, Any]:
+def _build_trend_context(df: pd.DataFrame, use_llm: bool = True) -> dict[str, Any]:
     from src.resume_agent.market_insights import compute_market_insights
     from api.routers.role_stats import role_distribution, role_salary
 
@@ -560,9 +723,12 @@ def _build_trend_context(df: pd.DataFrame) -> dict[str, Any]:
         "tech_stack_ranking": _collect_skill_stats(df, top_n=20),
         "skill_category_distribution": category_distribution(),
         "responsibility_distribution": _collect_responsibility_stats(df),
-        "industry_distribution": _collect_llm_industry_distribution(df, top_n=10),
+        "industry_distribution": _collect_llm_industry_distribution(df, top_n=10, use_llm=use_llm),
         "company_distribution": _counter_from_column(df, "company", top_n=10),
-        "location_distribution": _counter_from_column(df, "location", top_n=10),
+        "location_distribution": [
+            {"name": name, "count": count}
+            for name, count in df["location"].apply(location_to_zh).value_counts().head(10).items()
+        ],
         "education_distribution": _counter_from_column(df, "education_required", top_n=8),
         "language_distribution": _counter_from_column(df, "languages_required", top_n=8),
         "knowledge_base_samples": _sample_jobs_for_analysis(df),
@@ -692,6 +858,32 @@ def _call_llm_for_trend_analysis(context: dict[str, Any]) -> list[dict[str, Any]
     return _parse_plain_trend_sections(content, section_specs)
 
 
+def _normalize_evidence(value: Any) -> list[Any]:
+    """把 LLM 返回的 evidence 统一成列表。
+
+    LLM 有时会把 evidence 写成一整段文字而不是数组，前端对字符串调用 .map 会抛错导致整块消失，
+    因此在写入缓存前就规整：列表原样保留；字符串按 、；; 换行符拆分；其它类型丢弃为空列表。
+    """
+    if isinstance(value, list):
+        return value
+    if isinstance(value, str):
+        parts = re.split(r"[、；;\n]+", value)
+        return [part.strip() for part in parts if part.strip()]
+    return []
+
+
+def _normalize_sections(sections: list[Any]) -> list[dict[str, Any]]:
+    """规整 LLM 返回的 sections：只保留字典项，并把 evidence 统一成列表。"""
+    normalized: list[dict[str, Any]] = []
+    for section in sections:
+        if not isinstance(section, dict):
+            continue
+        section = dict(section)
+        section["evidence"] = _normalize_evidence(section.get("evidence"))
+        normalized.append(section)
+    return normalized
+
+
 def _call_llm_sections(prompt: str) -> list[dict[str, Any]]:
     manager = LLMConfigManager()
     if not manager.configured:
@@ -725,7 +917,7 @@ def _call_llm_sections(prompt: str) -> list[dict[str, Any]]:
     sections = parsed.get("sections", []) if isinstance(parsed, dict) else parsed
     if not isinstance(sections, list):
         raise ValueError("LLM response does not contain sections list")
-    return sections
+    return _normalize_sections(sections)
 
 
 @router.get("/tech-trend-analysis")
@@ -748,7 +940,20 @@ def tech_trend_analysis(refresh: bool = Query(default=False)):
             _trend_analysis_cache["data"] = cached
             return cached
 
-    context = _build_trend_context(df)
+    context = _build_trend_context(df, use_llm=refresh)
+    if not refresh:
+        result = {
+            "llm_used": False,
+            "from_cache": False,
+            "analysis_status": "fallback",
+            "warning": "未命中 AI 分析缓存，已先返回本地知识库摘要；点击“重新生成分析”可调用 LLM 生成完整总结。",
+            "sections": _fallback_trend_sections(context),
+            "context": context,
+        }
+        _trend_analysis_cache["signature"] = signature
+        _trend_analysis_cache["data"] = result
+        return result
+
     try:
         sections = _call_llm_for_trend_analysis(context)
         result = {"llm_used": True, "from_cache": False, "analysis_status": "completed", "sections": sections, "context": context}
@@ -786,25 +991,118 @@ def _salary_overview_stats(df: pd.DataFrame) -> dict[str, Any]:
     }
 
 
-def _top_salary_jobs(df: pd.DataFrame, top_n: int = 15) -> list[dict[str, Any]]:
+def _list_from_maybe_string(value: Any) -> list[str]:
+    if isinstance(value, list):
+        return [str(item) for item in value if str(item).strip()]
+    text = _safe_text(value)
+    if not text:
+        return []
+    try:
+        parsed = json.loads(text.replace("'", '"'))
+        if isinstance(parsed, list):
+            return [str(item) for item in parsed if str(item).strip()]
+    except Exception:
+        pass
+    return [part.strip() for part in text.replace(";", ",").split(",") if part.strip()]
+
+
+def _call_llm_for_job_display_names(jobs: list[dict[str, Any]]) -> dict[int, str]:
+    """调用 LLM 为高薪岗位生成简洁中文显示名称，用于图表标签避免英文重叠"""
+    manager = LLMConfigManager()
+    if not manager.configured:
+        return {}
+    kwargs = manager.build_kwargs()
+    items = [
+        {"idx": i, "title": j.get("title", ""), "role": j.get("role_name", ""), "industry": j.get("industry_category", "")}
+        for i, j in enumerate(jobs)
+    ]
+    prompt = (
+        "你是香港 IT 招聘市場崗位名稱翻譯助手。請為以下每個英文崗位標題生成一個簡潔的中文顯示名稱（不超過10個字），"
+        "用於圖表標籤展示。名稱應體現崗位核心方向，避免過長導致標籤重疊。\n"
+        "規則：\n"
+        '1. 輸出 JSON 對象，格式為 {"items":[{"idx":0,"display_name":"AI應用工程師"}]}。\n'
+        "2. 優先使用角色名稱和行業信息輔助翻譯。\n"
+        "3. 如果標題已是中文，可以精簡後返回。\n"
+        "4. 相同方向的崗位可以合併為同一名稱。\n"
+        f"崗位數據：{json.dumps(items, ensure_ascii=False)}"
+    )
+    payload = {
+        "model": kwargs["model"],
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0,
+        "max_tokens": 2048,
+        "response_format": {"type": "json_object"},
+    }
+    headers = {"Authorization": f"Bearer {kwargs['api_key']}", "Content-Type": "application/json"}
+    resp = requests.post(
+        f"{kwargs['api_base'].rstrip('/')}/chat/completions",
+        headers=headers,
+        json=payload,
+        timeout=min(max(int(kwargs.get("timeout", 30) or 30), 30), 60),
+        proxies={"http": None, "https": None},
+    )
+    resp.raise_for_status()
+    message = resp.json()["choices"][0]["message"]
+    content = (message.get("content") or message.get("reasoning_content") or "").strip()
+    if content.startswith("```"):
+        content = content.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
+    start_obj = content.find("{")
+    end_obj = content.rfind("}")
+    if start_obj >= 0 and end_obj > start_obj:
+        content = content[start_obj:end_obj + 1]
+    parsed = json.loads(content)
+    result: dict[int, str] = {}
+    items_out = parsed.get("items", []) if isinstance(parsed, dict) else []
+    for item in items_out:
+        if not isinstance(item, dict):
+            continue
+        idx = item.get("idx")
+        name = item.get("display_name", "")
+        if isinstance(idx, int) and isinstance(name, str) and name.strip():
+            result[idx] = name.strip()
+    return result
+
+
+def _top_salary_jobs(df: pd.DataFrame, top_n: int = 15, use_llm: bool = True) -> list[dict[str, Any]]:
     if df.empty or "salary_min" not in df.columns:
         return []
+    from api.routers.role_stats import _get_classifier, _role_from_cache_or_rules
+
+    classifier = _get_classifier()
     rows = df.dropna(subset=["salary_min"]).copy()
     rows = rows[rows["salary_min"].astype(float) > 0]
     rows = rows.sort_values("salary_min", ascending=False).head(top_n)
     result = []
-    for _, row in rows.iterrows():
+    for idx, row in rows.iterrows():
+        role = _role_from_cache_or_rules(classifier, row)
+        industry = _infer_industry_with_rules(_job_industry_record(row, int(idx)))
+        jd = _safe_text(row.get("jd_text")) or _safe_text(row.get("jd_raw")) or _safe_text(row.get("kb_document_text"))
         result.append({
             "title": _safe_text(row.get("title")),
             "company": _safe_text(row.get("company")),
             "location": location_to_zh(_safe_text(row.get("location"))),
+            "industry_category": industry,
+            "role_name": role.role_name,
+            "role_id": role.role_id,
+            "tech_stack": _list_from_maybe_string(row.get("tech_stack"))[:10],
+            "work_summary": jd[:220],
             "salary_min": float(row.get("salary_min") or 0),
             "salary_max": float(row.get("salary_max") or 0) if _safe_text(row.get("salary_max")) else 0,
         })
+
+    # 调用 LLM 生成简洁中文显示名称，避免英文标题在图表中重叠
+    display_names = {}
+    if use_llm:
+        try:
+            display_names = _call_llm_for_job_display_names(result)
+        except Exception:
+            display_names = {}
+    for i, item in enumerate(result):
+        item["display_name"] = display_names.get(i) or item.get("role_name") or item.get("title", "")
+
     return result
 
-
-def _build_salary_context(df: pd.DataFrame) -> dict[str, Any]:
+def _build_salary_context(df: pd.DataFrame, use_llm: bool = True) -> dict[str, Any]:
     from api.routers.role_stats import role_salary
 
     return {
@@ -812,7 +1110,7 @@ def _build_salary_context(df: pd.DataFrame) -> dict[str, Any]:
         "salary_overview": _salary_overview_stats(df),
         "salary_by_location": salary_by_location(),
         "salary_by_role": role_salary(),
-        "top_salary_jobs": _top_salary_jobs(df),
+        "top_salary_jobs": _top_salary_jobs(df, use_llm=use_llm),
     }
 
 
@@ -825,7 +1123,7 @@ def _fallback_salary_sections(context: dict[str, Any]) -> list[dict[str, Any]]:
         {"key": "salary_overview", "title": "薪资总体分析", "summary": f"当前可用薪资样本 {overview.get('count', 0)} 条，平均月薪约 HKD {overview.get('avg', 0)}，中位数约 HKD {overview.get('median', 0)}。最高与最低值差距较大，说明岗位 seniority 与技术方向对薪资影响明显。", "evidence": [overview]},
         {"key": "salary_location", "title": "地区薪资分析", "summary": f"地区均薪较高的样本包括：{locations}。地区薪资应结合样本数一起看，样本少的区域不宜单独作为市场结论。", "evidence": context.get("salary_by_location", [])[:6]},
         {"key": "salary_role", "title": "角色薪资分析", "summary": f"角色均薪较突出的方向包括：{roles}。高薪角色通常更强调架构、AI 应用、DevOps 与后端交付能力。", "evidence": context.get("salary_by_role", [])[:6]},
-        {"key": "top_salary_jobs", "title": "高薪岗位分析", "summary": f"高薪岗位样本包括：{top_jobs}。这些岗位可作为求职定位和技能补强的优先参考。", "evidence": context.get("top_salary_jobs", [])[:6]},
+        {"key": "top_salary_jobs", "title": "高薪岗位分析", "summary": f"高薪岗位样本包括：{top_jobs}。建议结合行业、角色方向、工作内容、技术栈和地域判断高薪来源；不要只追逐薪资数字，应优先选择能积累行业知识与可迁移技术能力的岗位。", "evidence": context.get("top_salary_jobs", [])[:6]},
     ]
 
 
@@ -849,13 +1147,26 @@ def salary_analysis(refresh: bool = Query(default=False)):
             _salary_analysis_cache["data"] = cached
             return cached
 
-    context = _build_salary_context(df)
+    context = _build_salary_context(df, use_llm=refresh)
+    if not refresh:
+        result = {
+            "llm_used": False,
+            "from_cache": False,
+            "analysis_status": "fallback",
+            "warning": "未命中 AI 分析缓存，已先返回本地薪资摘要；点击“重新生成分析”可调用 LLM 生成完整总结。",
+            "sections": _fallback_salary_sections(context),
+            "context": context,
+        }
+        _salary_analysis_cache["signature"] = signature
+        _salary_analysis_cache["data"] = result
+        return result
+
     prompt = (
         "你是香港 IT 招聘市场薪资分析师。请只基于下面的薪资知识库统计，"
         "用中文输出合法 JSON 对象，顶层字段为 sections。sections 必须包含四个对象："
         "薪资总体分析、地区薪资分析、角色薪资分析、高薪岗位分析。"
         "每个对象字段为 key、title、summary、evidence。summary 写 2-4 句，"
-        "必须提到 HKD/月，避免空泛，指出样本数或异常值风险。\n\n"
+        "必须提到 HKD/月，避免空泛，指出样本数或异常值风险。高薪岗位分析必须说明高薪岗位集中在什么行业、什么岗位方向、主要从事什么工作、用了什么技术栈、位于什么地域，并总结对就业市场的意义和求职者建议。\n\n"
         f"薪资知识库上下文：\n{json.dumps(context, ensure_ascii=False)[:7000]}"
     )
     try:

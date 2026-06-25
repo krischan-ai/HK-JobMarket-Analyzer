@@ -89,6 +89,12 @@ def list_jobs(
             src_time = datetime.fromtimestamp(f.stat().st_mtime).strftime("%Y-%m-%d %H:%M")
             source_times[src_name] = src_time
 
+    try:
+        from api.routers.role_stats import classified_industry_map
+        classified_industries = classified_industry_map()
+    except Exception:
+        classified_industries = {}
+
     items = []
     for _, row in df_page.iterrows():
         skills = None
@@ -96,8 +102,10 @@ def list_jobs(
             skills = row["skills"]
         src = str(row.get("source", "")).lower().strip()
         import_time = source_times.get(src, None)
+        job_id = str(row.get("job_id", ""))
+        industry_category = classified_industries.get(job_id) or (str(row.get("industry_category", "")) if pd.notna(row.get("industry_category")) else "")
         items.append({
-            "job_id": str(row.get("job_id", "")),
+            "job_id": job_id,
             "title": str(row.get("title", "")),
             "company": str(row.get("company", "")),
             "location": location_to_zh(str(row.get("location", ""))),
@@ -110,7 +118,7 @@ def list_jobs(
             "url": str(row.get("url", "")) if pd.notna(row.get("url")) else "",
             "posted_at": str(row.get("posted_at", "")) if pd.notna(row.get("posted_at")) else "",
             "employment_type": str(row.get("employment_type", "")) if pd.notna(row.get("employment_type")) else "",
-            "industry_category": str(row.get("industry_category", "")) if pd.notna(row.get("industry_category")) else "",
+            "industry_category": industry_category,
             "application_volume": str(row.get("application_volume", "")) if pd.notna(row.get("application_volume")) else "",
             "employer_questions": _safe_list(row, "employer_questions"),
             "is_insurance_sales": _safe_bool(row, "is_insurance_sales"),
@@ -142,7 +150,7 @@ def list_locations():
     df = load_jobs_df()
     if df.empty or "location" not in df.columns:
         return []
-    locs = df["location"].dropna().value_counts().reset_index()
+    # 先翻译再计数，合并同名地区
+    locs = df["location"].apply(location_to_zh).value_counts().reset_index()
     locs.columns = ["name", "count"]
-    locs["name"] = locs["name"].apply(location_to_zh)
     return locs.to_dict(orient="records")

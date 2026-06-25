@@ -3,7 +3,9 @@
     <div class="page-header">
       <h2>薪資分析</h2>
       <div class="header-actions">
-        <el-tag :type="analysisStatus.type">{{ analysisStatus.text }}</el-tag>
+        <span :key="`header-${analysisRenderKey}`" class="status-pill" :class="`status-pill--${analysisStatusType}`">
+          {{ analysisStatusText }}
+        </span>
         <el-button :loading="statsStore.salaryAnalysisLoading" type="primary" @click="refreshAnalysis">
           重新生成分析
         </el-button>
@@ -53,10 +55,27 @@
       </el-col>
     </el-row>
 
-    <section class="analysis-section">
+
+    <el-row :gutter="16" style="margin-bottom: 16px">
+      <el-col :span="24">
+        <RoleSalaryChart :data="statsStore.roleSalary" />
+        <div v-if="roleSalarySectionData" class="role-salary-summary">
+          <h4 class="summary-title">{{ roleSalarySectionData.title }}</h4>
+          <div class="summary-meta">
+            <span>知识库岗位数：{{ statsStore.salaryAnalysis?.context?.total_jobs || 0 }}</span>
+          </div>
+          <p class="summary">{{ roleSalarySectionData.summary }}</p>
+          <div v-if="salaryEvidenceLabels(roleSalarySectionData).length" class="evidence-list">
+            <span v-for="(label, idx) in salaryEvidenceLabels(roleSalarySectionData)" :key="idx">{{ label }}</span>
+          </div>
+        </div>
+      </el-col>
+    </el-row>    <section :key="`analysis-${analysisRenderKey}`" class="analysis-section">
       <div class="section-header">
         <h3>薪资智能总结</h3>
-        <el-tag :type="analysisStatus.type">{{ analysisStatus.text }}</el-tag>
+        <span :key="`section-${analysisRenderKey}`" class="status-pill" :class="`status-pill--${analysisStatusType}`">
+          {{ analysisStatusText }}
+        </span>
       </div>
 
       <el-alert
@@ -76,13 +95,13 @@
         style="margin-bottom: 16px"
       />
 
-      <div v-if="statsStore.salaryAnalysisLoading" class="loading-state">
+      <div v-if="showAnalysisLoading" class="loading-state">
         <el-alert title="AI 正在调用薪资知识库并生成分析。原始数据不变时后续会直接使用缓存。" type="info" show-icon :closable="false" />
         <el-skeleton :rows="8" animated />
       </div>
-      <el-row v-else :gutter="16">
+      <el-row v-show="!isAnalysisLoading()" :gutter="16">
         <el-col
-          v-for="section in statsStore.salaryAnalysis?.sections || []"
+          v-for="section in visibleSalarySections"
           :key="section.key || section.title"
           :span="24"
           class="analysis-col"
@@ -91,9 +110,9 @@
             <template #header><strong>{{ section.title }}</strong></template>
             <v-chart class="analysis-chart" :option="analysisChartOption(section)" autoresize />
             <p class="summary">{{ section.summary }}</p>
-            <div v-if="section.evidence?.length" class="evidence-list">
-              <span v-for="(item, idx) in section.evidence.slice(0, 8)" :key="idx">
-                {{ formatEvidence(item) }}
+            <div v-if="salaryEvidenceLabels(section).length" class="evidence-list">
+              <span v-for="(label, idx) in salaryEvidenceLabels(section)" :key="idx">
+                {{ label }}
               </span>
             </div>
           </el-card>
@@ -104,21 +123,26 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import VChart from 'vue-echarts'
 import api from '@/api'
 import { useStatsStore } from '@/stores/stats'
 import StatCard from '@/components/common/StatCard.vue'
 import SalaryBoxChart from '@/components/charts/SalaryBoxChart.vue'
 import TrendLineChart from '@/components/charts/TrendLineChart.vue'
+import RoleSalaryChart from '@/components/RoleSalaryChart.vue'
 import type { SalaryDistribution, TechTrendSection } from '@/types'
 
 const statsStore = useStatsStore()
 const stats = reactive({ avg: '-', min: '-', max: '-', median: '-' })
 const salaryData = ref<SalaryDistribution[]>([])
+const analysisRenderKey = ref(0)
+const visibleSalarySections = reactive<TechTrendSection[]>([])
+const roleSalarySectionData = ref<TechTrendSection | null>(null)
+const showAnalysisLoading = computed(() => statsStore.salaryAnalysisLoading && !statsStore.salaryAnalysis)
 
 const analysisStatus = computed(() => {
-  if (statsStore.salaryAnalysisLoading) return { text: 'AI 分析中', type: 'warning' as const }
+  if (showAnalysisLoading.value) return { text: 'AI 分析中', type: 'warning' as const }
   if (!statsStore.salaryAnalysis) return { text: '待生成', type: 'info' as const }
   if (statsStore.salaryAnalysis.from_cache || statsStore.salaryAnalysis.analysis_status === 'cached') {
     return { text: '使用缓存', type: 'success' as const }
@@ -127,11 +151,20 @@ const analysisStatus = computed(() => {
   return { text: '本地兜底摘要', type: 'warning' as const }
 })
 
-onMounted(async () => {
-  await Promise.all([
+const analysisStatusText = computed(() => analysisStatus.value.text)
+const analysisStatusType = computed(() => analysisStatus.value.type)
+
+onMounted(() => {
+  statsStore.cancelSalaryAnalysis()
+  void Promise.all([
     loadSalaryData(),
-    loadAnalysis(false),
+    statsStore.fetchRoleSalary(),
   ])
+  void loadAnalysis(false)
+})
+
+onBeforeUnmount(() => {
+  statsStore.cancelSalaryAnalysis()
 })
 
 async function loadSalaryData() {
@@ -152,6 +185,9 @@ async function loadAnalysis(refresh: boolean) {
     await statsStore.fetchSalaryAnalysis(refresh)
   } catch {
     // 页面内显示错误提示。
+  } finally {
+    syncSalarySections()
+    analysisRenderKey.value += 1
   }
 }
 
@@ -198,6 +234,23 @@ function sectionKind(section: TechTrendSection) {
   return key
 }
 
+function isAnalysisLoading() {
+  return statsStore.salaryAnalysisLoading && !statsStore.salaryAnalysis
+}
+
+function getSalarySummarySections() {
+  return (statsStore.salaryAnalysis?.sections || []).filter(section => sectionKind(section) !== 'salary_role')
+}
+
+function getRoleSalarySection() {
+  return (statsStore.salaryAnalysis?.sections || []).find(section => sectionKind(section) === 'salary_role')
+}
+
+function syncSalarySections() {
+  visibleSalarySections.splice(0, visibleSalarySections.length, ...getSalarySummarySections())
+  roleSalarySectionData.value = getRoleSalarySection() || null
+}
+
 function chartItemsForSection(section: TechTrendSection) {
   const kind = sectionKind(section)
   if (kind === 'salary_overview') {
@@ -223,7 +276,7 @@ function chartItemsForSection(section: TechTrendSection) {
   }
   if (kind === 'top_salary_jobs') {
     return contextArray('top_salary_jobs')
-      .map(item => ({ name: item.title, count: item.salary_min }))
+      .map(item => ({ name: item.display_name || item.role_name || item.title, count: item.salary_min }))
       .slice(0, 10)
   }
   return []
@@ -266,11 +319,46 @@ function analysisChartOption(section: TechTrendSection) {
   }
 }
 
-function formatEvidence(item: string | Record<string, unknown>) {
+function salaryEvidenceLabels(section?: TechTrendSection) {
+  if (!section) return []
+  const raw: unknown = section.evidence
+  // LLM 返回的 evidence 可能是数组，也可能是一整段字符串；统一成数组再渲染，避免对字符串调用 .map 抛错导致整块消失。
+  const list: Array<string | Record<string, unknown>> = Array.isArray(raw)
+    ? raw
+    : typeof raw === 'string'
+      ? raw.split(/[、；;\n]+/).map((part: string) => part.trim()).filter(Boolean)
+      : []
+  return list
+    .slice(0, 8)
+    .map(item => formatEvidence(item, sectionKind(section)))
+    .filter(Boolean)
+}
+
+function formatEvidence(item: string | Record<string, unknown>, kind = '') {
   if (typeof item === 'string') return item
-  const name = item.title || item.role_name || item.location || item.name || item.company
-  const value = item.salary_avg || item.avg || item.salary_min || item.count
-  return `${name || JSON.stringify(item)}${value ? `：HKD ${Number(value).toLocaleString()}` : ''}`
+  if (kind === 'salary_overview') {
+    const count = Number(item.count || 0)
+    const avg = Number(item.avg || 0)
+    return count || avg ? '样本数 ' + count + '，平均 HKD ' + avg.toLocaleString() : ''
+  }
+  if (kind === 'top_salary_jobs') {
+    const title = String(item.title || '')
+    const industry = String(item.industry_category || '')
+    const role = String(item.role_name || '')
+    const location = String(item.location || '')
+    const salary = Number(item.salary_min || 0)
+    return [
+      title,
+      industry,
+      role,
+      location,
+      salary ? 'HKD ' + salary.toLocaleString() : '',
+    ].filter(Boolean).join(' | ')
+  }
+  const name = String(item.role_name || item.location || item.name || item.company || item.title || '')
+  const value = Number(item.salary_avg || item.avg || item.salary_min || item.count || 0)
+  if (!name) return ''
+  return name + (value ? '：HKD ' + value.toLocaleString() : '')
 }
 </script>
 
@@ -292,6 +380,36 @@ function formatEvidence(item: string | Record<string, unknown>) {
   align-items: center;
   gap: 10px;
   flex-shrink: 0;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 9px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 22px;
+  white-space: nowrap;
+}
+
+.status-pill--success {
+  color: #529b2e;
+  background: #f0f9eb;
+  border-color: #e1f3d8;
+}
+
+.status-pill--warning {
+  color: #b88230;
+  background: #fdf6ec;
+  border-color: #faecd8;
+}
+
+.status-pill--info {
+  color: #73767a;
+  background: #f4f4f5;
+  border-color: #e9e9eb;
 }
 
 .page-header {
@@ -330,6 +448,19 @@ function formatEvidence(item: string | Record<string, unknown>) {
   margin-bottom: 10px;
 }
 
+.summary-title {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
+.role-salary-summary {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #ebeef5;
+}
+
 .summary {
   margin: 0 0 14px;
   color: #606266;
@@ -338,12 +469,14 @@ function formatEvidence(item: string | Record<string, unknown>) {
   white-space: pre-wrap;
 }
 
+.summary-meta,
 .evidence-list {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
+.summary-meta span,
 .evidence-list span {
   max-width: 100%;
   padding: 5px 8px;

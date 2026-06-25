@@ -18,6 +18,10 @@ export const useStatsStore = defineStore('stats', () => {
   const salaryAnalysisError = ref('')
   const classifying = ref(false)
   const loading = ref(false)
+  let techTrendController: AbortController | null = null
+  let salaryAnalysisController: AbortController | null = null
+  let techTrendRequestId = 0
+  let salaryAnalysisRequestId = 0
 
   async function fetchTopSkills(n: number = 15) {
     const { data } = await api.get('/stats/top-skills', { params: { top_n: n } })
@@ -63,46 +67,82 @@ export const useStatsStore = defineStore('stats', () => {
 
   async function fetchTechTrendAnalysis(refresh = false) {
     if (!refresh && techTrendAnalysis.value) {
+      techTrendLoading.value = false
       return techTrendAnalysis.value
     }
+    techTrendController?.abort()
+    techTrendController = new AbortController()
+    const requestId = ++techTrendRequestId
     techTrendLoading.value = true
     techTrendError.value = ''
     try {
-      const { data } = await api.get<TechTrendAnalysis>('/stats/tech-trend-analysis', { params: { refresh } })
+      const { data } = await api.get<TechTrendAnalysis>('/stats/tech-trend-analysis', {
+        params: { refresh },
+        signal: techTrendController.signal,
+      })
+      if (requestId !== techTrendRequestId) return techTrendAnalysis.value
       techTrendAnalysis.value = data
       return data
     } catch (error: any) {
+      if (error?.code === 'ERR_CANCELED') return techTrendAnalysis.value
       techTrendAnalysis.value = null
       techTrendError.value = error?.response?.data?.detail || '技术趋势分析生成失败'
       throw error
     } finally {
-      techTrendLoading.value = false
+      if (requestId === techTrendRequestId) {
+        techTrendLoading.value = false
+      }
     }
   }
 
   async function fetchSalaryAnalysis(refresh = false) {
     if (!refresh && salaryAnalysis.value) {
+      salaryAnalysisLoading.value = false
       return salaryAnalysis.value
     }
+    salaryAnalysisController?.abort()
+    salaryAnalysisController = new AbortController()
+    const requestId = ++salaryAnalysisRequestId
     salaryAnalysisLoading.value = true
     salaryAnalysisError.value = ''
     try {
-      const { data } = await api.get<SalaryAnalysis>('/stats/salary-analysis', { params: { refresh } })
+      const { data } = await api.get<SalaryAnalysis>('/stats/salary-analysis', {
+        params: { refresh },
+        signal: salaryAnalysisController.signal,
+      })
+      if (requestId !== salaryAnalysisRequestId) return salaryAnalysis.value
       salaryAnalysis.value = data
       return data
     } catch (error: any) {
+      if (error?.code === 'ERR_CANCELED') return salaryAnalysis.value
       salaryAnalysis.value = null
       salaryAnalysisError.value = error?.response?.data?.detail || '薪资智能分析生成失败'
       throw error
     } finally {
-      salaryAnalysisLoading.value = false
+      if (requestId === salaryAnalysisRequestId) {
+        salaryAnalysisLoading.value = false
+      }
     }
+  }
+
+  function cancelTechTrendAnalysis() {
+    techTrendController?.abort()
+    techTrendController = null
+    techTrendRequestId += 1
+    techTrendLoading.value = false
+  }
+
+  function cancelSalaryAnalysis() {
+    salaryAnalysisController?.abort()
+    salaryAnalysisController = null
+    salaryAnalysisRequestId += 1
+    salaryAnalysisLoading.value = false
   }
 
   async function runClassification(batchSize: number = 5) {
     classifying.value = true
     try {
-      const { data } = await api.post<ClassificationResult>('/stats/run-classification', { mode: 'full', batch_size: batchSize }, { timeout: 600000 })
+      const { data } = await api.post<ClassificationResult>('/stats/classify-jobs', { mode: 'full', batch_size: batchSize })
       return data
     } finally {
       classifying.value = false
@@ -116,6 +156,7 @@ export const useStatsStore = defineStore('stats', () => {
     salaryAnalysis, salaryAnalysisLoading, salaryAnalysisError,
     classifying, loading,
     fetchTopSkills, fetchCategories, fetchSalaryByLocation,
-    fetchRoleDistribution, fetchRoleSalary, fetchLLMStatus, fetchTechTrendAnalysis, fetchSalaryAnalysis, runClassification,
+    fetchRoleDistribution, fetchRoleSalary, fetchLLMStatus,
+    fetchTechTrendAnalysis, fetchSalaryAnalysis, cancelTechTrendAnalysis, cancelSalaryAnalysis, runClassification,
   }
 })

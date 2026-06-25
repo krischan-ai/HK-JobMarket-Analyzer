@@ -39,6 +39,9 @@ Thumbs.db
 # Data (crawler raw & cleaned data should be tracked)
 data/auth/
 
+# ChromaDB vector store (regenerable, large binary)
+data/chromadb/
+
 # Cookies / Auth tokens
 indeed_auth.json
 data/role_cache.json

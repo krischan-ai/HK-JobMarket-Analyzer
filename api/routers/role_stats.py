@@ -255,6 +255,29 @@ def _run_classify_in_background(req: RunClassificationRequest):
     jobs = df.to_dict(orient="records")
     total = len(jobs)
     start = time.time()
+    industry_by_idx: dict[int, str] = {}
+    try:
+        from api.routers.stats import _call_llm_for_industry_batch, _infer_industry_with_rules, _job_industry_record
+        industry_records = [_job_industry_record(row, idx) for idx, (_, row) in enumerate(df.iterrows())]
+        llm_industry = _call_llm_for_industry_batch(industry_records[:50])
+        for record in industry_records:
+            idx = int(record["idx"])
+            industry_by_idx[idx] = llm_industry.get(idx) or _infer_industry_with_rules(record)
+    except Exception as e:
+        logger.warning("Industry classification fallback to rules: %s", e)
+        try:
+            from api.routers.stats import _infer_industry_with_rules, _job_industry_record
+            for idx, (_, row) in enumerate(df.iterrows()):
+                industry_by_idx[idx] = _infer_industry_with_rules(_job_industry_record(row, idx))
+        except Exception:
+            industry_by_idx = {}
+
+    # 提前调用 LLM 统一翻译地名，写入磁盘缓存供后续统计复用
+    try:
+        from api.routers.stats import _precompute_location_normalization
+        _precompute_location_normalization(df)
+    except Exception as e:
+        logger.warning("Location normalization precompute failed: %s", e)
 
     cache_lock = Lock()
     classified_count = [0]
@@ -284,17 +307,18 @@ def _run_classify_in_background(req: RunClassificationRequest):
         if isinstance(v, float) and v != v: return ""
         return str(v)
 
-    def _classify_one(job: dict) -> dict:
+    def _classify_one(job: dict, idx: int) -> dict:
         try:
-            return _do_classify(job)
+            return _do_classify(job, idx)
         except Exception as e:
             logger.exception("Failed to classify job %s: %s", job.get("job_id", "?"), e)
             return {
                 "job_id": _safe_str(job.get("job_id")),
                 "title": _safe_str(job.get("title")),
                 "company": _safe_str(job.get("company")),
-                "location": _safe_str(job.get("location")),
+                "location": location_to_zh(_safe_str(job.get("location"))),
                 "source": _safe_str(job.get("source")),
+                "industry_category": industry_by_idx.get(idx) or _safe_str(job.get("industry_category")),
                 "role_id": "other", "role_name": "其他", "role_confidence": "low",
                 "salary_min": _safe_float(job.get("salary_min")),
                 "salary_max": _safe_float(job.get("salary_max")),
@@ -302,7 +326,7 @@ def _run_classify_in_background(req: RunClassificationRequest):
                 "llm_is_insurance": False, "llm_confidence": "", "llm_explanation": "",
             }
 
-    def _do_classify(job: dict) -> dict:
+    def _do_classify(job: dict, idx: int) -> dict:
         jd_text = str(job.get("jd_raw", "") or "")
         classify_text = jd_text if len(jd_text) > 20 else str(job.get("title", ""))
         cache_key = classifier._make_cache_key(classify_text)
@@ -356,6 +380,7 @@ def _run_classify_in_background(req: RunClassificationRequest):
             "company": _safe_str(job.get("company")),
             "location": _safe_str(job.get("location")),
             "source": _safe_str(job.get("source")),
+            "industry_category": industry_by_idx.get(idx) or _safe_str(job.get("industry_category")),
             "role_id": cls_result.role_id,
             "role_name": cls_result.role_name,
             "role_confidence": cls_result.confidence,
@@ -373,7 +398,7 @@ def _run_classify_in_background(req: RunClassificationRequest):
     workers = min(8, total)
     results_map: dict[int, dict] = {}
     with ThreadPoolExecutor(max_workers=workers) as pool:
-        futures = {pool.submit(_classify_one, job): idx for idx, job in enumerate(jobs)}
+        futures = {pool.submit(_classify_one, job, idx): idx for idx, job in enumerate(jobs)}
         for future in as_completed(futures):
             idx = futures[future]
             try:
@@ -506,4 +531,12 @@ def review_insurance(req: InsuranceReviewRequest):
         "duration_ms": round(elapsed, 0),
         "message": f"LLM 复审完成: {insurance_count}/{len(results)} 确认为保险销售 ({elapsed/1000:.1f}s)",
         "items": results,
+    }
+
+
+def classified_industry_map() -> dict[str, str]:
+    return {
+        str(item.get("job_id")): str(item.get("industry_category") or "")
+        for item in _classify_result
+        if item.get("job_id") and item.get("industry_category")
     }

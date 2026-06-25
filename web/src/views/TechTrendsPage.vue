@@ -42,6 +42,7 @@
             :loading="statsStore.techTrendLoading"
             :error="statsStore.techTrendError"
             fallback-title="技术栈需求分析"
+            :total-jobs="totalJobs"
           />
         </el-card>
       </el-col>
@@ -57,6 +58,7 @@
             :loading="statsStore.techTrendLoading"
             :error="statsStore.techTrendError"
             fallback-title="细分技能类别分析"
+            :total-jobs="totalJobs"
           />
         </el-card>
       </el-col>
@@ -75,25 +77,36 @@
 
     <el-row :gutter="16" style="margin-bottom: 16px">
       <el-col :span="24">
-        <RoleDistributionChart :data="statsStore.roleDistribution" />
-        <AnalysisSummary
-          :section="findSection('role_distribution')"
-          :loading="statsStore.techTrendLoading"
-          :error="statsStore.techTrendError"
-          fallback-title="角色分布分析"
-        />
+        <RoleDistributionChart :data="statsStore.roleDistribution">
+          <AnalysisSummary
+            :section="findSection('role_distribution')"
+            :loading="statsStore.techTrendLoading"
+            :error="statsStore.techTrendError"
+            fallback-title="角色分布分析"
+            :total-jobs="totalJobs"
+          />
+        </RoleDistributionChart>
       </el-col>
     </el-row>
 
     <el-row :gutter="16" style="margin-bottom: 16px">
       <el-col :span="24">
-        <RoleSalaryChart :data="statsStore.roleSalary" />
-        <AnalysisSummary
-          :section="findSection('role_classification')"
-          :loading="statsStore.techTrendLoading"
-          :error="statsStore.techTrendError"
-          fallback-title="角色分类分析"
-        />
+        <el-card>
+          <template #header><strong>角色分类分析</strong></template>
+          <v-chart
+            v-if="findSection('role_classification')"
+            class="analysis-chart"
+            :option="analysisChartOption(findSection('role_classification')!)"
+            autoresize
+          />
+          <AnalysisSummary
+            :section="findSection('role_classification')"
+            :loading="statsStore.techTrendLoading"
+            :error="statsStore.techTrendError"
+            fallback-title="角色分类分析"
+            :total-jobs="totalJobs"
+          />
+        </el-card>
       </el-col>
     </el-row>
 
@@ -148,13 +161,12 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, defineComponent, h, onMounted, ref } from 'vue'
+import { computed, defineComponent, h, onBeforeUnmount, onMounted, ref } from 'vue'
 import { ElAlert, ElMessage, ElSkeleton } from 'element-plus'
 import VChart from 'vue-echarts'
 import { useStatsStore } from '@/stores/stats'
 import CategoryPieChart from '@/components/charts/CategoryPieChart.vue'
 import RoleDistributionChart from '@/components/RoleDistributionChart.vue'
-import RoleSalaryChart from '@/components/RoleSalaryChart.vue'
 import LLMStatusCard from '@/components/LLMStatusCard.vue'
 import type { TechTrendSection } from '@/types'
 
@@ -162,16 +174,21 @@ const statsStore = useStatsStore()
 const pageSize = 20
 const skillPage = ref(1)
 
-onMounted(async () => {
-  await Promise.all([
+onMounted(() => {
+  void Promise.all([
     statsStore.fetchTopSkills(500),
     statsStore.fetchCategories(),
     statsStore.fetchRoleDistribution(),
-    statsStore.fetchRoleSalary(),
     statsStore.fetchLLMStatus(),
-    loadAnalysis(false),
   ])
+  void loadAnalysis(false)
 })
+
+onBeforeUnmount(() => {
+  statsStore.cancelTechTrendAnalysis()
+})
+
+const totalJobs = computed(() => Number((statsStore.techTrendAnalysis?.context as Record<string, unknown> | undefined)?.total_jobs || 0))
 
 const pagedSkills = computed(() => {
   const start = (skillPage.value - 1) * pageSize
@@ -212,7 +229,6 @@ async function handleRunClassification() {
       ElMessage.success(result.message)
       await Promise.all([
         statsStore.fetchRoleDistribution(),
-        statsStore.fetchRoleSalary(),
         statsStore.fetchLLMStatus(),
         loadAnalysis(true),
       ])
@@ -335,6 +351,7 @@ const AnalysisSummary = defineComponent({
     loading: Boolean,
     error: String,
     fallbackTitle: String,
+    totalJobs: Number,
   },
   setup(props) {
     return () => h('div', { class: 'inline-summary' }, [
@@ -345,6 +362,9 @@ const AnalysisSummary = defineComponent({
           : props.section
             ? h('div', { class: 'summary-body' }, [
               h('h4', { class: 'summary-title' }, props.section.title || props.fallbackTitle),
+              props.totalJobs ? h('div', { class: 'summary-meta' }, [
+                h('span', '知识库岗位数：' + props.totalJobs),
+              ]) : null,
               h('p', { class: 'summary-text' }, props.section.summary),
               props.section.evidence?.length
                 ? h('div', { class: 'evidence-list' }, props.section.evidence.slice(0, 8).map((item: string | Record<string, unknown>, idx: number) =>
@@ -410,7 +430,6 @@ const AnalysisSummary = defineComponent({
   border-top: 1px solid #ebeef5;
 }
 
-.inline-summary h4,
 .summary-title {
   margin: 0 0 8px;
   font-size: 13px;
@@ -418,7 +437,6 @@ const AnalysisSummary = defineComponent({
   font-weight: 600;
 }
 
-.inline-summary p,
 .summary-text,
 .summary {
   margin: 0 0 12px;
@@ -451,13 +469,53 @@ const AnalysisSummary = defineComponent({
   margin-bottom: 12px;
 }
 
+.summary-meta,
 .evidence-list {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
+.summary-meta span,
 .evidence-list span {
+  max-width: 100%;
+  padding: 5px 8px;
+  border-radius: 4px;
+  background: #f5f7fa;
+  color: #606266;
+  font-size: 12px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+:deep(.inline-summary .summary-title) {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
+:deep(.inline-summary .summary-text) {
+  margin: 0 0 12px;
+  color: #606266;
+  font-size: 12px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
+
+:deep(.inline-summary .summary-meta),
+:deep(.inline-summary .evidence-list) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+:deep(.inline-summary .summary-meta) {
+  margin-bottom: 12px;
+}
+
+:deep(.inline-summary .summary-meta span),
+:deep(.inline-summary .evidence-list span) {
   max-width: 100%;
   padding: 5px 8px;
   border-radius: 4px;

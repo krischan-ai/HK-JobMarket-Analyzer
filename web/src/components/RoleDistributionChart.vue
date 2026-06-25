@@ -3,6 +3,7 @@
     <template #header><strong>角色分佈</strong></template>
     <v-chart :option="chartOption" autoresize style="height: 420px" v-if="data.length" />
     <el-empty description="暫無角色分類數據" v-else />
+    <slot />
   </el-card>
 </template>
 
