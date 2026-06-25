@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <el-menu
     :default-active="route.path"
     router
@@ -16,6 +16,10 @@
     <el-menu-item index="/resume">
       <el-icon><DocumentChecked /></el-icon>
       <span>簡歷潤色</span>
+    </el-menu-item>
+    <el-menu-item index="/resume-generate">
+      <el-icon><Tickets /></el-icon>
+      <span>簡歷生成</span>
     </el-menu-item>
     <el-menu-item index="/tech-trends">
       <el-icon><TrendCharts /></el-icon>
@@ -68,3 +72,4 @@
 import { useRoute } from 'vue-router'
 const route = useRoute()
 </script>
+

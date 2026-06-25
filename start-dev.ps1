@@ -1,4 +1,4 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 
 $Root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $WebRoot = Join-Path $Root "web"
@@ -38,9 +38,10 @@ Write-Host "API base: $ApiBase"
 Write-Host ""
 
 $BackendCommand = "Set-Location -LiteralPath '$Root'; python -m uvicorn api.main:app --reload --host 127.0.0.1 --port $BackendPort"
-$FrontendCommand = "Set-Location -LiteralPath '$WebRoot'; `$env:VITE_API_BASE_URL='$ApiBase'; npm run dev"
+$FrontendCommand = "Set-Location -LiteralPath '$WebRoot'; `$env:VITE_API_BASE_URL='$ApiBase'; npm run dev -- --host 127.0.0.1 --port 5174"
 
 Start-Process powershell -ArgumentList @("-NoExit", "-ExecutionPolicy", "Bypass", "-Command", $BackendCommand)
 Start-Process powershell -ArgumentList @("-NoExit", "-ExecutionPolicy", "Bypass", "-Command", $FrontendCommand)
 
 Write-Host "Started two terminal windows. Close them or press Ctrl+C in each window to stop." -ForegroundColor Green
+

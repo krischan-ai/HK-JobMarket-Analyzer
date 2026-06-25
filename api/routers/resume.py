@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
 
@@ -7,13 +7,18 @@ from fastapi.responses import StreamingResponse
 
 from src.resume_agent import (
     analyze_resume_only,
+    build_target_profile_only,
     check_input_health,
     match_jobs_only,
+    parse_profile_only,
     research_jobs,
     run_interview_prep,
     run_resume_agent,
+    run_resume_generator,
+    run_resume_generator_stream,
 )
 from src.resume_agent.graph import run_resume_agent_stream
+from src.resume_agent.generator_models import ResumeGenerateRequest, ResumeGenerateResponse
 from src.resume_agent.models import (
     InputHealthEndpointResponse,
     InputHealthRequest,
@@ -31,11 +36,76 @@ from src.resume_agent.models import (
 )
 from src.resume_agent.pdf_parser import extract_resume_text_from_pdf
 from src.resume_agent.utils import ResumeAgentError
-
 # 上传 PDF 体积上限（10 MB），避免超大文件占用内存。
 _MAX_PDF_BYTES = 10 * 1024 * 1024
 
 router = APIRouter(prefix="/api/resume", tags=["resume"])
+
+@router.post("/generate", response_model=ResumeGenerateResponse)
+async def generate_resume(request: ResumeGenerateRequest):
+    """知识库驱动的目标岗位简历生成。"""
+    try:
+        return run_resume_generator(request)
+    except ResumeAgentError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Resume generation failed: {exc}") from exc
+
+
+@router.post("/generate-stream")
+async def generate_resume_stream(request: ResumeGenerateRequest):
+    """流式简历生成：逐阶段输出岗位画像、选材、简历与质量闸门。"""
+
+    def event_gen():
+        try:
+            for event in run_resume_generator_stream(request):
+                yield _sse(event)
+        except ResumeAgentError as exc:
+            yield _sse({"stage": "error", "error": str(exc)})
+        except Exception as exc:  # noqa: BLE001
+            yield _sse({"stage": "error", "error": f"Resume generation failed: {exc}"})
+
+    return StreamingResponse(
+        event_gen(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
+
+
+@router.post("/profile-parse")
+async def parse_resume_profile_endpoint(request: ResumeGenerateRequest):
+    """只解析个人资料，便于生成前预览。"""
+    try:
+        return parse_profile_only(
+            resume_text=request.resume_text,
+            profile_context=request.profile_context,
+            project_context=request.project_context,
+        )
+    except ResumeAgentError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Resume profile parse failed: {exc}") from exc
+
+
+@router.post("/target-profile")
+async def target_profile_endpoint(request: ResumeGenerateRequest):
+    """只生成目标岗位画像，便于确认目标方向。"""
+    try:
+        return build_target_profile_only(
+            resume_text=request.resume_text,
+            target_role=request.target_role,
+            target_role_id=request.target_role_id,
+            target_market=request.target_market,
+            top_k_jobs=request.top_k_jobs,
+        )
+    except ResumeAgentError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Target profile generation failed: {exc}") from exc
 
 
 @router.post("/polish", response_model=ResumePolishResponse)
@@ -222,3 +292,6 @@ async def extract_pdf(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"PDF extraction failed: {exc}") from exc
 
     return PdfExtractResponse(success=True, resume_text=text, char_count=len(text))
+
+
+
