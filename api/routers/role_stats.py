@@ -28,6 +28,20 @@ _classify_last_at: Optional[str] = None  # 最近一次分类完成时间
 _classify_thread: Optional[threading.Thread] = None
 
 
+def _empty_soft_skills() -> dict[str, list[str]]:
+    return {"education": [], "language": [], "soft_skill": []}
+
+
+def _normalize_soft_skills(value) -> dict[str, list[str]]:
+    if isinstance(value, dict):
+        return {
+            "education": [str(x).strip() for x in value.get("education", []) if str(x).strip()],
+            "language": [str(x).strip() for x in value.get("language", []) if str(x).strip()],
+            "soft_skill": [str(x).strip() for x in value.get("soft_skill", []) if str(x).strip()],
+        }
+    return _empty_soft_skills()
+
+
 def _get_classifier() -> RoleClassifier:
     return RoleClassifier()
 
@@ -53,6 +67,7 @@ def _role_from_cache_or_rules(classifier: RoleClassifier, row) -> RoleResult:
                 role_id=role_id,
                 role_name=ROLE_DEFS.get(role_id, {}).get("name", "其他"),
                 confidence=entry.get("confidence", "low"),
+                soft_skills=_normalize_soft_skills(entry.get("soft_skills")),
             )
 
     for text in (
@@ -71,6 +86,7 @@ def _role_from_cache_or_rules(classifier: RoleClassifier, row) -> RoleResult:
                 role_id=role_id,
                 role_name=ROLE_DEFS.get(role_id, {}).get("name", "其他"),
                 confidence=cached.get("confidence", "low"),
+                soft_skills=_normalize_soft_skills(cached.get("soft_skills")),
             )
 
     text = _safe_role_text(row)
@@ -323,6 +339,7 @@ def _run_classify_in_background(req: RunClassificationRequest):
                 "salary_min": _safe_float(job.get("salary_min")),
                 "salary_max": _safe_float(job.get("salary_max")),
                 "skills": [], "is_insurance_sales": False, "insurance_score": 0,
+                "soft_skills": _empty_soft_skills(),
                 "llm_is_insurance": False, "llm_confidence": "", "llm_explanation": "",
             }
 
@@ -338,6 +355,7 @@ def _run_classify_in_background(req: RunClassificationRequest):
                     role_id=cached.get("role_id", "other"),
                     role_name=cached.get("role_name", "其他"),
                     confidence=cached.get("confidence", "low"),
+                    soft_skills=_normalize_soft_skills(cached.get("soft_skills")),
                 )
                 from_cache = True
             else:
@@ -357,6 +375,7 @@ def _run_classify_in_background(req: RunClassificationRequest):
                     "role_id": cls_result.role_id,
                     "role_name": cls_result.role_name,
                     "confidence": cls_result.confidence,
+                    "soft_skills": cls_result.soft_skills,
                 }
                 classifier._save_cache()
 
@@ -387,6 +406,7 @@ def _run_classify_in_background(req: RunClassificationRequest):
             "salary_min": _safe_float(job.get("salary_min")),
             "salary_max": _safe_float(job.get("salary_max")),
             "skills": flat_skills,
+            "soft_skills": cls_result.soft_skills,
             "is_insurance_sales": is_ins,
             "insurance_score": ins_score,
             "llm_is_insurance": _safe_bool(job.get("llm_is_insurance")),
@@ -408,18 +428,18 @@ def _run_classify_in_background(req: RunClassificationRequest):
                     "job_id": _safe_str(jobs[idx].get("job_id")),
                     "role_id": "other", "role_name": "其他", "role_confidence": "low",
                     "salary_min": 0.0, "salary_max": 0.0, "skills": [],
+                    "soft_skills": _empty_soft_skills(),
                 }
             done_count = len(results_map)
-            pct = round(done_count / total * 100, 0)
+            pct = 8 + round(done_count / total * 82, 0)
             _classify_progress = {
                 "running": True, "progress": int(pct), "total": total,
                 "done": done_count,
-                "message": f"正在分類... {done_count}/{total} ({int(pct)}%)",
+                "message": f"正在分類... {done_count}/{total}",
                 "llm_mode": llm_mode,
             }
 
     results = [results_map[i] for i in range(total) if i in results_map]
-    elapsed = (time.time() - start) * 1000
 
     # Save cache
     for job in jobs:
@@ -431,12 +451,39 @@ def _run_classify_in_background(req: RunClassificationRequest):
     now_ts = datetime.now(timezone.utc).isoformat()
     _classify_result = results
     _classify_last_at = now_ts
+
+    analysis_completed = False
+    _classify_progress = {
+        "running": True, "progress": 90, "total": total, "done": total,
+        "message": "正在生成技術趨勢分析...",
+        "llm_mode": llm_mode,
+    }
+    try:
+        from api.routers.stats import _generate_salary_analysis, _generate_trend_analysis
+
+        _generate_trend_analysis(df)
+        _classify_progress = {
+            "running": True, "progress": 95, "total": total, "done": total,
+            "message": "正在生成薪資分析...",
+            "llm_mode": llm_mode,
+        }
+        _generate_salary_analysis(df)
+        analysis_completed = True
+    except Exception as e:
+        logger.warning("Post-classification analysis failed: %s", e)
+
+    elapsed = (time.time() - start) * 1000
     _classify_progress = {
         "running": False, "progress": 100, "total": total, "done": total,
-        "message": f"分類完成：{classified_count[0]}/{total} ({ 'LLM' if llm_mode else '規則' } 模式)",
+        "message": (
+            f"全部分析完成：{classified_count[0]}/{total} ({ 'LLM' if llm_mode else '規則' } 模式)"
+            if analysis_completed
+            else f"分類完成：{classified_count[0]}/{total} ({ 'LLM' if llm_mode else '規則' } 模式)，趨勢/薪資分析可稍後重試"
+        ),
         "llm_mode": llm_mode,
         "duration_ms": round(elapsed, 0),
         "classified": classified_count[0],
+        "analysis_completed": analysis_completed,
     }
     _classify_thread = None
     logger.info("Classify-bg done: %d/%d in %.1fs", classified_count[0], total, elapsed / 1000)

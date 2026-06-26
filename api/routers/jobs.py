@@ -6,6 +6,7 @@ import math
 from pathlib import Path
 from datetime import datetime
 import ast
+import json
 
 router = APIRouter(prefix="/api/jobs", tags=["jobs"])
 
@@ -46,6 +47,42 @@ def _safe_list(row, field: str) -> list[str]:
         except (ValueError, SyntaxError):
             return [part.strip() for part in text.split(";") if part.strip()]
     return []
+
+
+def _empty_soft_skills() -> dict[str, list[str]]:
+    return {"education": [], "language": [], "soft_skill": []}
+
+
+def _normalize_soft_skills(value) -> dict[str, list[str]]:
+    if not isinstance(value, dict):
+        return _empty_soft_skills()
+    return {
+        "education": [str(x).strip() for x in value.get("education", []) if str(x).strip()],
+        "language": [str(x).strip() for x in value.get("language", []) if str(x).strip()],
+        "soft_skill": [str(x).strip() for x in value.get("soft_skill", []) if str(x).strip()],
+    }
+
+
+def _soft_skills_by_job_id() -> dict[str, dict[str, list[str]]]:
+    try:
+        from src.analyzer.role_classifier import CACHE_PATH
+        if not CACHE_PATH.exists():
+            return {}
+        with open(CACHE_PATH, "r", encoding="utf-8") as f:
+            cache_data = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+    result: dict[str, dict[str, list[str]]] = {}
+    if not isinstance(cache_data, dict):
+        return result
+    for entry in cache_data.values():
+        if not isinstance(entry, dict):
+            continue
+        job_id = str(entry.get("_job_id") or "").strip()
+        if job_id:
+            result[job_id] = _normalize_soft_skills(entry.get("soft_skills"))
+    return result
 
 
 @router.get("")
@@ -94,6 +131,7 @@ def list_jobs(
         classified_industries = classified_industry_map()
     except Exception:
         classified_industries = {}
+    soft_skills_by_job = _soft_skills_by_job_id()
 
     items = []
     for _, row in df_page.iterrows():
@@ -130,6 +168,7 @@ def list_jobs(
             "education_required": _safe_str(row, "education_required"),
             "languages_required": _safe_list(row, "languages_required"),
             "tech_stack": _safe_list(row, "tech_stack"),
+            "soft_skills": soft_skills_by_job.get(job_id, _empty_soft_skills()),
             "job_type": _safe_str(row, "job_type"),
             "import_time": import_time,
         })

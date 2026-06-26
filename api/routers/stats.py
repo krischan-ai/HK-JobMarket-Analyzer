@@ -404,12 +404,36 @@ def location_distribution():
 
 
 _trend_analysis_cache: dict[str, Any] = {}
-_TREND_ANALYSIS_CONTEXT_VERSION = "v8"
+_TREND_ANALYSIS_CONTEXT_VERSION = "v9"
 _salary_analysis_cache: dict[str, Any] = {}
-_SALARY_ANALYSIS_CONTEXT_VERSION = "v3"
+_SALARY_ANALYSIS_CONTEXT_VERSION = "v4"
 _INDUSTRY_DISTRIBUTION_VERSION = "v3"
-_SOFT_SKILL_DISTRIBUTION_VERSION = "v1"
+_SOFT_SKILL_DISTRIBUTION_VERSION = "v2"
 _ANALYSIS_CACHE_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "cache" / "ai_analysis_cache.json"
+
+
+def _jobs_csv_stamp() -> float:
+    csv_path = Path(__file__).resolve().parent.parent.parent / "data" / "cleaned" / "jobs.csv"
+    return csv_path.stat().st_mtime if csv_path.exists() else 0
+
+
+def _role_cache_stamp_and_count() -> tuple[float, int]:
+    try:
+        from src.analyzer.role_classifier import CACHE_PATH
+        stamp = CACHE_PATH.stat().st_mtime if CACHE_PATH.exists() else 0
+        if not CACHE_PATH.exists():
+            return stamp, 0
+        with open(CACHE_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        count = len(data) if isinstance(data, dict) else 0
+        return stamp, count
+    except (OSError, json.JSONDecodeError):
+        return 0, 0
+
+
+def _analysis_signature(version: str, df: pd.DataFrame) -> str:
+    role_stamp, role_count = _role_cache_stamp_and_count()
+    return f"{version}:{_jobs_csv_stamp()}:{len(df)}:{role_stamp}:{role_count}"
 
 
 def _load_analysis_cache() -> dict[str, Any]:
@@ -695,122 +719,52 @@ def _collect_llm_industry_distribution(df: pd.DataFrame, top_n: int = 10, use_ll
 
 
 def _soft_skill_cache_signature(df: pd.DataFrame) -> str:
-    csv_path = Path(__file__).resolve().parent.parent.parent / "data" / "cleaned" / "jobs.csv"
-    stamp = csv_path.stat().st_mtime if csv_path.exists() else 0
-    return f"{_SOFT_SKILL_DISTRIBUTION_VERSION}:{stamp}:{len(df)}"
+    role_stamp, role_count = _role_cache_stamp_and_count()
+    return f"{_SOFT_SKILL_DISTRIBUTION_VERSION}:{role_stamp}:{role_count}:{len(df)}"
 
 
-def _job_soft_skill_record(row: pd.Series, idx: int) -> dict[str, Any]:
-    jd = _safe_text(row.get("kb_document_text")) or _safe_text(row.get("jd_text")) or _safe_text(row.get("jd_raw"))
-    return {
-        "idx": idx,
-        "title": _safe_text(row.get("title"))[:120],
-        "jd_excerpt": jd[:600],
-    }
-
-
-def _call_llm_for_soft_skill_batch(records: list[dict[str, Any]]) -> dict[int, dict[str, list[str]]]:
-    manager = LLMConfigManager()
-    if not manager.configured:
-        raise HTTPException(status_code=400, detail="LLM 未配置，无法生成软技能分析")
-    kwargs = manager.build_kwargs()
-    prompt = (
-        "你是香港 IT 招聘市場軟技能分析師。請閱讀下面每條崗位的標題和 JD 文本，"
-        "理解後提取該崗位提到的軟技能要求，嚴格分為三類：\n"
-        "1. education: 學歷要求（例如 學士學位、碩士優先、計算機相關學歷、大專或以上 等）\n"
-        "2. language: 語言要求（例如 英語、粵語、普通話、中文 等）\n"
-        "3. soft_skill: 個人能力（例如 溝通能力、團隊合作、組織能力、領導力、問題解決、抗壓能力、跨團隊協作 等）\n"
-        "規則：\n"
-        "- 必須基於 JD 實際內容理解後提取，不要憑空編造。\n"
-        "- 學歷統一用中文表達，歸併同義寫法（如 Bachelor's degree / 学士学位 都寫成「學士學位」）。\n"
-        "- 語言統一用中文，歸併同義寫法（如 English / 英语 都寫成「英語」，Cantonese 寫成「粵語」，Mandarin 寫成「普通話」，Chinese 寫成「中文」）。\n"
-        "- 個人能力統一用中文，歸併同義寫法（如 communication → 溝通能力，teamwork → 團隊合作，organizational skills → 組織能力，problem-solving → 問題解決）。\n"
-        "- 每條崗位的三類各輸出若干項，JD 中沒有明確提到的輸出空數組。\n"
-        "請輸出 JSON 對象，格式嚴格為："
-        "{\"items\":[{\"idx\":0,\"education\":[\"學士學位\"],\"language\":[\"英語\",\"粵語\"],\"soft_skill\":[\"溝通能力\",\"團隊合作\"]}]}。\n"
-        f"崗位數據：{json.dumps(records, ensure_ascii=False)}"
-    )
-    payload = {
-        "model": kwargs["model"],
-        "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0,
-        "max_tokens": 3072,
-        "response_format": {"type": "json_object"},
-    }
-    headers = {"Authorization": f"Bearer {kwargs['api_key']}", "Content-Type": "application/json"}
-    resp = requests.post(
-        f"{kwargs['api_base'].rstrip('/')}/chat/completions",
-        headers=headers,
-        json=payload,
-        timeout=min(max(int(kwargs.get("timeout", 30) or 30), 30), 90),
-        proxies={"http": None, "https": None},
-    )
-    resp.raise_for_status()
-    message = resp.json()["choices"][0]["message"]
-    content = (message.get("content") or message.get("reasoning_content") or "").strip()
-    if content.startswith("```"):
-        content = content.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
-    start_obj = content.find("{")
-    end_obj = content.rfind("}")
-    if start_obj >= 0 and end_obj > start_obj:
-        content = content[start_obj:end_obj + 1]
-    parsed = json.loads(content)
-    items = parsed.get("items", []) if isinstance(parsed, dict) else []
-    result: dict[int, dict[str, list[str]]] = {}
-    for item in items:
-        if not isinstance(item, dict):
-            continue
-        try:
-            idx = int(item.get("idx"))
-        except (TypeError, ValueError):
-            continue
-        result[idx] = {
-            "education": [str(x) for x in (item.get("education") or []) if str(x).strip()],
-            "language": [str(x) for x in (item.get("language") or []) if str(x).strip()],
-            "soft_skill": [str(x) for x in (item.get("soft_skill") or []) if str(x).strip()],
-        }
-    return result
-
-
-def _collect_llm_soft_skill_distribution(df: pd.DataFrame, use_llm: bool = True) -> list[dict[str, Any]]:
-    """讓 LLM 閱讀全庫 JD 後提取學歷、語言、個人能力三類軟技能並聚計排名。
-
-    與規則匹配不同，這裡由大模型理解 JD 語義後歸併同義表達並輸出標準化中文標籤。
-    """
-    if df.empty:
+def _aggregate_soft_skills_from_cache(df: pd.DataFrame | None = None) -> list[dict[str, Any]]:
+    if df is not None and df.empty:
         return []
-    signature = _soft_skill_cache_signature(df)
+    signature = _soft_skill_cache_signature(df if df is not None else load_jobs_df())
     cached = _get_disk_cached_analysis("soft_skill_distribution", signature)
     if cached and isinstance(cached.get("items"), list):
         return cached["items"]
 
-    records = [_job_soft_skill_record(row, idx) for idx, (_, row) in enumerate(df.iterrows())]
-    assigned: dict[int, dict[str, list[str]]] = {}
-    llm_used = False
-    if use_llm:
-        batch_size = 20
-        for start in range(0, len(records), batch_size):
-            batch = records[start:start + batch_size]
-            try:
-                assigned.update(_call_llm_for_soft_skill_batch(batch))
-                llm_used = True
-            except Exception:
-                pass
-
     edu_counter: Counter[str] = Counter()
     lang_counter: Counter[str] = Counter()
     skill_counter: Counter[str] = Counter()
-    for record in records:
-        idx = int(record["idx"])
-        extracted = assigned.get(idx)
-        if not extracted:
+
+    try:
+        from src.analyzer.role_classifier import CACHE_PATH
+        if not CACHE_PATH.exists():
+            return []
+        with open(CACHE_PATH, "r", encoding="utf-8") as f:
+            cache_data = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return []
+
+    if not isinstance(cache_data, dict):
+        return []
+
+    for entry in cache_data.values():
+        if not isinstance(entry, dict):
             continue
-        for item in extracted.get("education", []):
-            edu_counter[item] += 1
-        for item in extracted.get("language", []):
-            lang_counter[item] += 1
-        for item in extracted.get("soft_skill", []):
-            skill_counter[item] += 1
+        soft_skills = entry.get("soft_skills")
+        if not isinstance(soft_skills, dict):
+            continue
+        for item in soft_skills.get("education", []):
+            text = _safe_text(item)
+            if text:
+                edu_counter[text] += 1
+        for item in soft_skills.get("language", []):
+            text = _safe_text(item)
+            if text:
+                lang_counter[text] += 1
+        for item in soft_skills.get("soft_skill", []):
+            text = _safe_text(item)
+            if text:
+                skill_counter[text] += 1
 
     items: list[dict[str, Any]] = []
     for name, count in skill_counter.most_common(10):
@@ -821,7 +775,7 @@ def _collect_llm_soft_skill_distribution(df: pd.DataFrame, use_llm: bool = True)
         items.append({"name": name, "category": "language", "count": count})
 
     cache = _load_analysis_cache()
-    cache["soft_skill_distribution"] = {"signature": signature, "data": {"llm_used": llm_used, "items": items}}
+    cache["soft_skill_distribution"] = {"signature": signature, "data": {"llm_used": False, "items": items}}
     _save_analysis_cache(cache)
     return items
 
@@ -857,7 +811,7 @@ def _build_trend_context(df: pd.DataFrame, use_llm: bool = True) -> dict[str, An
         "skill_category_distribution": category_distribution(),
         "responsibility_distribution": _collect_responsibility_stats(df),
         "industry_distribution": _collect_llm_industry_distribution(df, top_n=10, use_llm=use_llm),
-        "soft_skill_demand": _collect_llm_soft_skill_distribution(df, use_llm=use_llm),
+        "soft_skill_demand": _aggregate_soft_skills_from_cache(df),
         "company_distribution": _counter_from_column(df, "company", top_n=10),
         "location_distribution": [
             {"name": name, "count": count}
@@ -1064,8 +1018,7 @@ def tech_trend_analysis(refresh: bool = Query(default=False)):
     if df.empty:
         return {"llm_used": False, "sections": [], "context": {"total_jobs": 0}}
 
-    csv_path = Path(__file__).resolve().parent.parent.parent / "data" / "cleaned" / "jobs.csv"
-    signature = f"{_TREND_ANALYSIS_CONTEXT_VERSION}:{csv_path.stat().st_mtime if csv_path.exists() else 0}:{len(df)}"
+    signature = _analysis_signature(_TREND_ANALYSIS_CONTEXT_VERSION, df)
     if not refresh and _trend_analysis_cache.get("signature") == signature:
         data = dict(_trend_analysis_cache["data"])
         data["from_cache"] = True
@@ -1107,6 +1060,27 @@ def tech_trend_analysis(refresh: bool = Query(default=False)):
             "context": context,
         }
 
+    _trend_analysis_cache["signature"] = signature
+    _trend_analysis_cache["data"] = result
+    _set_disk_cached_analysis("tech_trend", signature, result)
+    return result
+
+
+def _generate_trend_analysis(df: pd.DataFrame) -> dict[str, Any]:
+    signature = _analysis_signature(_TREND_ANALYSIS_CONTEXT_VERSION, df)
+    context = _build_trend_context(df, use_llm=True)
+    try:
+        sections = _call_llm_for_trend_analysis(context)
+        result = {"llm_used": True, "from_cache": False, "analysis_status": "completed", "sections": sections, "context": context}
+    except Exception as exc:
+        result = {
+            "llm_used": False,
+            "from_cache": False,
+            "analysis_status": "fallback",
+            "warning": f"LLM 趋势总结失败，已返回本地知识库兜底摘要：{exc}",
+            "sections": _fallback_trend_sections(context),
+            "context": context,
+        }
     _trend_analysis_cache["signature"] = signature
     _trend_analysis_cache["data"] = result
     _set_disk_cached_analysis("tech_trend", signature, result)
@@ -1271,8 +1245,7 @@ def salary_analysis(refresh: bool = Query(default=False)):
     if df.empty:
         return {"llm_used": False, "sections": [], "context": {"total_jobs": 0}}
 
-    csv_path = Path(__file__).resolve().parent.parent.parent / "data" / "cleaned" / "jobs.csv"
-    signature = f"{_SALARY_ANALYSIS_CONTEXT_VERSION}:{csv_path.stat().st_mtime if csv_path.exists() else 0}:{len(df)}"
+    signature = _analysis_signature(_SALARY_ANALYSIS_CONTEXT_VERSION, df)
     if not refresh and _salary_analysis_cache.get("signature") == signature:
         data = dict(_salary_analysis_cache["data"])
         data["from_cache"] = True
@@ -1312,6 +1285,35 @@ def salary_analysis(refresh: bool = Query(default=False)):
         result = {"llm_used": True, "from_cache": False, "analysis_status": "completed", "sections": sections, "context": context}
     except HTTPException:
         raise
+    except Exception as exc:
+        result = {
+            "llm_used": False,
+            "from_cache": False,
+            "analysis_status": "fallback",
+            "warning": f"LLM 薪资总结失败，已返回本地知识库兜底摘要：{exc}",
+            "sections": _fallback_salary_sections(context),
+            "context": context,
+        }
+    _salary_analysis_cache["signature"] = signature
+    _salary_analysis_cache["data"] = result
+    _set_disk_cached_analysis("salary", signature, result)
+    return result
+
+
+def _generate_salary_analysis(df: pd.DataFrame) -> dict[str, Any]:
+    signature = _analysis_signature(_SALARY_ANALYSIS_CONTEXT_VERSION, df)
+    context = _build_salary_context(df, use_llm=True)
+    prompt = (
+        "你是香港 IT 招聘市场薪资分析师。请只基于下面的薪资知识库统计，"
+        "用中文输出合法 JSON 对象，顶层字段为 sections。sections 必须包含四个对象："
+        "薪资总体分析、地区薪资分析、角色薪资分析、高薪岗位分析。"
+        "每个对象字段为 key、title、summary、evidence。summary 写 2-4 句，"
+        "必须提到 HKD/月，避免空泛，指出样本数或异常值风险。高薪岗位分析必须说明高薪岗位集中在什么行业、什么岗位方向、主要从事什么工作、用了什么技术栈、位于什么地域，并总结对就业市场的意义和求职者建议。\n\n"
+        f"薪资知识库上下文：\n{json.dumps(context, ensure_ascii=False)[:7000]}"
+    )
+    try:
+        sections = _call_llm_sections(prompt)
+        result = {"llm_used": True, "from_cache": False, "analysis_status": "completed", "sections": sections, "context": context}
     except Exception as exc:
         result = {
             "llm_used": False,

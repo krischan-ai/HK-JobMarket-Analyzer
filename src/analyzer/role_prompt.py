@@ -130,6 +130,10 @@ Return ONLY valid JSON with these fields:
 - "role_id": one of: frontend, backend, fullstack, mobile, data_scientist, ml_engineer, data_engineer, devops, qa, security, solution_architect, engineering_manager, it_analyst, product, design, blockchain, ai_prompt_engineer, ai_model_training, ai_agent_dev, ai_application, data_science, other
 - "role_name": Chinese name for the role
 - "confidence": "high", "medium", or "low"
+- "soft_skills": object with three arrays:
+  - "education": education requirements in normalized Chinese labels
+  - "language": language requirements in normalized Chinese labels
+  - "soft_skill": personal capability requirements in normalized Chinese labels
 
 Role reference (distinguish carefully):
 frontend=前端开发, backend=后端开发, fullstack=全栈开发, mobile=移动开发,
@@ -155,6 +159,16 @@ IMPORTANT distinctions:
 - Manager roles (Engineering Manager/Tech Lead/Team Lead) → engineering_manager
 - Analyst roles (System Analyst/Business Analyst) → it_analyst
 - Senior/Lead/Head titles: classify by technical domain, NOT as engineering_manager
+
+Soft skill extraction rules:
+- Only extract requirements explicitly present in the JD. Do not invent labels.
+- Normalize education labels in Chinese, e.g. Bachelor's degree / bachelor / degree → "學士學位"; master preferred → "碩士優先"; computer science related degree → "計算機相關學歷".
+- Normalize language labels in Chinese, e.g. English → "英語"; Cantonese → "粵語"; Mandarin / Putonghua → "普通話"; Chinese → "中文".
+- Normalize personal capabilities in Chinese, e.g. communication → "溝通能力"; teamwork → "團隊合作"; organizational skills → "組織能力"; problem-solving → "問題解決"; leadership → "領導力"; work under pressure → "抗壓能力"; cross-functional collaboration → "跨團隊協作".
+- If a category is not mentioned, return an empty array for that category.
+
+Example output:
+{"role_id":"frontend","role_name":"前端开发","confidence":"high","soft_skills":{"education":["學士學位"],"language":["英語","粵語"],"soft_skill":["溝通能力","團隊合作"]}}
 
 Job description:
 """ + jd_text[:3000]

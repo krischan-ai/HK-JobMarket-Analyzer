@@ -29,6 +29,18 @@
       </el-tag>
       <span v-if="skillList.length > 4" class="job-card__skill-more">+{{ skillList.length - 4 }}</span>
     </div>
+    <div v-if="softSkillList.length" class="job-card__skills job-card__skills--soft">
+      <el-tag
+        v-for="tag in softSkillList.slice(0, 4)"
+        :key="tag.category + tag.name"
+        size="small"
+        :type="softSkillTagType(tag.category)"
+        effect="plain"
+      >
+        {{ tag.name }}
+      </el-tag>
+      <span v-if="softSkillList.length > 4" class="job-card__skill-more">+{{ softSkillList.length - 4 }}</span>
+    </div>
     <div class="job-card__footer">
       <span class="job-card__source">{{ job.source }}</span>
       <span class="job-card__footer-right">
@@ -81,8 +93,24 @@ const skillList = computed(() => {
   return list
 })
 
+const softSkillList = computed(() => {
+  const softSkills = props.job.soft_skills
+  if (!softSkills) return []
+  return [
+    ...softSkills.education.map((name) => ({ name, category: 'education' })),
+    ...softSkills.language.map((name) => ({ name, category: 'language' })),
+    ...softSkills.soft_skill.map((name) => ({ name, category: 'soft_skill' })),
+  ].filter((item) => item.name)
+})
+
 function skillTagType(cat: string): '' | 'success' | 'warning' | 'danger' | 'info' {
   return (skillTagColors[cat] || 'info') as '' | 'success' | 'warning' | 'danger' | 'info'
+}
+
+function softSkillTagType(cat: string): '' | 'success' | 'warning' | 'danger' | 'info' {
+  if (cat === 'education') return 'danger'
+  if (cat === 'language') return 'warning'
+  return 'info'
 }
 
 function formatSalary(min?: number, max?: number): string {
@@ -152,6 +180,9 @@ function formatSalary(min?: number, max?: number): string {
   flex-wrap: wrap;
   gap: 4px;
   align-items: center;
+}
+.job-card__skills--soft {
+  margin-top: 5px;
 }
 .job-card__skill-more {
   font-size: 11px;

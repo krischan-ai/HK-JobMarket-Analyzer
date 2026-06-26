@@ -101,6 +101,25 @@
         </div>
       </div>
 
+      <!-- 软技能要求 -->
+      <div v-if="softSkillGroups.length" class="detail-section">
+        <h4 class="detail-section__title">軟技能要求</h4>
+        <div v-for="group in softSkillGroups" :key="group.category" class="detail-skill-group">
+          <span class="detail-skill-group__label">{{ group.label }}</span>
+          <div class="detail-skill-group__tags">
+            <el-tag
+              v-for="sk in group.skills"
+              :key="group.category + sk"
+              size="small"
+              :type="softSkillTagType(group.category)"
+              effect="plain"
+            >
+              {{ sk }}
+            </el-tag>
+          </div>
+        </div>
+      </div>
+
       <!-- JD 正文 -->
       <div class="detail-section">
         <h4 class="detail-section__title">職位描述</h4>
@@ -289,6 +308,16 @@ const groupedSkills = computed(() => {
     }))
 })
 
+const softSkillGroups = computed(() => {
+  const softSkills = props.job?.soft_skills
+  if (!softSkills) return []
+  return [
+    { category: 'education', label: '學歷要求', skills: softSkills.education ?? [] },
+    { category: 'language', label: '語言要求', skills: softSkills.language ?? [] },
+    { category: 'soft_skill', label: '個人能力', skills: softSkills.soft_skill ?? [] },
+  ].filter((group) => group.skills.length > 0)
+})
+
 const techStackList = computed(() => {
   return props.job?.tech_stack ?? []
 })
@@ -342,6 +371,12 @@ const jobTags = computed<{ label: string; type: '' | 'success' | 'warning' | 'da
 
 function skillTagType(cat: string): '' | 'success' | 'warning' | 'danger' | 'info' {
   return categoryColors[cat] || 'info'
+}
+
+function softSkillTagType(cat: string): '' | 'success' | 'warning' | 'danger' | 'info' {
+  if (cat === 'education') return 'danger'
+  if (cat === 'language') return 'warning'
+  return 'info'
 }
 
 function formatSalary(min?: number, max?: number): string {

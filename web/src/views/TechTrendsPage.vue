@@ -7,9 +7,6 @@
       </div>
       <div class="header-actions">
         <el-tag :type="analysisStatus.type">{{ analysisStatus.text }}</el-tag>
-        <el-button :loading="statsStore.techTrendLoading" type="primary" @click="refreshAnalysis">
-          重新生成分析
-        </el-button>
       </div>
     </div>
 
@@ -134,7 +131,7 @@
       />
 
       <div v-if="statsStore.techTrendLoading" class="loading-state">
-        <el-alert title="AI 正在调用岗位知识库并生成分析，通常需要几十秒。已有结果会在原始数据不变时走缓存。" type="info" show-icon :closable="false" />
+        <el-alert title="分析会在角色分类完成后自动生成；当前正在读取缓存或生成本地摘要。" type="info" show-icon :closable="false" />
         <el-skeleton :rows="8" animated />
       </div>
       <el-row v-else :gutter="16">
@@ -216,10 +213,6 @@ async function loadAnalysis(refresh: boolean) {
   } catch {
     // 页面内已显示错误提示。
   }
-}
-
-async function refreshAnalysis() {
-  await loadAnalysis(true)
 }
 
 async function handleRunClassification() {

@@ -6,9 +6,6 @@
         <span :key="`header-${analysisRenderKey}`" class="status-pill" :class="`status-pill--${analysisStatusType}`">
           {{ analysisStatusText }}
         </span>
-        <el-button :loading="statsStore.salaryAnalysisLoading" type="primary" @click="refreshAnalysis">
-          重新生成分析
-        </el-button>
       </div>
     </div>
 
@@ -102,7 +99,7 @@
       />
 
       <div v-if="showAnalysisLoading" class="loading-state">
-        <el-alert title="AI 正在调用薪资知识库并生成分析。原始数据不变时后续会直接使用缓存。" type="info" show-icon :closable="false" />
+        <el-alert title="薪资分析会在角色分类完成后自动生成；当前正在读取缓存或生成本地摘要。" type="info" show-icon :closable="false" />
         <el-skeleton :rows="8" animated />
       </div>
       <el-row v-show="!isAnalysisLoading()" :gutter="16">
@@ -194,10 +191,6 @@ async function loadAnalysis(refresh: boolean) {
     syncSalarySections()
     analysisRenderKey.value += 1
   }
-}
-
-async function refreshAnalysis() {
-  await loadAnalysis(true)
 }
 
 const topLocationOption = computed(() => {

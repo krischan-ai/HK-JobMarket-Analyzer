@@ -26,7 +26,14 @@ export interface JobItem {
   education_required?: string
   languages_required?: string[]
   tech_stack?: string[]
+  soft_skills?: SoftSkillTags
   job_type?: string
+}
+
+export interface SoftSkillTags {
+  education: string[]
+  language: string[]
+  soft_skill: string[]
 }
 
 export interface JobListResponse {
@@ -130,6 +137,8 @@ export interface ClassificationResult {
   duration_ms: number
   message: string
 }
+
+export type ClassifiedSoftSkills = SoftSkillTags
 
 export interface TechTrendSection {
   key: string

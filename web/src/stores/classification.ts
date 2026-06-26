@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import api from '@/api'
+import type { SoftSkillTags } from '@/types'
 
 export interface ClassifiedJob {
   job_id: string
@@ -15,6 +16,7 @@ export interface ClassifiedJob {
   salary_min: number
   salary_max: number
   skills: Array<{ name: string; category: string }>
+  soft_skills?: SoftSkillTags
   is_insurance_sales: boolean
   insurance_score: number
   llm_is_insurance: boolean

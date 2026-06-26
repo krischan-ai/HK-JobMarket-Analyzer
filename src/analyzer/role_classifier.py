@@ -23,6 +23,11 @@ class RoleResult:
     role_id: str
     role_name: str
     confidence: str
+    soft_skills: dict[str, list[str]] = field(default_factory=lambda: {
+        "education": [],
+        "language": [],
+        "soft_skill": [],
+    })
 
 
 class RoleClassifier:
@@ -78,6 +83,17 @@ class RoleClassifier:
         text = str(text) if text and str(text) != "nan" else ""
         return hashlib.md5(text[:500].encode("utf-8")).hexdigest()
 
+    @staticmethod
+    def _normalize_soft_skills(value: Any) -> dict[str, list[str]]:
+        result = {"education": [], "language": [], "soft_skill": []}
+        if not isinstance(value, dict):
+            return result
+        for key in result:
+            raw_items = value.get(key, [])
+            if isinstance(raw_items, list):
+                result[key] = [str(item).strip() for item in raw_items if str(item).strip()]
+        return result
+
     def classify(self, jd_text: str) -> RoleResult:
         if not jd_text or not isinstance(jd_text, str):
             return RoleResult(role_id="other", role_name="其他", confidence="low")
@@ -89,6 +105,7 @@ class RoleClassifier:
                 role_id=cached.get("role_id", "other"),
                 role_name=cached.get("role_name", "其他"),
                 confidence=cached.get("confidence", "low"),
+                soft_skills=self._normalize_soft_skills(cached.get("soft_skills")),
             )
 
         if self.available:
@@ -96,7 +113,12 @@ class RoleClassifier:
         else:
             result = self._classify_with_rules(jd_text)
 
-        self._cache[cache_key] = {"role_id": result.role_id, "role_name": result.role_name, "confidence": result.confidence}
+        self._cache[cache_key] = {
+            "role_id": result.role_id,
+            "role_name": result.role_name,
+            "confidence": result.confidence,
+            "soft_skills": result.soft_skills,
+        }
         self._save_cache()
         return result
 
@@ -164,6 +186,7 @@ class RoleClassifier:
                     role_id=role_id,
                     role_name=ROLE_DEFINITIONS.get(role_id, {}).get("name", "其他"),
                     confidence=parsed.get("confidence", "medium"),
+                    soft_skills=self._normalize_soft_skills(parsed.get("soft_skills")),
                 )
             except json.JSONDecodeError:
                 self.logger.warning("LLM non-JSON response at attempt %d, using rules", attempt + 1)
@@ -314,11 +337,13 @@ class RoleClassifier:
                     job["role_id"] = result.role_id
                     job["role_name"] = result.role_name
                     job["role_confidence"] = result.confidence
+                    job["soft_skills"] = result.soft_skills
                 except Exception as e:
                     self.logger.warning("Failed to classify job %s: %s", job.get("job_id", "?"), e)
                     job["role_id"] = "other"
                     job["role_name"] = "其他"
                     job["role_confidence"] = "low"
+                    job["soft_skills"] = {"education": [], "language": [], "soft_skill": []}
                 results.append(job)
             if i + batch_size < len(jobs):
                 self.logger.info("Classified %d/%d jobs", i + batch_size, len(jobs))
