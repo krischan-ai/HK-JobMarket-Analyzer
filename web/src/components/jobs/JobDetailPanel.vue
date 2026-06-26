@@ -101,9 +101,9 @@
         </div>
       </div>
 
-      <!-- 软技能要求 -->
+      <!-- 非技术能力要求 -->
       <div v-if="softSkillGroups.length" class="detail-section">
-        <h4 class="detail-section__title">軟技能要求</h4>
+        <h4 class="detail-section__title">非技術能力要求</h4>
         <div v-for="group in softSkillGroups" :key="group.category" class="detail-skill-group">
           <span class="detail-skill-group__label">{{ group.label }}</span>
           <div class="detail-skill-group__tags">
@@ -315,6 +315,9 @@ const softSkillGroups = computed(() => {
     { category: 'education', label: '學歷要求', skills: softSkills.education ?? [] },
     { category: 'language', label: '語言要求', skills: softSkills.language ?? [] },
     { category: 'soft_skill', label: '個人能力', skills: softSkills.soft_skill ?? [] },
+    { category: 'domain_knowledge', label: '行業知識', skills: softSkills.domain_knowledge ?? [] },
+    { category: 'certification', label: '資格證', skills: softSkills.certification ?? [] },
+    { category: 'business_skill', label: '業務交付', skills: softSkills.business_skill ?? [] },
   ].filter((group) => group.skills.length > 0)
 })
 
@@ -376,6 +379,8 @@ function skillTagType(cat: string): '' | 'success' | 'warning' | 'danger' | 'inf
 function softSkillTagType(cat: string): '' | 'success' | 'warning' | 'danger' | 'info' {
   if (cat === 'education') return 'danger'
   if (cat === 'language') return 'warning'
+  if (cat === 'domain_knowledge') return 'success'
+  if (cat === 'certification') return 'danger'
   return 'info'
 }
 

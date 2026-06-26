@@ -34,6 +34,9 @@ export interface SoftSkillTags {
   education: string[]
   language: string[]
   soft_skill: string[]
+  domain_knowledge?: string[]
+  certification?: string[]
+  business_skill?: string[]
 }
 
 export interface JobListResponse {

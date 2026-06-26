@@ -3,7 +3,7 @@
     <div class="page-header">
       <div>
         <h2>技术趋势分析</h2>
-        <p>技能榜单、角色分类、软技能需求和知识库智能总结。</p>
+        <p>技能榜单、角色分类、非技术能力画像和知识库智能总结。</p>
       </div>
       <div class="header-actions">
         <el-tag :type="analysisStatus.type">{{ analysisStatus.text }}</el-tag>
@@ -243,7 +243,7 @@ function sectionKind(section: { key?: string; title?: string }) {
   if (key.includes('skill_category') || title.includes('技能类别') || title.includes('细分')) return 'tech_category'
   if (key.includes('role_distribution') || title.includes('角色分布')) return 'role_distribution'
   if (key.includes('role') || title.includes('角色分类')) return 'role_classification'
-  if (key.includes('soft_skill') || title.includes('软技能')) return 'soft_skill_demand'
+  if (key.includes('soft_skill') || title.includes('软技能') || title.includes('非技术能力')) return 'soft_skill_demand'
   if (key.includes('responsibility') || title.includes('岗位职责')) return 'responsibility'
   if (key.includes('company') || title.includes('公司') || title.includes('行业')) return 'company_industry'
   if (key.includes('tech_direction') || title.includes('技术方向')) return 'tech_direction'
@@ -277,7 +277,36 @@ function chartItemsForSection(section: TechTrendSection) {
     }))
     .filter(item => item.name && item.count)
   if (kind === 'soft_skill_demand') {
-    const items = contextArray('soft_skill_demand').map(item => ({ name: item.name, count: item.count })).slice(0, 12)
+    const categoryLabels: Record<string, string> = {
+      soft_skill: '个人能力',
+      business_skill: '业务交付',
+      domain_knowledge: '行业知识',
+      language: '语言',
+      education: '学历',
+      certification: '资格证',
+    }
+    const perCategoryLimit: Record<string, number> = {
+      soft_skill: 3,
+      business_skill: 3,
+      domain_knowledge: 3,
+      language: 4,
+      education: 3,
+      certification: 4,
+    }
+    const grouped: Record<string, any[]> = {}
+    for (const item of contextArray('soft_skill_demand')) {
+      const category = String(item.category || 'soft_skill')
+      if (!grouped[category]) grouped[category] = []
+      grouped[category].push(item)
+    }
+    const items = Object.keys(perCategoryLimit).flatMap((category) =>
+      (grouped[category] || [])
+        .slice(0, perCategoryLimit[category])
+        .map(item => ({
+          name: `${categoryLabels[category] || category}｜${item.name}`,
+          count: item.count,
+        })),
+    )
     return items.length ? items : evidenceItems.slice(0, 12)
   }
   if (kind === 'responsibility') {

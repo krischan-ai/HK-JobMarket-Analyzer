@@ -404,11 +404,11 @@ def location_distribution():
 
 
 _trend_analysis_cache: dict[str, Any] = {}
-_TREND_ANALYSIS_CONTEXT_VERSION = "v9"
+_TREND_ANALYSIS_CONTEXT_VERSION = "v10"
 _salary_analysis_cache: dict[str, Any] = {}
 _SALARY_ANALYSIS_CONTEXT_VERSION = "v4"
 _INDUSTRY_DISTRIBUTION_VERSION = "v3"
-_SOFT_SKILL_DISTRIBUTION_VERSION = "v2"
+_SOFT_SKILL_DISTRIBUTION_VERSION = "v4"
 _ANALYSIS_CACHE_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "cache" / "ai_analysis_cache.json"
 
 
@@ -723,56 +723,239 @@ def _soft_skill_cache_signature(df: pd.DataFrame) -> str:
     return f"{_SOFT_SKILL_DISTRIBUTION_VERSION}:{role_stamp}:{role_count}:{len(df)}"
 
 
-def _aggregate_soft_skills_from_cache(df: pd.DataFrame | None = None) -> list[dict[str, Any]]:
-    if df is not None and df.empty:
+_NON_TECH_CATEGORY_LIMITS = {
+    "soft_skill": 10,
+    "business_skill": 8,
+    "domain_knowledge": 8,
+    "language": 6,
+    "education": 6,
+    "certification": 8,
+}
+
+_LANGUAGE_LABELS = {
+    "english": "英語",
+    "eng": "英語",
+    "英語": "英語",
+    "英语": "英語",
+    "cantonese": "粵語",
+    "canto": "粵語",
+    "粵語": "粵語",
+    "粤语": "粵語",
+    "廣東話": "粵語",
+    "广东话": "粵語",
+    "mandarin": "普通話",
+    "putonghua": "普通話",
+    "普通話": "普通話",
+    "普通话": "普通話",
+    "chinese": "中文",
+    "中文": "中文",
+}
+
+
+def _canonical_non_tech_label(value: Any, category: str) -> str:
+    text = _safe_text(value)
+    if not text:
+        return ""
+    lower = text.lower().replace("_", " ").replace("-", " ").replace(".", " ")
+
+    if category == "language":
+        compact = lower.strip()
+        return _LANGUAGE_LABELS.get(compact, _LANGUAGE_LABELS.get(text.strip(), text))
+
+    if category == "education":
+        if any(k in lower for k in ["master", "msc", "硕士", "碩士"]):
+            return "碩士學位"
+        if any(k in lower for k in ["phd", "doctor", "博士"]):
+            return "博士學位"
+        if any(k in lower for k in ["diploma", "associate", "大專", "副學士", "文憑"]):
+            return "大專/文憑"
+        if any(k in lower for k in ["computer", "information technology", "資訊科技", "计算机", "計算機", "cs"]):
+            return "計算機相關學歷"
+        if any(k in lower for k in ["bachelor", "degree", "学士", "學士", "本科"]):
+            return "學士學位"
+
+    if category == "soft_skill":
+        synonym_groups = [
+            ("團隊協作", ["teamwork", "team work", "collaboration", "collaborative", "cross functional", "cross team", "團隊合作", "团队合作", "跨團隊協作", "跨团队协作", "協作", "协作"]),
+            ("溝通能力", ["communication", "communicate", "interpersonal", "presentation", "溝通", "沟通", "表達", "表达"]),
+            ("問題解決", ["problem solving", "problem solving", "troubleshoot", "analytical", "analysis", "問題解決", "问题解决", "分析能力"]),
+            ("領導力", ["leadership", "leading", "leader", "mentoring", "領導", "领导", "帶領", "带领"]),
+            ("組織能力", ["organizational", "organisation", "organization", "time management", "multi task", "組織", "组织", "時間管理", "时间管理"]),
+            ("抗壓能力", ["work under pressure", "pressure", "抗壓", "抗压"]),
+            ("責任感", ["responsible", "ownership", "accountability", "責任", "责任"]),
+            ("主動性", ["proactive", "self motivated", "initiative", "積極主動", "积极主动", "主動"]),
+            ("注重細節", ["detail oriented", "attention to detail", "細節", "细节"]),
+        ]
+        for label, keywords in synonym_groups:
+            if any(k in lower or k in text for k in keywords):
+                return label
+
+    if category == "business_skill":
+        synonym_groups = [
+            ("需求分析", ["requirement", "business analysis", "user story", "需求分析", "需求收集", "需求梳理"]),
+            ("持份者管理", ["stakeholder", "持份者", "利益相關", "利益相关"]),
+            ("項目管理", ["project management", "pmp", "scrum master", "項目管理", "项目管理", "專案管理"]),
+            ("文檔撰寫", ["documentation", "document", "write", "report", "文檔", "文档", "報告", "报告"]),
+            ("匯報/演示", ["presentation", "present", "demo", "匯報", "汇报", "演示"]),
+            ("供應商管理", ["vendor", "supplier", "供應商", "供应商"]),
+            ("客戶溝通", ["client facing", "customer", "客戶", "客户"]),
+            ("合規報告", ["compliance reporting", "audit report", "合規報告", "合规报告"]),
+        ]
+        for label, keywords in synonym_groups:
+            if any(k in lower or k in text for k in keywords):
+                return label
+
+    if category == "domain_knowledge":
+        synonym_groups = [
+            ("金融/金融科技知識", ["finance", "fintech", "bank", "banking", "payment", "payments", "trading", "金融", "银行", "銀行", "支付", "交易"]),
+            ("保險/財富管理知識", ["insurance", "wealth", "asset management", "保險", "保险", "財富管理", "财富管理", "資產管理", "资产管理"]),
+            ("風險合規知識", ["risk", "compliance", "regulatory", "audit", "aml", "kyc", "風險", "风险", "合規", "合规", "監管", "监管", "審計", "审计"]),
+            ("電商/零售業務知識", ["ecommerce", "e commerce", "retail", "電商", "电商", "零售"]),
+            ("物流/供應鏈知識", ["logistics", "supply chain", "物流", "供應鏈", "供应链"]),
+            ("醫療健康行業知識", ["healthcare", "medical", "hospital", "醫療", "医疗", "健康"]),
+            ("政府/公共服務知識", ["government", "public sector", "政府", "公共"]),
+            ("Web3/區塊鏈業務知識", ["web3", "blockchain", "crypto", "區塊鏈", "区块链", "加密貨幣", "加密货币"]),
+        ]
+        for label, keywords in synonym_groups:
+            if any(k in lower or k in text for k in keywords):
+                return label
+
+    if category == "certification":
+        upper = text.upper()
+        certs = ["PMP", "SCRUM MASTER", "CSM", "CFA", "FRM", "CPA", "SFC", "HKMA", "CISSP", "CISA", "CISM", "ITIL", "PRINCE2"]
+        for cert in certs:
+            if cert in upper:
+                return cert
+
+    return text
+
+
+def _iter_listish(value: Any) -> list[str]:
+    if isinstance(value, list):
+        return [_safe_text(item) for item in value if _safe_text(item)]
+    text = _safe_text(value)
+    if not text or text == "[]":
         return []
-    signature = _soft_skill_cache_signature(df if df is not None else load_jobs_df())
+    try:
+        parsed = json.loads(text.replace("'", '"'))
+        if isinstance(parsed, list):
+            return [_safe_text(item) for item in parsed if _safe_text(item)]
+    except Exception:
+        pass
+    return [part.strip() for part in re.split(r"[,;、/]+", text) if part.strip()]
+
+
+def _add_label(bucket: dict[str, set[str]], category: str, label: Any) -> None:
+    canonical = _canonical_non_tech_label(label, category)
+    if canonical:
+        bucket.setdefault(category, set()).add(canonical)
+
+
+def _scan_non_tech_labels_from_text(text: str) -> dict[str, set[str]]:
+    bucket: dict[str, set[str]] = {}
+    lower = text.lower()
+
+    for raw, label in _LANGUAGE_LABELS.items():
+        if raw.lower() in lower or raw in text:
+            _add_label(bucket, "language", label)
+
+    for category, candidates in {
+        "domain_knowledge": [
+            "finance", "fintech", "banking", "payment", "insurance", "wealth management",
+            "risk", "compliance", "regulatory", "audit", "aml", "kyc", "ecommerce",
+            "retail", "logistics", "supply chain", "healthcare", "government", "web3", "blockchain",
+            "金融", "金融科技", "銀行", "银行", "支付", "保險", "保险", "財富管理", "财富管理",
+            "風險", "风险", "合規", "合规", "監管", "监管", "電商", "电商", "零售", "物流", "醫療", "医疗", "政府", "區塊鏈", "区块链",
+        ],
+        "certification": ["PMP", "Scrum Master", "CSM", "CFA", "FRM", "CPA", "SFC", "HKMA", "CISSP", "CISA", "CISM", "ITIL", "PRINCE2"],
+        "business_skill": [
+            "requirement", "business analysis", "stakeholder", "project management", "documentation",
+            "presentation", "vendor", "client facing", "customer", "compliance reporting",
+            "需求分析", "需求收集", "持份者", "項目管理", "项目管理", "文檔", "文档", "匯報", "汇报", "供應商", "供应商", "客戶", "客户",
+        ],
+        "soft_skill": [
+            "communication", "teamwork", "collaboration", "cross functional", "leadership", "problem solving",
+            "analytical", "organizational", "time management", "proactive", "detail oriented",
+            "溝通", "沟通", "團隊合作", "团队合作", "跨團隊協作", "跨团队协作", "問題解決", "问题解决", "領導", "领导", "抗壓", "抗压",
+        ],
+    }.items():
+        for candidate in candidates:
+            if candidate.lower() in lower or candidate in text:
+                _add_label(bucket, category, candidate)
+
+    return bucket
+
+
+def _aggregate_soft_skills_from_cache(df: pd.DataFrame | None = None) -> list[dict[str, Any]]:
+    if df is None:
+        df = load_jobs_df()
+    if df.empty:
+        return []
+    signature = _soft_skill_cache_signature(df)
     cached = _get_disk_cached_analysis("soft_skill_distribution", signature)
     if cached and isinstance(cached.get("items"), list):
         return cached["items"]
 
-    edu_counter: Counter[str] = Counter()
-    lang_counter: Counter[str] = Counter()
-    skill_counter: Counter[str] = Counter()
+    counters: dict[str, Counter[str]] = {category: Counter() for category in _NON_TECH_CATEGORY_LIMITS}
 
     try:
         from src.analyzer.role_classifier import CACHE_PATH
-        if not CACHE_PATH.exists():
-            return []
-        with open(CACHE_PATH, "r", encoding="utf-8") as f:
-            cache_data = json.load(f)
+        cache_data = json.loads(CACHE_PATH.read_text(encoding="utf-8")) if CACHE_PATH.exists() else {}
     except (OSError, json.JSONDecodeError):
-        return []
+        cache_data = {}
 
-    if not isinstance(cache_data, dict):
-        return []
+    soft_by_job: dict[str, dict[str, list[str]]] = {}
+    if isinstance(cache_data, dict):
+        for entry in cache_data.values():
+            if not isinstance(entry, dict):
+                continue
+            job_id = _safe_text(entry.get("_job_id"))
+            if job_id and isinstance(entry.get("soft_skills"), dict):
+                soft_by_job[job_id] = entry["soft_skills"]
 
-    for entry in cache_data.values():
-        if not isinstance(entry, dict):
-            continue
-        soft_skills = entry.get("soft_skills")
-        if not isinstance(soft_skills, dict):
-            continue
-        for item in soft_skills.get("education", []):
-            text = _safe_text(item)
-            if text:
-                edu_counter[text] += 1
-        for item in soft_skills.get("language", []):
-            text = _safe_text(item)
-            if text:
-                lang_counter[text] += 1
-        for item in soft_skills.get("soft_skill", []):
-            text = _safe_text(item)
-            if text:
-                skill_counter[text] += 1
+    for idx, row in df.iterrows():
+        job_bucket: dict[str, set[str]] = {category: set() for category in _NON_TECH_CATEGORY_LIMITS}
+        job_id = _safe_text(row.get("job_id"))
+
+        cached_soft = soft_by_job.get(job_id, {})
+        if isinstance(cached_soft, dict):
+            for category in _NON_TECH_CATEGORY_LIMITS:
+                for item in cached_soft.get(category, []):
+                    _add_label(job_bucket, category, item)
+
+        for item in _iter_listish(row.get("languages_required")):
+            _add_label(job_bucket, "language", item)
+        if _safe_text(row.get("education_required")):
+            _add_label(job_bucket, "education", row.get("education_required"))
+
+        jd = " ".join([
+            _safe_text(row.get("title")),
+            _safe_text(row.get("company")),
+            _safe_text(row.get("industry_category")),
+            _safe_text(row.get("jd_text")),
+            _safe_text(row.get("jd_raw")),
+            _safe_text(row.get("kb_document_text")),
+        ])
+        scanned = _scan_non_tech_labels_from_text(jd)
+        for category, labels in scanned.items():
+            for label in labels:
+                _add_label(job_bucket, category, label)
+
+        try:
+            industry = _infer_industry_with_rules(_job_industry_record(row, int(idx)))
+            if industry and industry != "其他":
+                _add_label(job_bucket, "domain_knowledge", industry)
+        except Exception:
+            pass
+
+        for category, labels in job_bucket.items():
+            for label in labels:
+                counters[category][label] += 1
 
     items: list[dict[str, Any]] = []
-    for name, count in skill_counter.most_common(10):
-        items.append({"name": name, "category": "soft_skill", "count": count})
-    for name, count in edu_counter.most_common(6):
-        items.append({"name": name, "category": "education", "count": count})
-    for name, count in lang_counter.most_common(6):
-        items.append({"name": name, "category": "language", "count": count})
+    for category, limit in _NON_TECH_CATEGORY_LIMITS.items():
+        for name, count in counters[category].most_common(limit):
+            items.append({"name": name, "category": category, "count": count})
 
     cache = _load_analysis_cache()
     cache["soft_skill_distribution"] = {"signature": signature, "data": {"llm_used": False, "items": items}}
@@ -824,6 +1007,10 @@ def _build_trend_context(df: pd.DataFrame, use_llm: bool = True) -> dict[str, An
 
 
 def _compact_trend_context(context: dict[str, Any]) -> dict[str, Any]:
+    non_tech_by_category: dict[str, list[dict[str, Any]]] = {}
+    for item in context.get("soft_skill_demand", []):
+        category = str(item.get("category") or "soft_skill")
+        non_tech_by_category.setdefault(category, []).append(item)
     return {
         "total_jobs": context.get("total_jobs", 0),
         "role_demand_ranking": context.get("role_demand_ranking", [])[:8],
@@ -833,7 +1020,11 @@ def _compact_trend_context(context: dict[str, Any]) -> dict[str, Any]:
         "skill_category_distribution": context.get("skill_category_distribution", [])[:10],
         "responsibility_distribution": context.get("responsibility_distribution", [])[:8],
         "industry_distribution": context.get("industry_distribution", [])[:8],
-        "soft_skill_demand": context.get("soft_skill_demand", [])[:14],
+        "soft_skill_demand": context.get("soft_skill_demand", [])[:48],
+        "non_tech_ability_by_category": {
+            category: items[:8]
+            for category, items in non_tech_by_category.items()
+        },
         "company_distribution": context.get("company_distribution", [])[:8],
         "location_distribution": context.get("location_distribution", [])[:8],
         "education_distribution": context.get("education_distribution", [])[:6],
@@ -856,13 +1047,30 @@ def _fallback_trend_sections(context: dict[str, Any]) -> list[dict[str, Any]]:
     skills = "、".join([f"{x.get('skill')}({x.get('count')})" for x in context.get("tech_stack_ranking", [])[:8]]) or "暂无技能统计"
     categories = "、".join([f"{x.get('category')}({x.get('count')})" for x in context.get("skill_category_distribution", [])[:6]]) or "暂无类别统计"
     industries = "、".join([f"{x.get('name')}({x.get('count')})" for x in context.get("industry_distribution", [])[:5]]) or "行业字段较少，需结合公司名称和 JD 判断"
-    soft_skills = "、".join([f"{x.get('name')}({x.get('count')})" for x in context.get("soft_skill_demand", [])[:6]]) or "暂无软技能统计，点击「重新生成分析」调用 LLM 提取"
+    non_tech_items = context.get("soft_skill_demand", [])
+    non_tech_by_category: dict[str, list[dict[str, Any]]] = {}
+    for item in non_tech_items:
+        non_tech_by_category.setdefault(str(item.get("category") or "soft_skill"), []).append(item)
+    category_titles = {
+        "soft_skill": "个人能力",
+        "business_skill": "业务交付",
+        "domain_knowledge": "行业知识",
+        "language": "语言",
+        "education": "学历",
+        "certification": "资格证",
+    }
+    non_tech_summary = "；".join(
+        f"{category_titles.get(category, category)}："
+        + "、".join([f"{x.get('name')}({x.get('count')})" for x in items[:4]])
+        for category, items in non_tech_by_category.items()
+        if items
+    ) or "暂无非技术能力统计"
     return [
         {"key": "tech_stack_demand", "title": "技术栈需求分析", "summary": f"技术栈榜单显示：{skills}。这些高频技术说明香港 IT 岗位更偏向云平台、后端工程、数据处理与自动化交付的组合能力，单一工具会被放在完整交付链路里评估。", "evidence": context.get("tech_stack_ranking", [])[:8]},
         {"key": "tech_category", "title": "细分技能类别分析", "summary": f"细分类别占比中较突出的方向包括：{categories}。相比原始大类，这些类别更能反映岗位真实能力结构，适合用来判断候选人技能组合是否均衡。", "evidence": context.get("skill_category_distribution", [])[:6]},
         {"key": "role_classification", "title": "角色分类分析", "summary": f"角色分类显示市场需求集中在：{roles}。求职定位时应先选择主角色，再围绕该角色补齐最常见技术栈和职责表达，避免简历只堆工具名。", "evidence": context.get("role_demand_ranking", [])[:5]},
         {"key": "role_distribution", "title": "角色分布分析", "summary": f"角色分布占比靠前的是：{role_dist}。这说明岗位供给并非均匀分散，热门方向竞争更强，但也意味着 JD 表达更标准、可对标样本更多。", "evidence": context.get("role_distribution", [])[:6]},
-        {"key": "soft_skill_demand", "title": "软技能需求分析", "summary": f"基于知识库 JD 的语义分析，软技能需求排名前列：{soft_skills}。学历与语言要求体现岗位门槛，个人能力（沟通、团队协作、组织等）反映雇主对综合素质的偏好；求职者应在简历中用具体事例佐证这些能力，而非仅罗列形容词。", "evidence": context.get("soft_skill_demand", [])[:8]},
+        {"key": "soft_skill_demand", "title": "非技术能力画像", "summary": f"基于岗位缓存、结构化字段和 JD 关键词聚合后，非技术能力画像包括：{non_tech_summary}。这部分不仅包含沟通、團隊協作等个人能力，也覆盖普通話/粵語/英語等语言门槛、金融/保险/合规等行业知识、资格证与业务交付能力；求职者应在简历中用项目场景和业务结果证明这些能力。", "evidence": context.get("soft_skill_demand", [])[:18]},
         {"key": "responsibility", "title": "岗位职责分析", "summary": "从样本 JD 看，职责通常围绕系统开发、AI/数据能力落地、云基础设施交付、跨团队协作和质量/安全要求展开。技术型岗位不只看工具名，还强调端到端交付和业务场景理解。", "evidence": context.get("knowledge_base_samples", [])[:5]},
         {"key": "company_industry", "title": "公司行业分析", "summary": f"基于公司名称、岗位标题和 JD 业务语境归类后，行业集中在：{industries}。行业排名反映的是岗位需求来自哪些业务场景，而不是公司名称出现次数；求职时应结合目标行业补充对应业务词汇、监管语境和项目案例。", "evidence": context.get("industry_distribution", [])[:5]},
         {"key": "tech_direction", "title": "技术方向分析", "summary": f"技术栈高频项包括：{skills}。整体方向偏向云平台、AI 应用、数据工程、DevOps 自动化和全栈开发能力组合，简称类技术名已在图表中补充中文全称。", "evidence": context.get("tech_stack_ranking", [])[:8]},
@@ -875,7 +1083,7 @@ def _trend_section_specs(context: dict[str, Any]) -> list[dict[str, Any]]:
         {"key": "tech_category", "title": "细分技能类别分析", "evidence": context.get("skill_category_distribution", [])[:8]},
         {"key": "role_classification", "title": "角色分类分析", "evidence": context.get("role_demand_ranking", [])[:8]},
         {"key": "role_distribution", "title": "角色分布分析", "evidence": context.get("role_distribution", [])[:8]},
-        {"key": "soft_skill_demand", "title": "软技能需求分析", "evidence": context.get("soft_skill_demand", [])[:10]},
+        {"key": "soft_skill_demand", "title": "非技术能力画像", "evidence": context.get("soft_skill_demand", [])[:48]},
         {"key": "responsibility", "title": "岗位职责分析", "evidence": context.get("responsibility_distribution", [])[:8]},
         {"key": "company_industry", "title": "公司行业分析", "evidence": context.get("industry_distribution", [])[:8]},
         {"key": "tech_direction", "title": "技术方向分析", "evidence": context.get("tech_stack_ranking", [])[:8]},
@@ -921,12 +1129,17 @@ def _call_llm_for_trend_analysis(context: dict[str, Any]) -> list[dict[str, Any]
         "每个标题下写 3-5 句中文，不能只复述出现次数；"
         "必须解释这些数据对香港 IT 行情的意义、对候选人技能组合/简历关键词/求职优先级的建议、以及样本局限。"
         "技术简称必须补充中文解释，例如 持续集成/持续交付（CI/CD）。不要输出 JSON。\n\n"
-        "特别注意：「软技能需求分析」一节必须覆盖学历要求、语言要求、个人能力（如沟通能力、团队合作、组织能力、领导力等）三类，"
-        "分别说明每类的高频项及其对求职者简历表达与能力准备的启示，不要只谈岗位数量。\n\n"
+        "特别注意：「非技术能力画像」一节必须覆盖六类：学历要求、语言要求（普通話/粵語/英語等）、"
+        "个人能力（沟通、團隊協作、问题解决、领导力等，注意同义项已归并）、"
+        "跨行业/业务知识（如金融/金融科技、保险/财富管理、风险合规、Web3 等）、"
+        "资格证（如 PMP、Scrum、CFA、FRM、CPA、SFC/HKMA、CISSP 等）、"
+        "业务交付能力（需求分析、持份者管理、项目管理、文档/汇报、客户沟通等）。"
+        "这些计数已在上下文 non_tech_ability_by_category 中按类别提供，请直接引用高频项和计数，"
+        "并说明这些非计算机专业能力对香港 IT 求职定位、简历关键词和面试准备的启示。\n\n"
         "标题顺序：\n"
         + "\n".join([f"### {spec['title']}" for spec in section_specs]) +
         "\n\n"
-        f"知识库上下文：\n{json.dumps(_compact_trend_context(context), ensure_ascii=False)[:5200]}"
+        f"知识库上下文：\n{json.dumps(_compact_trend_context(context), ensure_ascii=False)[:9000]}"
     )
     payload = {
         "model": kwargs["model"],

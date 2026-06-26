@@ -29,16 +29,22 @@ _classify_thread: Optional[threading.Thread] = None
 
 
 def _empty_soft_skills() -> dict[str, list[str]]:
-    return {"education": [], "language": [], "soft_skill": []}
+    return {
+        "education": [],
+        "language": [],
+        "soft_skill": [],
+        "domain_knowledge": [],
+        "certification": [],
+        "business_skill": [],
+    }
 
 
 def _normalize_soft_skills(value) -> dict[str, list[str]]:
     if isinstance(value, dict):
-        return {
-            "education": [str(x).strip() for x in value.get("education", []) if str(x).strip()],
-            "language": [str(x).strip() for x in value.get("language", []) if str(x).strip()],
-            "soft_skill": [str(x).strip() for x in value.get("soft_skill", []) if str(x).strip()],
-        }
+        result = _empty_soft_skills()
+        for key in result:
+            result[key] = [str(x).strip() for x in value.get(key, []) if str(x).strip()]
+        return result
     return _empty_soft_skills()
 
 

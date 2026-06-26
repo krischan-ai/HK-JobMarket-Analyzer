@@ -27,6 +27,9 @@ class RoleResult:
         "education": [],
         "language": [],
         "soft_skill": [],
+        "domain_knowledge": [],
+        "certification": [],
+        "business_skill": [],
     })
 
 
@@ -85,7 +88,14 @@ class RoleClassifier:
 
     @staticmethod
     def _normalize_soft_skills(value: Any) -> dict[str, list[str]]:
-        result = {"education": [], "language": [], "soft_skill": []}
+        result = {
+            "education": [],
+            "language": [],
+            "soft_skill": [],
+            "domain_knowledge": [],
+            "certification": [],
+            "business_skill": [],
+        }
         if not isinstance(value, dict):
             return result
         for key in result:
@@ -343,7 +353,7 @@ class RoleClassifier:
                     job["role_id"] = "other"
                     job["role_name"] = "其他"
                     job["role_confidence"] = "low"
-                    job["soft_skills"] = {"education": [], "language": [], "soft_skill": []}
+                    job["soft_skills"] = self._normalize_soft_skills({})
                 results.append(job)
             if i + batch_size < len(jobs):
                 self.logger.info("Classified %d/%d jobs", i + batch_size, len(jobs))

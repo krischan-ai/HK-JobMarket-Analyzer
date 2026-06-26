@@ -130,10 +130,13 @@ Return ONLY valid JSON with these fields:
 - "role_id": one of: frontend, backend, fullstack, mobile, data_scientist, ml_engineer, data_engineer, devops, qa, security, solution_architect, engineering_manager, it_analyst, product, design, blockchain, ai_prompt_engineer, ai_model_training, ai_agent_dev, ai_application, data_science, other
 - "role_name": Chinese name for the role
 - "confidence": "high", "medium", or "low"
-- "soft_skills": object with three arrays:
+- "soft_skills": object with six arrays:
   - "education": education requirements in normalized Chinese labels
   - "language": language requirements in normalized Chinese labels
   - "soft_skill": personal capability requirements in normalized Chinese labels
+  - "domain_knowledge": non-computer domain or industry knowledge requirements
+  - "certification": professional qualifications or certificates
+  - "business_skill": business, compliance, stakeholder, documentation, or project delivery skills
 
 Role reference (distinguish carefully):
 frontend=前端开发, backend=后端开发, fullstack=全栈开发, mobile=移动开发,
@@ -164,11 +167,14 @@ Soft skill extraction rules:
 - Only extract requirements explicitly present in the JD. Do not invent labels.
 - Normalize education labels in Chinese, e.g. Bachelor's degree / bachelor / degree → "學士學位"; master preferred → "碩士優先"; computer science related degree → "計算機相關學歷".
 - Normalize language labels in Chinese, e.g. English → "英語"; Cantonese → "粵語"; Mandarin / Putonghua → "普通話"; Chinese → "中文".
-- Normalize personal capabilities in Chinese, e.g. communication → "溝通能力"; teamwork → "團隊合作"; organizational skills → "組織能力"; problem-solving → "問題解決"; leadership → "領導力"; work under pressure → "抗壓能力"; cross-functional collaboration → "跨團隊協作".
+- Normalize personal capabilities in Chinese, e.g. communication → "溝通能力"; teamwork/collaboration/cross-functional collaboration → "團隊協作"; organizational skills → "組織能力"; problem-solving → "問題解決"; leadership → "領導力"; work under pressure → "抗壓能力".
+- Extract domain_knowledge for non-computer professional knowledge, e.g. finance/fintech/banking → "金融/金融科技知識"; insurance/wealth management → "保險/財富管理知識"; risk/compliance/regulatory → "風險合規知識"; ecommerce/retail → "電商/零售業務知識".
+- Extract certification for professional credentials, e.g. PMP, Scrum Master, CFA, FRM, CPA, SFC/HKMA, CISSP, CISA.
+- Extract business_skill for stakeholder management, requirement gathering, documentation, presentation, project management, vendor management, customer-facing communication, compliance reporting.
 - If a category is not mentioned, return an empty array for that category.
 
 Example output:
-{"role_id":"frontend","role_name":"前端开发","confidence":"high","soft_skills":{"education":["學士學位"],"language":["英語","粵語"],"soft_skill":["溝通能力","團隊合作"]}}
+{"role_id":"frontend","role_name":"前端开发","confidence":"high","soft_skills":{"education":["學士學位"],"language":["英語","粵語"],"soft_skill":["溝通能力","團隊協作"],"domain_knowledge":["金融/金融科技知識"],"certification":["PMP"],"business_skill":["需求分析","持份者管理"]}}
 
 Job description:
 """ + jd_text[:3000]
