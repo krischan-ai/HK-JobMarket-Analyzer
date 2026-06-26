@@ -3,7 +3,7 @@
     <div class="page-header">
       <div>
         <h2>技术趋势分析</h2>
-        <p>技能榜单、角色分类、岗位需求和知识库智能总结。</p>
+        <p>技能榜单、角色分类、软技能需求和知识库智能总结。</p>
       </div>
       <div class="header-actions">
         <el-tag :type="analysisStatus.type">{{ analysisStatus.text }}</el-tag>
@@ -197,7 +197,7 @@ const pagedSkills = computed(() => {
 
 const knowledgeSections = computed(() => {
   const sections = statsStore.techTrendAnalysis?.sections || []
-  return sections.filter(section => ['job_demand', 'responsibility', 'company_industry', 'tech_direction'].includes(sectionKind(section)))
+  return sections.filter(section => ['soft_skill_demand', 'responsibility', 'company_industry', 'tech_direction'].includes(sectionKind(section)))
 })
 
 const analysisStatus = computed(() => {
@@ -250,7 +250,7 @@ function sectionKind(section: { key?: string; title?: string }) {
   if (key.includes('skill_category') || title.includes('技能类别') || title.includes('细分')) return 'tech_category'
   if (key.includes('role_distribution') || title.includes('角色分布')) return 'role_distribution'
   if (key.includes('role') || title.includes('角色分类')) return 'role_classification'
-  if (key.includes('job_demand') || title.includes('岗位需求')) return 'job_demand'
+  if (key.includes('soft_skill') || title.includes('软技能')) return 'soft_skill_demand'
   if (key.includes('responsibility') || title.includes('岗位职责')) return 'responsibility'
   if (key.includes('company') || title.includes('公司') || title.includes('行业')) return 'company_industry'
   if (key.includes('tech_direction') || title.includes('技术方向')) return 'tech_direction'
@@ -283,9 +283,9 @@ function chartItemsForSection(section: TechTrendSection) {
       count: item.count || item.percentage || item.value || item.avg || item.salary_avg || 0,
     }))
     .filter(item => item.name && item.count)
-  if (kind === 'job_demand') {
-    const items = contextArray('role_demand_ranking').map(item => ({ name: item.role_name || item.role_id, count: item.count })).slice(0, 10)
-    return items.length ? items : evidenceItems.slice(0, 10)
+  if (kind === 'soft_skill_demand') {
+    const items = contextArray('soft_skill_demand').map(item => ({ name: item.name, count: item.count })).slice(0, 12)
+    return items.length ? items : evidenceItems.slice(0, 12)
   }
   if (kind === 'responsibility') {
     const items = contextArray('responsibility_distribution').slice(0, 10)

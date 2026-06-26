@@ -58,17 +58,23 @@
 
     <el-row :gutter="16" style="margin-bottom: 16px">
       <el-col :span="24">
-        <RoleSalaryChart :data="statsStore.roleSalary" />
-        <div v-if="roleSalarySectionData" class="role-salary-summary">
-          <h4 class="summary-title">{{ roleSalarySectionData.title }}</h4>
-          <div class="summary-meta">
-            <span>知识库岗位数：{{ statsStore.salaryAnalysis?.context?.total_jobs || 0 }}</span>
-          </div>
-          <p class="summary">{{ roleSalarySectionData.summary }}</p>
-          <div v-if="salaryEvidenceLabels(roleSalarySectionData).length" class="evidence-list">
-            <span v-for="(label, idx) in salaryEvidenceLabels(roleSalarySectionData)" :key="idx">{{ label }}</span>
-          </div>
-        </div>
+        <el-card>
+          <template #header><strong>各角色薪資對比</strong></template>
+          <v-chart :option="roleSalaryChartOption" autoresize style="height: 350px" v-if="statsStore.roleSalary.length" />
+          <el-empty description="暫無角色薪資數據" v-else />
+          <template v-if="roleSalarySectionData">
+            <div class="role-salary-summary">
+              <h4 class="summary-title">{{ roleSalarySectionData.title }}</h4>
+              <div class="summary-meta">
+                <span>知识库岗位数：{{ statsStore.salaryAnalysis?.context?.total_jobs || 0 }}</span>
+              </div>
+              <p class="summary">{{ roleSalarySectionData.summary }}</p>
+              <div v-if="salaryEvidenceLabels(roleSalarySectionData).length" class="evidence-list">
+                <span v-for="(label, idx) in salaryEvidenceLabels(roleSalarySectionData)" :key="idx">{{ label }}</span>
+              </div>
+            </div>
+          </template>
+        </el-card>
       </el-col>
     </el-row>    <section :key="`analysis-${analysisRenderKey}`" class="analysis-section">
       <div class="section-header">
@@ -130,7 +136,6 @@ import { useStatsStore } from '@/stores/stats'
 import StatCard from '@/components/common/StatCard.vue'
 import SalaryBoxChart from '@/components/charts/SalaryBoxChart.vue'
 import TrendLineChart from '@/components/charts/TrendLineChart.vue'
-import RoleSalaryChart from '@/components/RoleSalaryChart.vue'
 import type { SalaryDistribution, TechTrendSection } from '@/types'
 
 const statsStore = useStatsStore()
@@ -209,6 +214,37 @@ const topLocationOption = computed(() => {
       axisLabel: { fontSize: 11, lineHeight: 14, width: 120, overflow: 'break' },
     },
     series: [{ type: 'bar', data: sorted.map((i) => i.avg), color: '#67C23A', barMaxWidth: 20 }],
+  }
+})
+
+const roleSalaryChartOption = computed(() => {
+  const sorted = [...statsStore.roleSalary].sort((a, b) => b.salary_avg - a.salary_avg)
+  return {
+    tooltip: {
+      trigger: 'axis',
+      formatter: (params: any) => {
+        const d = params[0]
+        return `${d.name}<br/>平均薪資: HKD ${Number(d.value).toLocaleString()}`
+      },
+    },
+    grid: { left: 140, right: 40, top: 10, bottom: 20 },
+    xAxis: { type: 'value', name: 'HKD / 月' },
+    yAxis: {
+      type: 'category',
+      data: sorted.map((d) => d.role_name),
+      axisLabel: { fontSize: 12 },
+    },
+    series: [
+      {
+        type: 'bar',
+        data: sorted.map((d) => ({
+          name: d.role_name,
+          value: d.salary_avg,
+          itemStyle: { borderRadius: [0, 4, 4, 0] },
+        })),
+        barMaxWidth: 28,
+      },
+    ],
   }
 })
 
@@ -467,6 +503,8 @@ function formatEvidence(item: string | Record<string, unknown>, kind = '') {
   font-size: 12px;
   line-height: 1.65;
   white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .summary-meta,
@@ -486,5 +524,6 @@ function formatEvidence(item: string | Record<string, unknown>, kind = '') {
   font-size: 12px;
   line-height: 1.4;
   word-break: break-word;
+  overflow-wrap: anywhere;
 }
 </style>

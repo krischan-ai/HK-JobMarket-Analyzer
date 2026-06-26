@@ -404,10 +404,11 @@ def location_distribution():
 
 
 _trend_analysis_cache: dict[str, Any] = {}
-_TREND_ANALYSIS_CONTEXT_VERSION = "v7"
+_TREND_ANALYSIS_CONTEXT_VERSION = "v8"
 _salary_analysis_cache: dict[str, Any] = {}
 _SALARY_ANALYSIS_CONTEXT_VERSION = "v3"
 _INDUSTRY_DISTRIBUTION_VERSION = "v3"
+_SOFT_SKILL_DISTRIBUTION_VERSION = "v1"
 _ANALYSIS_CACHE_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "cache" / "ai_analysis_cache.json"
 
 
@@ -693,6 +694,138 @@ def _collect_llm_industry_distribution(df: pd.DataFrame, top_n: int = 10, use_ll
     return items
 
 
+def _soft_skill_cache_signature(df: pd.DataFrame) -> str:
+    csv_path = Path(__file__).resolve().parent.parent.parent / "data" / "cleaned" / "jobs.csv"
+    stamp = csv_path.stat().st_mtime if csv_path.exists() else 0
+    return f"{_SOFT_SKILL_DISTRIBUTION_VERSION}:{stamp}:{len(df)}"
+
+
+def _job_soft_skill_record(row: pd.Series, idx: int) -> dict[str, Any]:
+    jd = _safe_text(row.get("kb_document_text")) or _safe_text(row.get("jd_text")) or _safe_text(row.get("jd_raw"))
+    return {
+        "idx": idx,
+        "title": _safe_text(row.get("title"))[:120],
+        "jd_excerpt": jd[:600],
+    }
+
+
+def _call_llm_for_soft_skill_batch(records: list[dict[str, Any]]) -> dict[int, dict[str, list[str]]]:
+    manager = LLMConfigManager()
+    if not manager.configured:
+        raise HTTPException(status_code=400, detail="LLM 未配置，无法生成软技能分析")
+    kwargs = manager.build_kwargs()
+    prompt = (
+        "你是香港 IT 招聘市場軟技能分析師。請閱讀下面每條崗位的標題和 JD 文本，"
+        "理解後提取該崗位提到的軟技能要求，嚴格分為三類：\n"
+        "1. education: 學歷要求（例如 學士學位、碩士優先、計算機相關學歷、大專或以上 等）\n"
+        "2. language: 語言要求（例如 英語、粵語、普通話、中文 等）\n"
+        "3. soft_skill: 個人能力（例如 溝通能力、團隊合作、組織能力、領導力、問題解決、抗壓能力、跨團隊協作 等）\n"
+        "規則：\n"
+        "- 必須基於 JD 實際內容理解後提取，不要憑空編造。\n"
+        "- 學歷統一用中文表達，歸併同義寫法（如 Bachelor's degree / 学士学位 都寫成「學士學位」）。\n"
+        "- 語言統一用中文，歸併同義寫法（如 English / 英语 都寫成「英語」，Cantonese 寫成「粵語」，Mandarin 寫成「普通話」，Chinese 寫成「中文」）。\n"
+        "- 個人能力統一用中文，歸併同義寫法（如 communication → 溝通能力，teamwork → 團隊合作，organizational skills → 組織能力，problem-solving → 問題解決）。\n"
+        "- 每條崗位的三類各輸出若干項，JD 中沒有明確提到的輸出空數組。\n"
+        "請輸出 JSON 對象，格式嚴格為："
+        "{\"items\":[{\"idx\":0,\"education\":[\"學士學位\"],\"language\":[\"英語\",\"粵語\"],\"soft_skill\":[\"溝通能力\",\"團隊合作\"]}]}。\n"
+        f"崗位數據：{json.dumps(records, ensure_ascii=False)}"
+    )
+    payload = {
+        "model": kwargs["model"],
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0,
+        "max_tokens": 3072,
+        "response_format": {"type": "json_object"},
+    }
+    headers = {"Authorization": f"Bearer {kwargs['api_key']}", "Content-Type": "application/json"}
+    resp = requests.post(
+        f"{kwargs['api_base'].rstrip('/')}/chat/completions",
+        headers=headers,
+        json=payload,
+        timeout=min(max(int(kwargs.get("timeout", 30) or 30), 30), 90),
+        proxies={"http": None, "https": None},
+    )
+    resp.raise_for_status()
+    message = resp.json()["choices"][0]["message"]
+    content = (message.get("content") or message.get("reasoning_content") or "").strip()
+    if content.startswith("```"):
+        content = content.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
+    start_obj = content.find("{")
+    end_obj = content.rfind("}")
+    if start_obj >= 0 and end_obj > start_obj:
+        content = content[start_obj:end_obj + 1]
+    parsed = json.loads(content)
+    items = parsed.get("items", []) if isinstance(parsed, dict) else []
+    result: dict[int, dict[str, list[str]]] = {}
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        try:
+            idx = int(item.get("idx"))
+        except (TypeError, ValueError):
+            continue
+        result[idx] = {
+            "education": [str(x) for x in (item.get("education") or []) if str(x).strip()],
+            "language": [str(x) for x in (item.get("language") or []) if str(x).strip()],
+            "soft_skill": [str(x) for x in (item.get("soft_skill") or []) if str(x).strip()],
+        }
+    return result
+
+
+def _collect_llm_soft_skill_distribution(df: pd.DataFrame, use_llm: bool = True) -> list[dict[str, Any]]:
+    """讓 LLM 閱讀全庫 JD 後提取學歷、語言、個人能力三類軟技能並聚計排名。
+
+    與規則匹配不同，這裡由大模型理解 JD 語義後歸併同義表達並輸出標準化中文標籤。
+    """
+    if df.empty:
+        return []
+    signature = _soft_skill_cache_signature(df)
+    cached = _get_disk_cached_analysis("soft_skill_distribution", signature)
+    if cached and isinstance(cached.get("items"), list):
+        return cached["items"]
+
+    records = [_job_soft_skill_record(row, idx) for idx, (_, row) in enumerate(df.iterrows())]
+    assigned: dict[int, dict[str, list[str]]] = {}
+    llm_used = False
+    if use_llm:
+        batch_size = 20
+        for start in range(0, len(records), batch_size):
+            batch = records[start:start + batch_size]
+            try:
+                assigned.update(_call_llm_for_soft_skill_batch(batch))
+                llm_used = True
+            except Exception:
+                pass
+
+    edu_counter: Counter[str] = Counter()
+    lang_counter: Counter[str] = Counter()
+    skill_counter: Counter[str] = Counter()
+    for record in records:
+        idx = int(record["idx"])
+        extracted = assigned.get(idx)
+        if not extracted:
+            continue
+        for item in extracted.get("education", []):
+            edu_counter[item] += 1
+        for item in extracted.get("language", []):
+            lang_counter[item] += 1
+        for item in extracted.get("soft_skill", []):
+            skill_counter[item] += 1
+
+    items: list[dict[str, Any]] = []
+    for name, count in skill_counter.most_common(10):
+        items.append({"name": name, "category": "soft_skill", "count": count})
+    for name, count in edu_counter.most_common(6):
+        items.append({"name": name, "category": "education", "count": count})
+    for name, count in lang_counter.most_common(6):
+        items.append({"name": name, "category": "language", "count": count})
+
+    cache = _load_analysis_cache()
+    cache["soft_skill_distribution"] = {"signature": signature, "data": {"llm_used": llm_used, "items": items}}
+    _save_analysis_cache(cache)
+    return items
+
+
 def _sample_jobs_for_analysis(df: pd.DataFrame, limit: int = 12) -> list[dict[str, str]]:
     if df.empty:
         return []
@@ -724,6 +857,7 @@ def _build_trend_context(df: pd.DataFrame, use_llm: bool = True) -> dict[str, An
         "skill_category_distribution": category_distribution(),
         "responsibility_distribution": _collect_responsibility_stats(df),
         "industry_distribution": _collect_llm_industry_distribution(df, top_n=10, use_llm=use_llm),
+        "soft_skill_demand": _collect_llm_soft_skill_distribution(df, use_llm=use_llm),
         "company_distribution": _counter_from_column(df, "company", top_n=10),
         "location_distribution": [
             {"name": name, "count": count}
@@ -745,6 +879,7 @@ def _compact_trend_context(context: dict[str, Any]) -> dict[str, Any]:
         "skill_category_distribution": context.get("skill_category_distribution", [])[:10],
         "responsibility_distribution": context.get("responsibility_distribution", [])[:8],
         "industry_distribution": context.get("industry_distribution", [])[:8],
+        "soft_skill_demand": context.get("soft_skill_demand", [])[:14],
         "company_distribution": context.get("company_distribution", [])[:8],
         "location_distribution": context.get("location_distribution", [])[:8],
         "education_distribution": context.get("education_distribution", [])[:6],
@@ -767,12 +902,13 @@ def _fallback_trend_sections(context: dict[str, Any]) -> list[dict[str, Any]]:
     skills = "、".join([f"{x.get('skill')}({x.get('count')})" for x in context.get("tech_stack_ranking", [])[:8]]) or "暂无技能统计"
     categories = "、".join([f"{x.get('category')}({x.get('count')})" for x in context.get("skill_category_distribution", [])[:6]]) or "暂无类别统计"
     industries = "、".join([f"{x.get('name')}({x.get('count')})" for x in context.get("industry_distribution", [])[:5]]) or "行业字段较少，需结合公司名称和 JD 判断"
+    soft_skills = "、".join([f"{x.get('name')}({x.get('count')})" for x in context.get("soft_skill_demand", [])[:6]]) or "暂无软技能统计，点击「重新生成分析」调用 LLM 提取"
     return [
         {"key": "tech_stack_demand", "title": "技术栈需求分析", "summary": f"技术栈榜单显示：{skills}。这些高频技术说明香港 IT 岗位更偏向云平台、后端工程、数据处理与自动化交付的组合能力，单一工具会被放在完整交付链路里评估。", "evidence": context.get("tech_stack_ranking", [])[:8]},
         {"key": "tech_category", "title": "细分技能类别分析", "summary": f"细分类别占比中较突出的方向包括：{categories}。相比原始大类，这些类别更能反映岗位真实能力结构，适合用来判断候选人技能组合是否均衡。", "evidence": context.get("skill_category_distribution", [])[:6]},
         {"key": "role_classification", "title": "角色分类分析", "summary": f"角色分类显示市场需求集中在：{roles}。求职定位时应先选择主角色，再围绕该角色补齐最常见技术栈和职责表达，避免简历只堆工具名。", "evidence": context.get("role_demand_ranking", [])[:5]},
         {"key": "role_distribution", "title": "角色分布分析", "summary": f"角色分布占比靠前的是：{role_dist}。这说明岗位供给并非均匀分散，热门方向竞争更强，但也意味着 JD 表达更标准、可对标样本更多。", "evidence": context.get("role_distribution", [])[:6]},
-        {"key": "job_demand", "title": "岗位需求分析", "summary": f"知识库共覆盖 {context.get('total_jobs', 0)} 个岗位，需求更集中在：{roles}。建议优先关注出现频次高且薪资字段完整的方向，并结合具体 JD 判断岗位 seniority。", "evidence": context.get("role_demand_ranking", [])[:5]},
+        {"key": "soft_skill_demand", "title": "软技能需求分析", "summary": f"基于知识库 JD 的语义分析，软技能需求排名前列：{soft_skills}。学历与语言要求体现岗位门槛，个人能力（沟通、团队协作、组织等）反映雇主对综合素质的偏好；求职者应在简历中用具体事例佐证这些能力，而非仅罗列形容词。", "evidence": context.get("soft_skill_demand", [])[:8]},
         {"key": "responsibility", "title": "岗位职责分析", "summary": "从样本 JD 看，职责通常围绕系统开发、AI/数据能力落地、云基础设施交付、跨团队协作和质量/安全要求展开。技术型岗位不只看工具名，还强调端到端交付和业务场景理解。", "evidence": context.get("knowledge_base_samples", [])[:5]},
         {"key": "company_industry", "title": "公司行业分析", "summary": f"基于公司名称、岗位标题和 JD 业务语境归类后，行业集中在：{industries}。行业排名反映的是岗位需求来自哪些业务场景，而不是公司名称出现次数；求职时应结合目标行业补充对应业务词汇、监管语境和项目案例。", "evidence": context.get("industry_distribution", [])[:5]},
         {"key": "tech_direction", "title": "技术方向分析", "summary": f"技术栈高频项包括：{skills}。整体方向偏向云平台、AI 应用、数据工程、DevOps 自动化和全栈开发能力组合，简称类技术名已在图表中补充中文全称。", "evidence": context.get("tech_stack_ranking", [])[:8]},
@@ -785,7 +921,7 @@ def _trend_section_specs(context: dict[str, Any]) -> list[dict[str, Any]]:
         {"key": "tech_category", "title": "细分技能类别分析", "evidence": context.get("skill_category_distribution", [])[:8]},
         {"key": "role_classification", "title": "角色分类分析", "evidence": context.get("role_demand_ranking", [])[:8]},
         {"key": "role_distribution", "title": "角色分布分析", "evidence": context.get("role_distribution", [])[:8]},
-        {"key": "job_demand", "title": "岗位需求分析", "evidence": context.get("role_demand_ranking", [])[:8]},
+        {"key": "soft_skill_demand", "title": "软技能需求分析", "evidence": context.get("soft_skill_demand", [])[:10]},
         {"key": "responsibility", "title": "岗位职责分析", "evidence": context.get("responsibility_distribution", [])[:8]},
         {"key": "company_industry", "title": "公司行业分析", "evidence": context.get("industry_distribution", [])[:8]},
         {"key": "tech_direction", "title": "技术方向分析", "evidence": context.get("tech_stack_ranking", [])[:8]},
@@ -831,6 +967,8 @@ def _call_llm_for_trend_analysis(context: dict[str, Any]) -> list[dict[str, Any]
         "每个标题下写 3-5 句中文，不能只复述出现次数；"
         "必须解释这些数据对香港 IT 行情的意义、对候选人技能组合/简历关键词/求职优先级的建议、以及样本局限。"
         "技术简称必须补充中文解释，例如 持续集成/持续交付（CI/CD）。不要输出 JSON。\n\n"
+        "特别注意：「软技能需求分析」一节必须覆盖学历要求、语言要求、个人能力（如沟通能力、团队合作、组织能力、领导力等）三类，"
+        "分别说明每类的高频项及其对求职者简历表达与能力准备的启示，不要只谈岗位数量。\n\n"
         "标题顺序：\n"
         + "\n".join([f"### {spec['title']}" for spec in section_specs]) +
         "\n\n"

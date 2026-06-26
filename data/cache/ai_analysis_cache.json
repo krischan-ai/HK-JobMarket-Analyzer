@@ -1867,5 +1867,12 @@
       "Yau Tsim Mong District": "油尖旺",
       "Yuen Long District": "元朗"
     }
+  },
+  "soft_skill_distribution": {
+    "signature": "v1:1782267381.0341861:244",
+    "data": {
+      "llm_used": false,
+      "items": []
+    }
   }
 }
