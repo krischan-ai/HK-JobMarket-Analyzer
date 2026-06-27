@@ -46,6 +46,9 @@ data/chromadb/
 indeed_auth.json
 data/role_cache.json
 
+# Taxonomy discovery candidate pool & log (runtime-generated, v1.5)
+data/taxonomy/
+
 # Debug scripts
 scripts/_debug_*.py
 scripts/_test_*.py

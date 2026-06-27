@@ -306,3 +306,23 @@ COMBINATION_RULES: list[dict] = [
 
 def normalize_dimension_name(name: str) -> str:
     return CROSS_INDUSTRY_ALIASES.get(name.strip().lower(), name.strip())
+
+
+def compact_known_labels() -> list[str]:
+    """正式词库标签快照（去重排序），供 Taxonomy Discovery 提示 LLM 勿重复提议、
+    及候选去重共用（v1.5 第一期，doc §11.11.8）。"""
+    labels: set[str] = set()
+    labels.update(NAME_ALIASES.values())
+    labels.update(CROSS_INDUSTRY_ALIASES.values())
+    labels.update(CATEGORY_DISPLAY.values())
+    labels.update(DIMENSION_DISPLAY.values())
+    labels.update(rule["name"] for rule in COMBINATION_RULES)
+    for rules in DISAMBIGUATION.values():
+        for _ctx, target in rules:
+            if target:
+                labels.add(target)
+    for rules in CROSS_DISAMBIGUATION.values():
+        for _ctx, target in rules:
+            if target:
+                labels.add(target)
+    return sorted(label for label in labels if label and label.strip())

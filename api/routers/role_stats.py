@@ -93,6 +93,12 @@ def _normalize_job_context_profile(value) -> dict[str, list[dict]]:
     return result
 
 
+def _normalize_taxonomy_candidates(value) -> list[dict]:
+    if isinstance(value, list):
+        return [c for c in value if isinstance(c, dict) and str(c.get("name", "")).strip()]
+    return []
+
+
 def _get_classifier() -> RoleClassifier:
     return RoleClassifier()
 
@@ -435,6 +441,7 @@ def _run_classify_in_background(req: RunClassificationRequest):
                     tag_profile=_normalize_tag_profile(cached.get("tag_profile")),
                     cross_industry_profile=_normalize_cross_industry_profile(cached.get("cross_industry_profile")),
                     job_context_profile=_normalize_job_context_profile(cached.get("job_context_profile")),
+                    taxonomy_candidates=_normalize_taxonomy_candidates(cached.get("taxonomy_candidates")),
                 )
                 from_cache = True
             else:
@@ -458,6 +465,7 @@ def _run_classify_in_background(req: RunClassificationRequest):
                     "tag_profile": cls_result.tag_profile,
                     "cross_industry_profile": cls_result.cross_industry_profile,
                     "job_context_profile": cls_result.job_context_profile,
+                    "taxonomy_candidates": cls_result.taxonomy_candidates,
                 }
                 classifier._save_cache()
 
@@ -537,6 +545,14 @@ def _run_classify_in_background(req: RunClassificationRequest):
     classifier._save_cache()
     # 重置强制重新分类标志，后续单岗位分类可正常命中缓存
     classifier._force_reclassify = False
+
+    # v1.5 第一期：汇总各岗位发现的候选标签到候选词库（仅主线程，并发安全）
+    try:
+        from src.analyzer.taxonomy_discovery_agent import TaxonomyDiscoveryAgent
+        summary = TaxonomyDiscoveryAgent().consolidate_candidates(classifier._cache)
+        logger.info("Taxonomy candidates consolidated: %s", summary)
+    except Exception as e:
+        logger.warning("Taxonomy consolidation failed: %s", e)  # 不阻断分类完成
 
     now_ts = datetime.now(timezone.utc).isoformat()
     _classify_result = results

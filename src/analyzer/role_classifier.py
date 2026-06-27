@@ -47,6 +47,7 @@ class RoleResult:
     job_context_profile: dict[str, list[dict]] = field(default_factory=lambda: {
         "summary_tags": [],
     })
+    taxonomy_candidates: list[dict] = field(default_factory=list)
 
 
 class RoleClassifier:
@@ -168,6 +169,34 @@ class RoleClassifier:
             result["summary_tags"] = [t for t in value["summary_tags"] if isinstance(t, dict) and t.get("name")]
         return result
 
+    @staticmethod
+    def _normalize_taxonomy_candidates(candidates: Any, alias_updates: Any = None) -> list[dict]:
+        """规整 candidate_taxonomy_updates，并把 candidate_alias_updates 折叠为 category=='alias' 候选。"""
+        result: list[dict] = []
+        if isinstance(candidates, list):
+            for c in candidates:
+                if isinstance(c, dict) and str(c.get("name", "")).strip() and str(c.get("evidence", "")).strip():
+                    result.append(c)
+        if isinstance(alias_updates, list):
+            for a in alias_updates:
+                if not isinstance(a, dict):
+                    continue
+                alias = str(a.get("alias", "")).strip()
+                canonical = str(a.get("canonical", "")).strip()
+                evidence = str(a.get("evidence", "")).strip()
+                if alias and canonical and evidence:
+                    result.append({
+                        "name": alias,
+                        "category": "alias",
+                        "aliases": [canonical],
+                        "evidence": evidence,
+                        "reason": f"alias of {canonical}",
+                        "confidence": a.get("confidence", 0.8),
+                        "requirement_level": "",
+                        "status": "candidate",
+                    })
+        return result
+
     def classify(self, jd_text: str) -> RoleResult:
         if not jd_text or not isinstance(jd_text, str):
             return RoleResult(role_id="other", role_name="其他", confidence="low")
@@ -183,6 +212,7 @@ class RoleClassifier:
                 tag_profile=self._normalize_tag_profile(cached.get("tag_profile")),
                 cross_industry_profile=self._normalize_cross_industry_profile(cached.get("cross_industry_profile")),
                 job_context_profile=self._normalize_job_context_profile(cached.get("job_context_profile")),
+                taxonomy_candidates=self._normalize_taxonomy_candidates(cached.get("taxonomy_candidates")),
             )
 
         if self.available:
@@ -198,6 +228,7 @@ class RoleClassifier:
             "tag_profile": result.tag_profile,
             "cross_industry_profile": result.cross_industry_profile,
             "job_context_profile": result.job_context_profile,
+            "taxonomy_candidates": result.taxonomy_candidates,
         }
         self._save_cache()
         return result
@@ -273,6 +304,9 @@ class RoleClassifier:
                     tag_profile=self._normalize_tag_profile(parsed.get("tag_profile"), run_postprocess=True),
                     cross_industry_profile=cross_profile,
                     job_context_profile={"summary_tags": build_summary_tags(cross_profile)},
+                    taxonomy_candidates=self._normalize_taxonomy_candidates(
+                        parsed.get("candidate_taxonomy_updates"), parsed.get("candidate_alias_updates")
+                    ),
                 )
             except json.JSONDecodeError:
                 self.logger.warning("LLM non-JSON response at attempt %d, using rules", attempt + 1)
@@ -427,6 +461,7 @@ class RoleClassifier:
                     job["tag_profile"] = result.tag_profile
                     job["cross_industry_profile"] = result.cross_industry_profile
                     job["job_context_profile"] = result.job_context_profile
+                    job["taxonomy_candidates"] = result.taxonomy_candidates
                 except Exception as e:
                     self.logger.warning("Failed to classify job %s: %s", job.get("job_id", "?"), e)
                     job["role_id"] = "other"
@@ -436,6 +471,7 @@ class RoleClassifier:
                     job["tag_profile"] = self._empty_tag_profile()
                     job["cross_industry_profile"] = self._empty_cross_industry_profile()
                     job["job_context_profile"] = self._empty_job_context_profile()
+                    job["taxonomy_candidates"] = []
                 results.append(job)
             if i + batch_size < len(jobs):
                 self.logger.info("Classified %d/%d jobs", i + batch_size, len(jobs))

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from src.analyzer.skill_taxonomy import compact_known_labels
+
 ROLE_CLASSIFY_SYSTEM_PROMPT = """你是一个香港 IT 招聘市场的岗位分类专家。你的任务是根据岗位描述（JD）将岗位归类到标准技术角色。
 
 你需要返回一个 JSON 对象，包含以下字段：
@@ -149,6 +151,8 @@ Return ONLY valid JSON with these fields:
   - "compliance_standard": compliance/standard/security (e.g. ISO 27001, PDPO, AML/KYC, 政府合規, 信息安全合規)
   - "system_or_asset": built/integrated/monitored system or device (e.g. 傳感器, 機械設備, POS, 支付網關, 倉儲系統, 樓宇系統, ERP, 網絡設備)
   Each dimension tag is an object: {"name","confidence","evidence"}. Use 繁体中文 for names. Do NOT output combination/summary tags — the backend composes those.
+- "candidate_taxonomy_updates": array of NEW reusable labels you discovered that are NOT already in the known taxonomy below. Each item: {"name","category","aliases":[...],"evidence","reason","confidence","requirement_level","status":"candidate"}.
+- "candidate_alias_updates": array of term aliases mapping a JD term to a canonical label. Each item: {"alias","canonical","category","evidence","confidence"}.
 
 Role reference (distinguish carefully):
 frontend=前端开发, backend=后端开发, fullstack=全栈开发, mobile=移动开发,
@@ -203,8 +207,18 @@ cross_industry_profile extraction rules (doc §11.10.2/§11.12):
 6. sensors/machinery monitoring/water treatment facilities → system_or_asset (傳感器) and/or business_scenario (設備狀態監測); keep the industry scenario, not just a bare "Sensors".
 7. business development manager is not a role tag, but when co-occurring with "develop business opportunities" output 業務拓展支持 (delivery_motion).
 
+candidate_taxonomy_updates / candidate_alias_updates rules (doc §11.11.8):
+1. Only propose REUSABLE labels (short phrases), never full sentences or one-off project descriptions.
+2. Every candidate must have a JD-quote "evidence". No evidence => do not propose.
+3. Do NOT propose a label already present in the known taxonomy list below (or an obvious synonym of it).
+4. Mark each as "status":"candidate"; do not promote it to a formal label. Do not propose "inferred" candidates.
+5. Use candidate_alias_updates when a JD term is clearly an alias of an existing canonical label (e.g. "Proof-Of-Concept" -> "POC 測試").
+6. If you discover nothing genuinely new, return empty arrays.
+
+Known taxonomy (do NOT re-propose these): """ + "、".join(compact_known_labels()) + """
+
 Example output (a government/utility pre-sales solution JD):
-{"role_id":"solution_architect","role_name":"解决方案架构师","confidence":"high","soft_skills":{"education":["學士學位"],"language":["英語","中文"],"soft_skill":["溝通能力"],"domain_knowledge":["政府/公共部門業務知識"],"certification":[],"business_skill":["需求分析","業務拓展支持"]},"tag_profile":{"technical":[{"name":"Digital Twin","category":"ai_concepts","requirement_level":"required","confidence":0.95,"evidence":"AI and Digital Twin solutions to government clients"},{"name":"IT 基礎設施方案設計","category":"infrastructure","requirement_level":"required","confidence":0.96,"evidence":"Design IT infrastructure solutions"},{"name":"ISO 27001","category":"security_compliance","requirement_level":"required","confidence":0.98,"evidence":"compliance with government standards such as ISO 27001"}],"non_technical":[{"name":"技術提案","category":"presales_delivery","requirement_level":"required","confidence":0.93,"evidence":"technical proposals"}]},"cross_industry_profile":{"industry_context":[{"name":"政府/公共部門","confidence":0.94,"evidence":"government and public sector clients"}],"business_scenario":[{"name":"水處理設施監測","confidence":0.96,"evidence":"water treatment facilities"}],"solution_domain":[{"name":"Digital Twin 解決方案","confidence":0.95,"evidence":"Digital Twin solutions"}],"delivery_motion":[{"name":"POC 測試","confidence":0.93,"evidence":"Proof-Of-Concept (POC) tests"},{"name":"投標","confidence":0.9,"evidence":"tender preparation"}],"compliance_standard":[{"name":"ISO 27001","confidence":0.98,"evidence":"such as ISO 27001"}],"system_or_asset":[{"name":"傳感器","confidence":0.94,"evidence":"recommending and specifying suitable sensors brands"}]}}
+{"role_id":"solution_architect","role_name":"解决方案架构师","confidence":"high","soft_skills":{"education":["學士學位"],"language":["英語","中文"],"soft_skill":["溝通能力"],"domain_knowledge":["政府/公共部門業務知識"],"certification":[],"business_skill":["需求分析","業務拓展支持"]},"tag_profile":{"technical":[{"name":"Digital Twin","category":"ai_concepts","requirement_level":"required","confidence":0.95,"evidence":"AI and Digital Twin solutions to government clients"},{"name":"IT 基礎設施方案設計","category":"infrastructure","requirement_level":"required","confidence":0.96,"evidence":"Design IT infrastructure solutions"},{"name":"ISO 27001","category":"security_compliance","requirement_level":"required","confidence":0.98,"evidence":"compliance with government standards such as ISO 27001"}],"non_technical":[{"name":"技術提案","category":"presales_delivery","requirement_level":"required","confidence":0.93,"evidence":"technical proposals"}]},"cross_industry_profile":{"industry_context":[{"name":"政府/公共部門","confidence":0.94,"evidence":"government and public sector clients"}],"business_scenario":[{"name":"水處理設施監測","confidence":0.96,"evidence":"water treatment facilities"}],"solution_domain":[{"name":"Digital Twin 解決方案","confidence":0.95,"evidence":"Digital Twin solutions"}],"delivery_motion":[{"name":"POC 測試","confidence":0.93,"evidence":"Proof-Of-Concept (POC) tests"},{"name":"投標","confidence":0.9,"evidence":"tender preparation"}],"compliance_standard":[{"name":"ISO 27001","confidence":0.98,"evidence":"such as ISO 27001"}],"system_or_asset":[{"name":"傳感器","confidence":0.94,"evidence":"recommending and specifying suitable sensors brands"}]},"candidate_taxonomy_updates":[{"name":"水處理設施知識","category":"domain_knowledge","aliases":["water treatment facilities"],"evidence":"water treatment facilities for government clients","reason":"domain knowledge not in current taxonomy","confidence":0.96,"requirement_level":"required","status":"candidate"}],"candidate_alias_updates":[{"alias":"Proof-Of-Concept","canonical":"POC 測試","category":"presales_delivery","evidence":"Proof-Of-Concept (POC) tests","confidence":0.95}]}
 
 Job description:
 """ + jd_text[:3000]
