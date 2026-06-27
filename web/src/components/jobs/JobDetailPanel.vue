@@ -142,6 +142,40 @@
         </div>
       </div>
 
+      <!-- 跨行業崗位畫像（v1.3+v1.4） -->
+      <div v-if="summaryTags.length || crossIndustryGroups.length" class="detail-section">
+        <h4 class="detail-section__title">崗位畫像（跨行業）</h4>
+        <div v-if="summaryTags.length" class="detail-skill-group">
+          <span class="detail-skill-group__label">組合場景</span>
+          <div class="detail-skill-group__tags">
+            <el-tag
+              v-for="tag in summaryTags"
+              :key="'sum-' + tag.name"
+              size="small"
+              type="primary"
+              effect="dark"
+              :title="`支撐維度：${tag.supporting_dimensions.map(dimLabel).join('、')}`"
+            >
+              {{ tag.name }}
+            </el-tag>
+          </div>
+        </div>
+        <div v-for="group in crossIndustryGroups" :key="group.dim" class="detail-skill-group">
+          <span class="detail-skill-group__label">{{ group.label }}</span>
+          <div class="detail-skill-group__tags">
+            <el-tag
+              v-for="tag in group.tags"
+              :key="group.dim + tag.name"
+              size="small"
+              effect="plain"
+              :title="tag.evidence ? `證據：${tag.evidence}` : ''"
+            >
+              {{ tag.name }}
+            </el-tag>
+          </div>
+        </div>
+      </div>
+
       <!-- JD 正文 -->
       <div class="detail-section">
         <h4 class="detail-section__title">職位描述</h4>
@@ -235,7 +269,7 @@
 
 <script lang="ts" setup>
 import { computed } from 'vue'
-import type { JobItem } from '@/types'
+import type { DimensionTag, JobItem } from '@/types'
 
 const props = defineProps<{
   job: JobItem | null
@@ -371,6 +405,38 @@ function levelTagType(level: string): '' | 'success' | 'warning' | 'danger' | 'i
   if (level === 'example') return 'info'
   return ''
 }
+
+const _dimMeta: Array<{ dim: string; label: string }> = [
+  { dim: 'industry_context', label: '行業/客戶場景' },
+  { dim: 'business_scenario', label: '業務場景' },
+  { dim: 'solution_domain', label: '技術方案' },
+  { dim: 'delivery_motion', label: '交付動作' },
+  { dim: 'compliance_standard', label: '合規標準' },
+  { dim: 'system_or_asset', label: '系統/設備對象' },
+]
+
+function dimLabel(dim: string): string {
+  return _dimMeta.find((m) => m.dim === dim)?.label ?? dim
+}
+
+const summaryTags = computed(() => {
+  const tags = props.job?.job_context_profile?.summary_tags ?? []
+  return [...tags].sort((a, b) => (b.confidence ?? 0) - (a.confidence ?? 0))
+})
+
+const crossIndustryGroups = computed(() => {
+  const cip = props.job?.cross_industry_profile
+  if (!cip) return []
+  return _dimMeta
+    .map(({ dim, label }) => ({
+      dim,
+      label,
+      tags: [...((cip as Record<string, DimensionTag[]>)[dim] ?? [])]
+        .filter((t) => t && t.name)
+        .sort((a, b) => (b.confidence ?? 0) - (a.confidence ?? 0)),
+    }))
+    .filter((group) => group.tags.length > 0)
+})
 
 const techStackList = computed(() => {
   return props.job?.tech_stack ?? []

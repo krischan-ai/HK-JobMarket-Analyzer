@@ -169,6 +169,50 @@ def _tag_profile_by_job_id() -> dict[str, dict]:
     return result
 
 
+_CROSS_INDUSTRY_DIMENSIONS = (
+    "industry_context", "business_scenario", "solution_domain",
+    "delivery_motion", "compliance_standard", "system_or_asset",
+)
+
+
+def _cross_industry_by_job_id() -> dict[str, dict]:
+    """从 role_cache.json 读取 _job_id -> (cross_industry_profile, job_context_profile)。"""
+    try:
+        from src.analyzer.role_classifier import CACHE_PATH
+        if not CACHE_PATH.exists():
+            return {}
+        with open(CACHE_PATH, "r", encoding="utf-8") as f:
+            cache_data = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+    result: dict[str, dict] = {}
+    if not isinstance(cache_data, dict):
+        return result
+    for entry in cache_data.values():
+        if not isinstance(entry, dict):
+            continue
+        job_id = str(entry.get("_job_id") or "").strip()
+        if not job_id:
+            continue
+        cip = entry.get("cross_industry_profile")
+        jcp = entry.get("job_context_profile")
+        cross = {dim: [] for dim in _CROSS_INDUSTRY_DIMENSIONS}
+        if isinstance(cip, dict):
+            for dim in cross:
+                items = cip.get(dim, [])
+                if isinstance(items, list):
+                    cross[dim] = [t for t in items if isinstance(t, dict) and t.get("name")]
+        summary = []
+        if isinstance(jcp, dict) and isinstance(jcp.get("summary_tags"), list):
+            summary = [t for t in jcp["summary_tags"] if isinstance(t, dict) and t.get("name")]
+        result[job_id] = {
+            "cross_industry_profile": cross,
+            "job_context_profile": {"summary_tags": summary},
+        }
+    return result
+
+
 @router.get("")
 def list_jobs(
     keyword: str = Query(default=None),
@@ -217,6 +261,7 @@ def list_jobs(
         classified_industries = {}
     soft_skills_by_job = _soft_skills_by_job_id()
     tag_profile_by_job = _tag_profile_by_job_id()
+    cross_industry_by_job = _cross_industry_by_job_id()
 
     items = []
     for _, row in df_page.iterrows():
@@ -256,6 +301,12 @@ def list_jobs(
             "tech_stack": _safe_list(row, "tech_stack"),
             "soft_skills": soft_skills,
             "tag_profile": tag_profile_by_job.get(job_id, {"technical": [], "non_technical": []}),
+            "cross_industry_profile": cross_industry_by_job.get(job_id, {}).get(
+                "cross_industry_profile", {dim: [] for dim in _CROSS_INDUSTRY_DIMENSIONS}
+            ),
+            "job_context_profile": cross_industry_by_job.get(job_id, {}).get(
+                "job_context_profile", {"summary_tags": []}
+            ),
             "job_type": _safe_str(row, "job_type"),
             "import_time": import_time,
         })

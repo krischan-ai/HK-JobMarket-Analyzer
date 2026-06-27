@@ -28,6 +28,8 @@ export interface JobItem {
   tech_stack?: string[]
   soft_skills?: SoftSkillTags
   tag_profile?: TagProfile
+  cross_industry_profile?: CrossIndustryProfile
+  job_context_profile?: JobContextProfile
   job_type?: string
 }
 
@@ -54,6 +56,32 @@ export interface StructuredTag {
 export interface TagProfile {
   technical: StructuredTag[]
   non_technical: StructuredTag[]
+}
+
+export type CrossIndustryDimension =
+  | 'industry_context'
+  | 'business_scenario'
+  | 'solution_domain'
+  | 'delivery_motion'
+  | 'compliance_standard'
+  | 'system_or_asset'
+
+export interface DimensionTag {
+  name: string
+  confidence: number
+  evidence?: string
+}
+
+export type CrossIndustryProfile = Record<CrossIndustryDimension, DimensionTag[]>
+
+export interface SummaryTag {
+  name: string
+  confidence: number
+  supporting_dimensions: string[]
+}
+
+export interface JobContextProfile {
+  summary_tags: SummaryTag[]
 }
 
 export interface JobListResponse {

@@ -190,3 +190,119 @@ def infer_requirement_level(evidence: str, fallback: str = "required") -> str | 
     if any(m in low for m in PREFERRED_MARKERS):
         return "preferred"
     return None
+
+
+def any_keyword(text: str, keywords: tuple[str, ...]) -> bool:
+    """text 中是否命中任一关键词（英文词边界 / 中文子串）。text 应已小写。"""
+    return any(word_boundary_match(kw, text) for kw in keywords)
+
+
+# ===========================================================================
+# 跨行业六维标签治理模型（v1.3+v1.4，doc §11.10）
+# ===========================================================================
+
+CROSS_INDUSTRY_DIMENSIONS: tuple[str, ...] = (
+    "industry_context", "business_scenario", "solution_domain",
+    "delivery_motion", "compliance_standard", "system_or_asset",
+)
+
+DIMENSION_DISPLAY: dict[str, str] = {
+    "industry_context": "行業/客戶場景",
+    "business_scenario": "業務場景",
+    "solution_domain": "技術方案",
+    "delivery_motion": "交付動作",
+    "compliance_standard": "合規標準",
+    "system_or_asset": "系統/設備對象",
+}
+
+# 维度内名称归一（英文 / 简体 -> 繁体标准展示名），doc §11.12
+CROSS_INDUSTRY_ALIASES: dict[str, str] = {
+    "water treatment": "水處理設施", "water treatment facilities": "水處理設施", "水处理": "水處理設施",
+    "digital twin": "Digital Twin 解決方案", "数字孪生": "Digital Twin 解決方案",
+    "sensor": "傳感器", "sensors": "傳感器", "感測器": "傳感器", "传感器": "傳感器",
+    "proof-of-concept": "POC 測試", "proof of concept": "POC 測試", "poc": "POC 測試",
+    "tender": "投標", "tender preparation": "投標準備", "tender submission": "投標提交",
+    "iso 27001": "ISO 27001", "iso27001": "ISO 27001",
+    "it infrastructure": "IT 基礎設施方案設計",
+    "government": "政府/公共部門", "public sector": "政府/公共部門",
+    "pre-sales": "售前支持", "presales": "售前支持",
+    "network security": "網絡安全", "machinery monitoring": "設備狀態監測",
+}
+
+# 跨行业上下文消歧（doc §11.10.2）：keyword -> [(上下文词组, 维度, 目标标签 或 None=丢弃)]
+# 仅用于 industry_context / business_scenario 维度的多义词判定。
+CROSS_DISAMBIGUATION: dict[str, list[tuple[tuple[str, ...], str | None]]] = {
+    "payment": [
+        (("banking", "fintech", "kyc", "aml", "card", "wallet", "settlement", "sfc", "hkma"), "金融/金融科技業務"),
+        (("order", "promotion", "catalog", "ecommerce", "e-commerce", "retail", "pos", "checkout"), "電商/零售業務"),
+    ],
+    "insurance": [
+        (("policy", "claims", "underwriting", "broker", "actuarial", "wealth"), "保險/財富管理業務"),
+        (("coverage", "benefit", "medical", "life insurance", "fringe", "scheme"), None),
+    ],
+    "sensor": [
+        (("machinery", "monitoring", "physical condition", "facility", "water treatment", "tracking"), "設備狀態監測"),
+    ],
+}
+
+# 组合画像规则（doc §11.10.4）：满足 ≥min_groups 个不同维度信号即触发。
+# 每个 group = (维度, 关键词集合)，命中标签 name 或 evidence。
+COMBINATION_RULES: list[dict] = [
+    {
+        "name": "政府公用事業 AI/Digital Twin 售前解決方案",
+        "groups": [
+            ("industry_context", ("政府", "公共部門", "government", "public sector", "公用事業", "utility", "環保", "environmental")),
+            ("solution_domain", ("digital twin", "數字孿生", "ai", "人工智能", "人工智慧")),
+            ("delivery_motion", ("售前", "pre-sales", "presales", "poc", "proof", "tender", "投標", "技術提案", "proposal", "demo", "presentation")),
+            ("business_scenario", ("水處理", "water treatment", "設備狀態", "機械狀態", "monitoring")),
+        ],
+        "min_groups": 2,
+    },
+    {
+        "name": "零售/電商 ERP 系統集成",
+        "groups": [
+            ("solution_domain", ("erp", "d365", "dynamics 365", "sap", "middleware", "中間件", "系統集成", "system integration")),
+            ("industry_context", ("零售", "電商", "retail", "ecommerce", "e-commerce")),
+            ("business_scenario", ("訂單", "促銷", "定價", "order", "promotion", "pricing", "catalog")),
+        ],
+        "min_groups": 2,
+    },
+    {
+        "name": "電商支付與零售系統開發",
+        "groups": [
+            ("business_scenario", ("支付", "payment", "pos", "結帳", "checkout")),
+            ("industry_context", ("零售", "電商", "retail", "ecommerce", "e-commerce")),
+        ],
+        "min_groups": 2,
+    },
+    {
+        "name": "金融數據平台與合規場景",
+        "groups": [
+            ("solution_domain", ("data platform", "數據平台", "data pipeline", "數據管道", "aws")),
+            ("industry_context", ("金融", "銀行", "banking", "fintech")),
+            ("compliance_standard", ("hkma", "aml", "kyc", "sfc")),
+        ],
+        "min_groups": 2,
+    },
+    {
+        "name": "物流供應鏈系統集成",
+        "groups": [
+            ("solution_domain", ("tms", "wms", "api integration", "系統集成", "system integration")),
+            ("industry_context", ("物流", "供應鏈", "logistics", "supply chain")),
+        ],
+        "min_groups": 2,
+    },
+    {
+        "name": "樓宇設施與 IoT 系統方案",
+        "groups": [
+            ("system_or_asset", ("bms", "樓宇", "building management", "facility", "設施")),
+            ("solution_domain", ("iot", "物聯網")),
+            ("compliance_standard", ("security", "安全")),
+        ],
+        "min_groups": 2,
+    },
+]
+
+
+def normalize_dimension_name(name: str) -> str:
+    return CROSS_INDUSTRY_ALIASES.get(name.strip().lower(), name.strip())

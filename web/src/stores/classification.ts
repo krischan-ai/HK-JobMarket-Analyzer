@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import api from '@/api'
-import type { SoftSkillTags, TagProfile } from '@/types'
+import type { CrossIndustryProfile, JobContextProfile, SoftSkillTags, TagProfile } from '@/types'
 
 export interface ClassifiedJob {
   job_id: string
@@ -18,6 +18,8 @@ export interface ClassifiedJob {
   skills: Array<{ name: string; category: string }>
   soft_skills?: SoftSkillTags
   tag_profile?: TagProfile
+  cross_industry_profile?: CrossIndustryProfile
+  job_context_profile?: JobContextProfile
   is_insurance_sales: boolean
   insurance_score: number
   llm_is_insurance: boolean

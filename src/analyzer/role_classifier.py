@@ -12,7 +12,12 @@ import requests
 
 from config.settings import settings
 from src.analyzer.role_prompt import ROLE_DEFINITIONS, build_role_classify_messages
-from src.analyzer.skill_postprocessor import postprocess_tag_profile
+from src.analyzer.skill_postprocessor import (
+    build_summary_tags,
+    postprocess_cross_industry_profile,
+    postprocess_tag_profile,
+)
+from src.analyzer.skill_taxonomy import CROSS_INDUSTRY_DIMENSIONS
 from src.llm_config_manager import LLMConfigManager
 from src.logger import get_logger
 
@@ -35,6 +40,12 @@ class RoleResult:
     tag_profile: dict[str, list[dict]] = field(default_factory=lambda: {
         "technical": [],
         "non_technical": [],
+    })
+    cross_industry_profile: dict[str, list[dict]] = field(default_factory=lambda: {
+        dim: [] for dim in CROSS_INDUSTRY_DIMENSIONS
+    })
+    job_context_profile: dict[str, list[dict]] = field(default_factory=lambda: {
+        "summary_tags": [],
     })
 
 
@@ -129,6 +140,34 @@ class RoleClassifier:
                 result[bucket] = [item for item in items if isinstance(item, dict) and item.get("name")]
         return result
 
+    @staticmethod
+    def _empty_cross_industry_profile() -> dict[str, list[dict]]:
+        return {dim: [] for dim in CROSS_INDUSTRY_DIMENSIONS}
+
+    @staticmethod
+    def _empty_job_context_profile() -> dict[str, list[dict]]:
+        return {"summary_tags": []}
+
+    @classmethod
+    def _normalize_cross_industry_profile(cls, value: Any, run_postprocess: bool = False) -> dict[str, list[dict]]:
+        if run_postprocess:
+            return postprocess_cross_industry_profile(value)
+        result = cls._empty_cross_industry_profile()
+        if not isinstance(value, dict):
+            return result
+        for dim in result:
+            items = value.get(dim, [])
+            if isinstance(items, list):
+                result[dim] = [item for item in items if isinstance(item, dict) and item.get("name")]
+        return result
+
+    @classmethod
+    def _normalize_job_context_profile(cls, value: Any) -> dict[str, list[dict]]:
+        result = cls._empty_job_context_profile()
+        if isinstance(value, dict) and isinstance(value.get("summary_tags"), list):
+            result["summary_tags"] = [t for t in value["summary_tags"] if isinstance(t, dict) and t.get("name")]
+        return result
+
     def classify(self, jd_text: str) -> RoleResult:
         if not jd_text or not isinstance(jd_text, str):
             return RoleResult(role_id="other", role_name="其他", confidence="low")
@@ -142,6 +181,8 @@ class RoleClassifier:
                 confidence=cached.get("confidence", "low"),
                 soft_skills=self._normalize_soft_skills(cached.get("soft_skills")),
                 tag_profile=self._normalize_tag_profile(cached.get("tag_profile")),
+                cross_industry_profile=self._normalize_cross_industry_profile(cached.get("cross_industry_profile")),
+                job_context_profile=self._normalize_job_context_profile(cached.get("job_context_profile")),
             )
 
         if self.available:
@@ -155,6 +196,8 @@ class RoleClassifier:
             "confidence": result.confidence,
             "soft_skills": result.soft_skills,
             "tag_profile": result.tag_profile,
+            "cross_industry_profile": result.cross_industry_profile,
+            "job_context_profile": result.job_context_profile,
         }
         self._save_cache()
         return result
@@ -219,12 +262,17 @@ class RoleClassifier:
                 role_id = parsed.get("role_id", "other")
                 if role_id not in ROLE_DEFINITIONS:
                     role_id = "other"
+                cross_profile = self._normalize_cross_industry_profile(
+                    parsed.get("cross_industry_profile"), run_postprocess=True
+                )
                 return RoleResult(
                     role_id=role_id,
                     role_name=ROLE_DEFINITIONS.get(role_id, {}).get("name", "其他"),
                     confidence=parsed.get("confidence", "medium"),
                     soft_skills=self._normalize_soft_skills(parsed.get("soft_skills")),
                     tag_profile=self._normalize_tag_profile(parsed.get("tag_profile"), run_postprocess=True),
+                    cross_industry_profile=cross_profile,
+                    job_context_profile={"summary_tags": build_summary_tags(cross_profile)},
                 )
             except json.JSONDecodeError:
                 self.logger.warning("LLM non-JSON response at attempt %d, using rules", attempt + 1)
@@ -250,7 +298,7 @@ class RoleClassifier:
             "model": self.model,
             "messages": messages,
             "temperature": 0.1,
-            "max_tokens": 6144,
+            "max_tokens": 8192,
         }
         url = f"{self.api_base}/chat/completions"
         resp = requests.post(url, headers=headers, json=payload, timeout=self.timeout, proxies={"http": None, "https": None})
@@ -377,6 +425,8 @@ class RoleClassifier:
                     job["role_confidence"] = result.confidence
                     job["soft_skills"] = result.soft_skills
                     job["tag_profile"] = result.tag_profile
+                    job["cross_industry_profile"] = result.cross_industry_profile
+                    job["job_context_profile"] = result.job_context_profile
                 except Exception as e:
                     self.logger.warning("Failed to classify job %s: %s", job.get("job_id", "?"), e)
                     job["role_id"] = "other"
@@ -384,6 +434,8 @@ class RoleClassifier:
                     job["role_confidence"] = "low"
                     job["soft_skills"] = self._normalize_soft_skills({})
                     job["tag_profile"] = self._empty_tag_profile()
+                    job["cross_industry_profile"] = self._empty_cross_industry_profile()
+                    job["job_context_profile"] = self._empty_job_context_profile()
                 results.append(job)
             if i + batch_size < len(jobs):
                 self.logger.info("Classified %d/%d jobs", i + batch_size, len(jobs))

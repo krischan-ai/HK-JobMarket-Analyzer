@@ -62,6 +62,37 @@ def _normalize_tag_profile(value) -> dict[str, list[dict]]:
     return result
 
 
+_CROSS_INDUSTRY_DIMENSIONS = (
+    "industry_context", "business_scenario", "solution_domain",
+    "delivery_motion", "compliance_standard", "system_or_asset",
+)
+
+
+def _empty_cross_industry_profile() -> dict[str, list[dict]]:
+    return {dim: [] for dim in _CROSS_INDUSTRY_DIMENSIONS}
+
+
+def _normalize_cross_industry_profile(value) -> dict[str, list[dict]]:
+    result = _empty_cross_industry_profile()
+    if isinstance(value, dict):
+        for dim in result:
+            items = value.get(dim, [])
+            if isinstance(items, list):
+                result[dim] = [item for item in items if isinstance(item, dict) and item.get("name")]
+    return result
+
+
+def _empty_job_context_profile() -> dict[str, list[dict]]:
+    return {"summary_tags": []}
+
+
+def _normalize_job_context_profile(value) -> dict[str, list[dict]]:
+    result = _empty_job_context_profile()
+    if isinstance(value, dict) and isinstance(value.get("summary_tags"), list):
+        result["summary_tags"] = [t for t in value["summary_tags"] if isinstance(t, dict) and t.get("name")]
+    return result
+
+
 def _get_classifier() -> RoleClassifier:
     return RoleClassifier()
 
@@ -383,6 +414,8 @@ def _run_classify_in_background(req: RunClassificationRequest):
                 "skills": [], "is_insurance_sales": False, "insurance_score": 0,
                 "soft_skills": _empty_soft_skills(),
                 "tag_profile": _empty_tag_profile(),
+                "cross_industry_profile": _empty_cross_industry_profile(),
+                "job_context_profile": _empty_job_context_profile(),
                 "llm_is_insurance": False, "llm_confidence": "", "llm_explanation": "",
             }
 
@@ -400,6 +433,8 @@ def _run_classify_in_background(req: RunClassificationRequest):
                     confidence=cached.get("confidence", "low"),
                     soft_skills=_normalize_soft_skills(cached.get("soft_skills")),
                     tag_profile=_normalize_tag_profile(cached.get("tag_profile")),
+                    cross_industry_profile=_normalize_cross_industry_profile(cached.get("cross_industry_profile")),
+                    job_context_profile=_normalize_job_context_profile(cached.get("job_context_profile")),
                 )
                 from_cache = True
             else:
@@ -421,6 +456,8 @@ def _run_classify_in_background(req: RunClassificationRequest):
                     "confidence": cls_result.confidence,
                     "soft_skills": cls_result.soft_skills,
                     "tag_profile": cls_result.tag_profile,
+                    "cross_industry_profile": cls_result.cross_industry_profile,
+                    "job_context_profile": cls_result.job_context_profile,
                 }
                 classifier._save_cache()
 
@@ -453,6 +490,8 @@ def _run_classify_in_background(req: RunClassificationRequest):
             "skills": flat_skills,
             "soft_skills": cls_result.soft_skills,
             "tag_profile": cls_result.tag_profile,
+            "cross_industry_profile": cls_result.cross_industry_profile,
+            "job_context_profile": cls_result.job_context_profile,
             "is_insurance_sales": is_ins,
             "insurance_score": ins_score,
             "llm_is_insurance": _safe_bool(job.get("llm_is_insurance")),
@@ -476,6 +515,8 @@ def _run_classify_in_background(req: RunClassificationRequest):
                     "salary_min": 0.0, "salary_max": 0.0, "skills": [],
                     "soft_skills": _empty_soft_skills(),
                     "tag_profile": _empty_tag_profile(),
+                    "cross_industry_profile": _empty_cross_industry_profile(),
+                    "job_context_profile": _empty_job_context_profile(),
                 }
             done_count = len(results_map)
             pct = 8 + round(done_count / total * 82, 0)

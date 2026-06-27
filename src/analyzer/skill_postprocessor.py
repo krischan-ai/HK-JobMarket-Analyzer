@@ -190,3 +190,102 @@ def postprocess_tag_profile(raw: Any) -> dict[str, list[dict]]:
             reverse=True,
         )
     return result
+
+
+# ===========================================================================
+# 跨行业六维标签治理（v1.3+v1.4，doc §11.10）
+# ===========================================================================
+
+
+def _coerce_dim_tag(raw: Any) -> dict | None:
+    if isinstance(raw, str):
+        name = raw.strip()
+        return {"name": name, "confidence": 0.6, "evidence": ""} if name else None
+    if not isinstance(raw, dict):
+        return None
+    name = str(raw.get("name", "")).strip()
+    if not name:
+        return None
+    return {
+        "name": name,
+        "confidence": _coerce_confidence(raw.get("confidence")),
+        "evidence": str(raw.get("evidence", "") or "").strip()[:_EVIDENCE_MAX],
+    }
+
+
+def _disambiguate_dimension(dim: str, name: str, evidence: str) -> str | None:
+    """industry_context/business_scenario 多义词消歧 + 福利语境抑制。
+    返回归一后的 name 或 None（丢弃）。"""
+    if dim not in ("industry_context", "business_scenario"):
+        return name
+    ev = evidence.lower()
+    for keyword, rules in tax.CROSS_DISAMBIGUATION.items():
+        if not (tax.word_boundary_match(keyword, ev) or tax.word_boundary_match(keyword + "s", ev)):
+            continue
+        for ctx_words, target in rules:
+            if any(c in ev for c in ctx_words):
+                return target  # None -> 丢弃；否则重新归类
+    if any(w in ev for w in tax.BENEFIT_CONTEXT_WORDS) and not _has_industry_signal(ev):
+        return None
+    return name
+
+
+def postprocess_cross_industry_profile(raw: Any) -> dict[str, list[dict]]:
+    """清洗 LLM 六维原子标签：名称归一 -> 消歧/抑制 -> 去重 -> 按置信排序。"""
+    result: dict[str, list[dict]] = {dim: [] for dim in tax.CROSS_INDUSTRY_DIMENSIONS}
+    if not isinstance(raw, dict):
+        return result
+    for dim in tax.CROSS_INDUSTRY_DIMENSIONS:
+        items = raw.get(dim, [])
+        if not isinstance(items, list):
+            continue
+        seen: dict[str, dict] = {}
+        for item in items:
+            tag = _coerce_dim_tag(item)
+            if tag is None:
+                continue
+            name = tax.normalize_dimension_name(tag["name"])
+            disamb = _disambiguate_dimension(dim, name, tag["evidence"])
+            if disamb is None:
+                continue
+            name = tax.normalize_dimension_name(disamb)
+            entry = {"name": name, "confidence": tag["confidence"], "evidence": tag["evidence"]}
+            cur = seen.get(name.lower())
+            if cur is None or (entry["confidence"], len(entry["evidence"])) > (cur["confidence"], len(cur["evidence"])):
+                seen[name.lower()] = entry
+        result[dim] = sorted(seen.values(), key=lambda t: t["confidence"], reverse=True)
+    return result
+
+
+def build_summary_tags(cross_profile: Any) -> list[dict]:
+    """确定性组合器：当某规则命中 ≥min_groups 个不同维度信号时产出组合画像（doc §11.10.4）。"""
+    if not isinstance(cross_profile, dict):
+        return []
+    summaries: dict[str, dict] = {}
+    for rule in tax.COMBINATION_RULES:
+        matched_dims: dict[str, float] = {}
+        for dim, keywords in rule["groups"]:
+            tags = cross_profile.get(dim, [])
+            if not isinstance(tags, list):
+                continue
+            best: float | None = None
+            for t in tags:
+                if not isinstance(t, dict):
+                    continue
+                hay = (str(t.get("name", "")) + " " + str(t.get("evidence", ""))).lower()
+                if tax.any_keyword(hay, keywords):
+                    conf = _coerce_confidence(t.get("confidence"))
+                    best = conf if best is None else max(best, conf)
+            if best is not None and (dim not in matched_dims or best > matched_dims[dim]):
+                matched_dims[dim] = best
+        if len(matched_dims) >= rule.get("min_groups", 2):
+            conf = round(sum(matched_dims.values()) / len(matched_dims), 2)
+            name = rule["name"]
+            existing = summaries.get(name)
+            if existing is None or conf > existing["confidence"]:
+                summaries[name] = {
+                    "name": name,
+                    "confidence": conf,
+                    "supporting_dimensions": sorted(matched_dims.keys()),
+                }
+    return sorted(summaries.values(), key=lambda s: s["confidence"], reverse=True)
