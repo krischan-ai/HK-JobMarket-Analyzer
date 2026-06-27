@@ -552,6 +552,72 @@ def _collect_responsibility_stats(df: pd.DataFrame) -> list[dict[str, Any]]:
     return [{"name": name, "count": count} for name, count in counter.most_common()]
 
 
+def _has_cjk(text: str) -> bool:
+    """判断字符串是否含中文字符（中文关键词无需词边界）。"""
+    return any("\u4e00" <= ch <= "\u9fff" for ch in text)
+
+
+def _word_boundary_match(keyword: str, text: str) -> bool:
+    """词边界匹配：英文关键词用 \\b 正则避免子串误判（如 ai 不命中 Tai、rag 不命中 coverage）；
+    中文关键词保留 ``in`` 子串匹配。"""
+    if not keyword:
+        return False
+    if _has_cjk(keyword):
+        return keyword in text
+    # 英文关键词：用词边界正则。空格/斜杠结尾的关键词先 strip 再加 \b
+    kw = keyword.strip()
+    if not kw:
+        return False
+    pattern = r"\b" + re.escape(kw) + r"\b"
+    return re.search(pattern, text) is not None
+
+
+# 多义词福利/技术语境判定：insurance/medical/payment/health 等词在福利描述或技术语境中
+# 不应归类为行业知识。命中以下邻近词时视为非行业语境。
+_BENEFIT_CONTEXT_WORDS = (
+    "coverage", "benefit", "benefits", "pension", "life insurance",
+    "medical insurance", "medical and life", "fringe", "scheme",
+    "health check", "health-check", "post-release", "system health",
+    "application health", "service health",
+)
+
+
+def _is_non_industry_context(text: str, keyword: str) -> bool:
+    """判断关键词命中位置是否处于福利/技术语境（非行业语境）。
+    检查关键词命中点前后 40 字符窗口内是否出现福利/技术语境词。"""
+    if not keyword:
+        return False
+    lower = text.lower()
+    kw = keyword.strip().lower()
+    if not kw:
+        return False
+    # 找到所有命中位置，任一处于福利语境即判定（保守起见：所有命中都需通过）
+    start = 0
+    while True:
+        idx = lower.find(kw, start)
+        if idx < 0:
+            break
+        window = lower[max(0, idx - 40): idx + len(kw) + 40]
+        if any(ctx in window for ctx in _BENEFIT_CONTEXT_WORDS):
+            return True
+        start = idx + len(kw)
+    return False
+
+
+# 需要做福利/技术语境消歧的多义词：命中后需进一步判断上下文
+_POLYSEMY_INDUSTRY_KEYWORDS = {"insurance", "medical", "health", "payment", "wealth"}
+
+
+def _industry_keyword_hit(keyword: str, text: str) -> bool:
+    """行业关键词命中判定：词边界匹配 + 多义词消歧。"""
+    if not _word_boundary_match(keyword, text):
+        return False
+    kw = keyword.strip().lower()
+    if kw in _POLYSEMY_INDUSTRY_KEYWORDS and _is_non_industry_context(text, keyword):
+        return False
+    return True
+
+
 _INDUSTRY_LABELS = [
     "金融服务/金融科技",
     "保险/财富管理",
@@ -568,6 +634,8 @@ _INDUSTRY_LABELS = [
     "酒店/旅游",
     "媒体/娱乐",
     "制造/硬件",
+    "快消/消费品制造",
+    "企业应用/ERP系统集成",
     "其他",
 ]
 
@@ -575,19 +643,43 @@ _INDUSTRY_KEYWORD_RULES: list[tuple[str, tuple[str, ...]]] = [
     ("金融服务/金融科技", ("bank", "banking", "finance", "financial", "fintech", "trading", "securities", "payment", "wealth")),
     ("保险/财富管理", ("insurance", "insurtech", "actuarial", "underwriting", "claims", "broker")),
     ("互联网/软件服务", ("software", "saas", "platform", "application", "web", "mobile app", "product company")),
-    ("人工智能/数据服务", ("artificial intelligence", "ai ", " ai/", "machine learning", "data science", "analytics", "big data", "llm", "rag")),
+    ("人工智能/数据服务", ("artificial intelligence", "ai", "machine learning", "data science", "analytics", "big data", "llm", "rag")),
     ("电信/云与基础设施", ("telecom", "telecommunication", "cloud", "infrastructure", "data centre", "data center", "network", "hosting")),
     ("教育/科研", ("education institution", "school", "university", "college", "academy")),
     ("政府/公共机构", ("government", "public sector", "authority", "department", "bureau", "council")),
     ("零售/电商", ("retail", "e-commerce", "ecommerce", "commerce", "mall", "shop", "customer loyalty")),
-    ("物流/供应链", ("logistics", "supply chain", "shipping", "freight", "warehouse", "transport")),
+    ("物流/供应链", ("logistics", "supply chain", "shipping", "freight", "warehouse", "transport", "tms", "transportation management", "fulfillment")),
     ("医疗健康", ("health", "medical", "hospital", "clinic", "pharma", "biotech")),
     ("房地产/物业", ("property", "real estate", "facility management", "facilities management")),
     ("咨询/专业服务", ("consulting", "consultancy", "professional service", "outsourcing", "solution provider", "vendor")),
     ("酒店/旅游", ("hospitality", "hotel", "travel", "tourism", "airline")),
     ("媒体/娱乐", ("media", "advertising", "entertainment", "gaming", "game")),
     ("制造/硬件", ("manufacturing", "hardware", "semiconductor", "electronics", "iot", "device")),
+    ("快消/消费品制造", ("fmcg", "consumer goods", "fast-moving", "fast moving", "consumer packaged")),
+    ("企业应用/ERP系统集成", ("d365", "dynamics 365", "erp", "sap", "system integration", "middleware", "order management", "promotion", "pricing", "catalog")),
 ]
+
+# 简体 16 类行业 → 繁体行业知识标签映射（统一标签体系，根因 5 修复）
+_INDUSTRY_TO_DOMAIN_LABEL: dict[str, str] = {
+    "金融服务/金融科技": "金融/金融科技知識",
+    "保险/财富管理": "保險/財富管理知識",
+    "互联网/软件服务": "互聯網/軟件服務知識",
+    "人工智能/数据服务": "人工智能/數據服務知識",
+    "电信/云与基础设施": "電信/雲與基礎設施知識",
+    "教育/科研": "教育/科研知識",
+    "政府/公共机构": "政府/公共服務知識",
+    "零售/电商": "電商/零售業務知識",
+    "物流/供应链": "物流/供應鏈知識",
+    "医疗健康": "醫療健康行業知識",
+    "房地产/物业": "房地產/物業知識",
+    "咨询/专业服务": "諮詢/專業服務知識",
+    "酒店/旅游": "酒店/旅遊知識",
+    "媒体/娱乐": "媒體/娛樂知識",
+    "制造/硬件": "製造/硬件知識",
+    "快消/消费品制造": "快消/消費品製造知識",
+    "企业应用/ERP系统集成": "企業應用/ERP系統集成知識",
+    "其他": "",
+}
 
 
 def _industry_cache_signature(df: pd.DataFrame) -> str:
@@ -612,7 +704,7 @@ def _infer_industry_with_rules(record: dict[str, Any]) -> str:
     if provided and provided not in {"-", "None", "null"}:
         text = provided.lower()
         for label, keywords in _INDUSTRY_KEYWORD_RULES:
-            if any(keyword in text for keyword in keywords):
+            if any(_industry_keyword_hit(keyword, text) for keyword in keywords):
                 return label
     business_text = " ".join([
         _safe_text(record.get("company")),
@@ -620,11 +712,11 @@ def _infer_industry_with_rules(record: dict[str, Any]) -> str:
         provided,
     ]).lower()
     for label, keywords in _INDUSTRY_KEYWORD_RULES:
-        if any(keyword in business_text for keyword in keywords):
+        if any(_industry_keyword_hit(keyword, business_text) for keyword in keywords):
             return label
     jd_text = _safe_text(record.get("jd_excerpt")).lower()
     for label, keywords in _INDUSTRY_KEYWORD_RULES:
-        if any(keyword in jd_text for keyword in keywords):
+        if any(_industry_keyword_hit(keyword, jd_text) for keyword in keywords):
             return label
     return "其他"
 
@@ -693,7 +785,8 @@ def _collect_llm_industry_distribution(df: pd.DataFrame, top_n: int = 10, use_ll
     llm_used = False
     if use_llm:
         batch_size = 50
-        llm_records = records[:50]
+        # 4.6a：去除原 [:50] 限制，全量分批 LLM 行业归类
+        llm_records = records
         for start in range(0, len(llm_records), batch_size):
             batch = llm_records[start:start + batch_size]
             try:
@@ -806,18 +899,24 @@ def _canonical_non_tech_label(value: Any, category: str) -> str:
                 return label
 
     if category == "domain_knowledge":
+        # 根因 5 修复：简体行业标签直接映射到繁体行业知识标签，统一标签体系
+        mapped = _INDUSTRY_TO_DOMAIN_LABEL.get(text.strip())
+        if mapped:
+            return mapped
         synonym_groups = [
             ("金融/金融科技知識", ["finance", "fintech", "bank", "banking", "payment", "payments", "trading", "金融", "银行", "銀行", "支付", "交易"]),
             ("保險/財富管理知識", ["insurance", "wealth", "asset management", "保險", "保险", "財富管理", "财富管理", "資產管理", "资产管理"]),
             ("風險合規知識", ["risk", "compliance", "regulatory", "audit", "aml", "kyc", "風險", "风险", "合規", "合规", "監管", "监管", "審計", "审计"]),
             ("電商/零售業務知識", ["ecommerce", "e commerce", "retail", "電商", "电商", "零售"]),
-            ("物流/供應鏈知識", ["logistics", "supply chain", "物流", "供應鏈", "供应链"]),
+            ("物流/供應鏈知識", ["logistics", "supply chain", "tms", "transportation management", "fulfillment", "物流", "供應鏈", "供应链"]),
             ("醫療健康行業知識", ["healthcare", "medical", "hospital", "醫療", "医疗", "健康"]),
             ("政府/公共服務知識", ["government", "public sector", "政府", "公共"]),
             ("Web3/區塊鏈業務知識", ["web3", "blockchain", "crypto", "區塊鏈", "区块链", "加密貨幣", "加密货币"]),
+            ("快消/消費品製造知識", ["fmcg", "consumer goods", "fast-moving", "fast moving", "consumer packaged", "快消", "消費品"]),
+            ("企業應用/ERP系統集成知識", ["d365", "dynamics 365", "erp", "sap", "system integration", "middleware", "order management", "企業應用", "系統集成"]),
         ]
         for label, keywords in synonym_groups:
-            if any(k in lower or k in text for k in keywords):
+            if any(_word_boundary_match(k, lower) if not _has_cjk(k) else (k in lower or k in text) for k in keywords):
                 return label
 
     if category == "certification":
@@ -856,7 +955,7 @@ def _scan_non_tech_labels_from_text(text: str) -> dict[str, set[str]]:
     lower = text.lower()
 
     for raw, label in _LANGUAGE_LABELS.items():
-        if raw.lower() in lower or raw in text:
+        if _word_boundary_match(raw, lower) or raw in text:
             _add_label(bucket, "language", label)
 
     for category, candidates in {
@@ -864,6 +963,8 @@ def _scan_non_tech_labels_from_text(text: str) -> dict[str, set[str]]:
             "finance", "fintech", "banking", "payment", "insurance", "wealth management",
             "risk", "compliance", "regulatory", "audit", "aml", "kyc", "ecommerce",
             "retail", "logistics", "supply chain", "healthcare", "government", "web3", "blockchain",
+            "fmcg", "consumer goods", "d365", "dynamics 365", "erp", "sap", "system integration",
+            "middleware", "order management", "tms", "transportation management", "fulfillment",
             "金融", "金融科技", "銀行", "银行", "支付", "保險", "保险", "財富管理", "财富管理",
             "風險", "风险", "合規", "合规", "監管", "监管", "電商", "电商", "零售", "物流", "醫療", "医疗", "政府", "區塊鏈", "区块链",
         ],
@@ -880,8 +981,13 @@ def _scan_non_tech_labels_from_text(text: str) -> dict[str, set[str]]:
         ],
     }.items():
         for candidate in candidates:
-            if candidate.lower() in lower or candidate in text:
-                _add_label(bucket, category, candidate)
+            # 行业知识类用词边界 + 多义词消歧；其余类别用词边界匹配
+            if category == "domain_knowledge":
+                if _industry_keyword_hit(candidate, lower):
+                    _add_label(bucket, category, candidate)
+            else:
+                if _word_boundary_match(candidate, lower) or candidate in text:
+                    _add_label(bucket, category, candidate)
 
     return bucket
 

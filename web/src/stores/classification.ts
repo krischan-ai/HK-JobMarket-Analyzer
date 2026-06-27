@@ -181,7 +181,7 @@ export const useClassificationStore = defineStore('classification', () => {
     total.value = 0
     classified.value = 0
     duration.value = 0
-    results.value = []
+    // 4.6d：不清空 results，保留旧结果供分类期间展示
     message.value = '正在啟動分類任務...'
 
     try {

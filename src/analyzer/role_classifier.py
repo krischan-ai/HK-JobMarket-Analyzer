@@ -58,6 +58,7 @@ class RoleClassifier:
         self._llm_failure_count = 0  # 连续 LLM 调用失败计数
         self._llm_failure_lock = Lock()
         self._max_llm_failures = 5  # 超过此阈值后禁用 LLM
+        self._force_reclassify: bool = False  # full 模式跳过缓存命中、强制重新分类（不删除磁盘缓存）
         self._load_cache()
 
     @property
@@ -109,7 +110,7 @@ class RoleClassifier:
             return RoleResult(role_id="other", role_name="其他", confidence="low")
 
         cache_key = self._make_cache_key(jd_text)
-        if cache_key in self._cache:
+        if not self._force_reclassify and cache_key in self._cache:
             cached = self._cache[cache_key]
             return RoleResult(
                 role_id=cached.get("role_id", "other"),

@@ -1,53 +1,41 @@
 {
   "salary": {
-    "signature": "v4:1782267381.0341861:244:1782450610.3031676:242",
+    "signature": "v4:1782267381.0341861:244:1782531869.8265479:248",
     "data": {
       "llm_used": true,
       "from_cache": false,
       "analysis_status": "completed",
       "sections": [
         {
-          "key": "overview",
+          "key": "salary_overview",
           "title": "薪资总体分析",
-          "summary": "本次统计覆盖244个IT职位，其中42个披露薪资，平均月薪50,556 HKD，中位数45,416 HKD，整体薪资范围从9,000 HKD至105,000 HKD。由于样本量较小（仅42个），且可能存在高薪岗位选择性披露的情况，统计结果可能偏高，需谨慎参考。",
+          "summary": "基于42个样本，香港IT岗位平均月薪约50,556 HKD，中位数45,416 HKD，最低9,000 HKD，最高105,000 HKD。样本量较小，可能存在偏差，尤其是高薪岗位拉高平均值。",
           "evidence": [
-            "基于42个有薪资数据的职位统计，平均月薪50,556 HKD，最低9,000 HKD，最高105,000 HKD，中位数45,416 HKD。"
+            "总样本244个岗位，有薪资数据42个，平均50556 HKD，中位数45416 HKD，极差96000 HKD。"
           ]
         },
         {
-          "key": "location",
+          "key": "salary_by_location",
           "title": "地区薪资分析",
-          "summary": "香港岛、鰂魚涌、科學園等核心商业及科技园区平均薪资较高，超过65,000 HKD/月，而南區仅9,000 HKD/月。多数地区样本量极少（仅1个），如鰂魚涌、科學園等，地区薪资对比存在较大偶然性，代表性不足。",
+          "summary": "鰂魚涌、香港島、科學園等地区平均薪资较高，分別为80,000 HKD、70,767 HKD、67,500 HKD，但样本数仅1-5个，存在异常值风险。中環样本9个，平均52,084 HKD。南區仅9,000 HKD，可能为特殊情况。",
           "evidence": [
-            "薪资最高地区为鰂魚涌（80,000 HKD，1个样本）",
-            "香港島（70,767 HKD，5个样本）",
-            "科學園（67,500 HKD，1个样本）",
-            "最低为南區（9,000 HKD，1个样本）。中環作为样本数较多地区（9个），平均52,084 HKD。"
+            "鰂魚涌平均80,000 HKD（1样本），香港島70,767 HKD（5样本），科學園67,500 HKD（1样本），中環52,084 HKD（9样本），南區9,000 HKD（1样本）。"
           ]
         },
         {
-          "key": "role",
+          "key": "salary_by_role",
           "title": "角色薪资分析",
-          "summary": "高薪角色集中在工程经理/技术主管（83,000 HKD）、机器学习工程师（80,000 HKD）等管理或前沿技术岗，而设计师、移动开发等岗位薪资较低（约33,000–37,000 HKD）。多数角色样本量不足5个，部分仅1个，统计稳定性较差，可能无法反映市场全貌。",
+          "summary": "机器学习工程师平均最高80,000 HKD（仅1样本），DevOps/SRE和工程经理平均约68,333-69,333 HKD（各3样本），AI Agent開發平均70,000 HKD（2样本）。产品管理和移动开发薪资较低，约32,250-33,333 HKD。部分角色样本极少，需谨慎参考。",
           "evidence": [
-            "工程经理/技术主管平均83,000 HKD（1个样本），机器学习工程师80,000 HKD（1个），解决方案架构师70,000 HKD（3个），DevOps/SRE 68,333 HKD（3个）。后端开发平均60,125 HKD（4个），产品管理平均32,250 HKD（4个）。"
+            "机器学习工程师80,000 HKD（1），DevOps/SRE 68,333 HKD（3），工程经理69,333 HKD（3），AI Agent開發70,000 HKD（2），IT分析师45,750 HKD（4），全栈开发40,000 HKD（4）。"
           ]
         },
         {
-          "key": "top_salary",
+          "key": "high_salary_analysis",
           "title": "高薪岗位分析",
-          "summary": "高薪岗位（月薪≥80,000 HKD）高度集中于金融服务/金融科技行业，岗位方向涵盖架构师、AI开发、技术管理及SRE，主要从事企业架构设计、AI/ML平台构建、Web3支付系统开发及高可用运维，技术栈普遍涉及Go、Python、Scala、RAG、LLM、云原生（AWS/Azure/GCP）、Kubernetes等。地域集中在中環、香港島、鰂魚涌等核心商圈。市场对复合型高端技术人才需求强劲，建议求职者深耕金融科技、AI工程化及分布式系统，积累架构级项目经验，并掌握云原生技术栈以提升竞争力。",
+          "summary": "高薪岗位（月薪80,000 HKD以上）主要集中在金融服务/金融科技和互联网/软件服务行业，岗位方向包括解决方案架构师、AI Agent开发、工程经理、DevOps/SRE、机器学习工程师。从事工作涉及企业架构、AI工具开发、Web3支付、SRE、AI平台等。技术栈涵盖Python、Go、RAG、LLM、SQL、Docker、Kubernetes、AWS/Azure等云平台。地域上集中在中環和香港島。对就业市场意义：高端技术人才需求旺盛，复合技能（如AI+工程）薪资溢价明显。求职者建议：深耕AI/ML、云原生、分布式系统等方向，积累金融或互联网行业经验，提升全栈能力和英语沟通。",
           "evidence": [
-            "前5高薪岗位：企业安全架构（105,000 HKD，中環，其他行业）",
-            "AI开发工程师（100,000 HKD，香港島，互联网/软件服务）",
-            "Web3技术总监（83,000 HKD，香港島，金融服务/金融科技）",
-            "运维工程师（80,000 HKD，鰂魚涌，金融服务/金融科技）",
-            "AI平台负责人（80,000 HKD，中環，金融服务/金融科技）。共同技术栈关键词：Go",
-            "Python",
-            "RAG",
-            "LLM",
-            "Docker",
-            "Kubernetes。"
+            "前5个高薪岗位：Enterprise Architect (105,000 HKD, 中環, 其他), AI Software Engineer (100,000 HKD, 香港島, 互联网/软件), CTO Web3 (83,000 HKD, 香港島, 其他), SRE Analyst (80,000 HKD, 鰂魚涌, 其他), AI Platform Lead (80,000 HKD, 中環, 金融)。技术栈包含python, go, rag, llm, docker, kubernetes等。"
           ]
         }
       ],
@@ -206,10 +194,10 @@
           {
             "role_id": "it_analyst",
             "role_name": "IT 分析师/系统分析师",
-            "salary_avg": 42600.0,
+            "salary_avg": 45750.0,
             "salary_min": 30000.0,
             "salary_max": 65000.0,
-            "count": 5
+            "count": 4
           },
           {
             "role_id": "product",
@@ -220,20 +208,28 @@
             "count": 4
           },
           {
+            "role_id": "solution_architect",
+            "role_name": "解决方案架构师",
+            "salary_avg": 62500.0,
+            "salary_min": 35000.0,
+            "salary_max": 105000.0,
+            "count": 4
+          },
+          {
             "role_id": "fullstack",
             "role_name": "全栈开发",
-            "salary_avg": 39500.0,
+            "salary_avg": 40000.0,
             "salary_min": 25000.0,
             "salary_max": 58000.0,
             "count": 4
           },
           {
-            "role_id": "backend",
-            "role_name": "后端开发",
-            "salary_avg": 60125.0,
-            "salary_min": 48000.0,
-            "salary_max": 67500.0,
-            "count": 4
+            "role_id": "ai_application",
+            "role_name": "AI應用開發",
+            "salary_avg": 43333.0,
+            "salary_min": 30000.0,
+            "salary_max": 60000.0,
+            "count": 3
           },
           {
             "role_id": "devops",
@@ -244,11 +240,11 @@
             "count": 3
           },
           {
-            "role_id": "solution_architect",
-            "role_name": "解决方案架构师",
-            "salary_avg": 70000.0,
-            "salary_min": 35000.0,
-            "salary_max": 105000.0,
+            "role_id": "engineering_manager",
+            "role_name": "工程经理/技术主管",
+            "salary_avg": 69333.0,
+            "salary_min": 60000.0,
+            "salary_max": 83000.0,
             "count": 3
           },
           {
@@ -268,19 +264,19 @@
             "count": 2
           },
           {
-            "role_id": "ai_application",
-            "role_name": "AI應用開發",
-            "salary_avg": 50000.0,
-            "salary_min": 40000.0,
-            "salary_max": 60000.0,
-            "count": 2
-          },
-          {
             "role_id": "data_engineer",
             "role_name": "数据工程",
             "salary_avg": 55416.0,
             "salary_min": 45833.0,
             "salary_max": 65000.0,
+            "count": 2
+          },
+          {
+            "role_id": "backend",
+            "role_name": "后端开发",
+            "salary_avg": 57750.0,
+            "salary_min": 48000.0,
+            "salary_max": 67500.0,
             "count": 2
           },
           {
@@ -314,14 +310,6 @@
             "salary_min": 65000.0,
             "salary_max": 65000.0,
             "count": 1
-          },
-          {
-            "role_id": "engineering_manager",
-            "role_name": "工程经理/技术主管",
-            "salary_avg": 83000.0,
-            "salary_min": 83000.0,
-            "salary_max": 83000.0,
-            "count": 1
           }
         ],
         "top_salary_jobs": [
@@ -338,7 +326,7 @@
             "work_summary": "Role Overview Support the development and consolidation of enterprise architecture views, ensuring a clear and consistent understanding of systems, services, and technology components across the organisation. Key Respons",
             "salary_min": 105000.0,
             "salary_max": 0,
-            "display_name": "企业安全架构"
+            "display_name": "解决方案架构师"
           },
           {
             "title": "AI Software Engineer - Strategic Office - Toptier MNC",
@@ -362,13 +350,13 @@
             "work_summary": "Key Responsibilities As the AI Solutions Engineer, Office of the Group CEO, you will be the primary technical partner responsible for building practical AI tools and workflows that reduce information latency and support ",
             "salary_min": 100000.0,
             "salary_max": 0,
-            "display_name": "AI开发工程师"
+            "display_name": "AI Agent開發"
           },
           {
             "title": "CTO (Web3 Payments)",
             "company": "Cornerstone Global Partners",
             "location": "香港島",
-            "industry_category": "金融服务/金融科技",
+            "industry_category": "其他",
             "role_name": "工程经理/技术主管",
             "role_id": "engineering_manager",
             "tech_stack": [
@@ -386,13 +374,13 @@
             "work_summary": "CTO (Web3 Payments) Compensation Benefits Equity: High-proportion Options / Equity Incentives Location: Hong Kong (Assistance with Hong Kong work visas for top talent) Company Overview We are a Licensed Web3 Payment Inst",
             "salary_min": 83000.0,
             "salary_max": 0,
-            "display_name": "Web3技术总监"
+            "display_name": "工程经理/技术主管"
           },
           {
             "title": "Production Support Analyst, SRE/ ITRS/ DR, IT (Leading iBank, up to 80K)",
             "company": "Recruit Logic Limited",
             "location": "鰂魚涌",
-            "industry_category": "金融服务/金融科技",
+            "industry_category": "其他",
             "role_name": "DevOps/SRE",
             "role_id": "devops",
             "tech_stack": [
@@ -410,7 +398,7 @@
             "work_summary": "Position Description We are seeking an experienced Support Analyst who will be responsible and accountable for both build and shared services operations, including monitoring, site reliability engineering (SRE), and ensu",
             "salary_min": 80000.0,
             "salary_max": 0,
-            "display_name": "运维工程师"
+            "display_name": "DevOps/SRE"
           },
           {
             "title": "AI Platform Lead | GenAI & MLOps | Top Financial Firm - J12838",
@@ -434,7 +422,7 @@
             "work_summary": "About the Client: Our client is a highly prestigious, tier-one financial institution based in Hong Kong, renowned for overseeing and maintaining the stability of the regional monetary and financial ecosystems. They are c",
             "salary_min": 80000.0,
             "salary_max": 0,
-            "display_name": "AI平台负责人"
+            "display_name": "机器学习工程师"
           },
           {
             "title": "Data Architect | FSI Data Platform Transformation & Modernization | Up to HKD70k",
@@ -451,13 +439,13 @@
             "work_summary": "Data Architect (Data Platform Transformation Modernization) Role purpose You will be a Data Architect(design-focused with development understanding and background) responsible for shaping the data platform transformation",
             "salary_min": 70000.0,
             "salary_max": 0,
-            "display_name": "数据架构师"
+            "display_name": "解决方案架构师"
           },
           {
             "title": "Web3.0 Back-end development engineer/Web3后端开发工程师",
             "company": "QUANTUM BAY INNOVATIONS LIMITED",
             "location": "科學園",
-            "industry_category": "互联网/软件服务",
+            "industry_category": "其他",
             "role_name": "后端开发",
             "role_id": "backend",
             "tech_stack": [
@@ -469,13 +457,13 @@
             "work_summary": "一 工作职责 1 负责公司内部公共基础框架 服务和平台的研发工作 2 负责量化交易及系统开发 保证生产环境服务和资源的可用性 3 关注研发全流程的效率提升 实现持续构建 持续集成 持续交付等 二 任职要求 1 本科学历或更高 计算机 数学 通信等相关理工科专业毕业 工作经验3年及以上 2 精通 Python / Go 开发 (至少一种) 3 熟悉 Docker Kubernetes等优先 4 有服务监控系统设计和研发经验者优先 5 有互",
             "salary_min": 67500.0,
             "salary_max": 0,
-            "display_name": "Web3后端开发"
+            "display_name": "后端开发"
           },
           {
             "title": "Hotel Business Analyst (Hospitality industry)",
             "company": "Optimum Solutions (Hong Kong) Limited",
             "location": "中環",
-            "industry_category": "医疗健康",
+            "industry_category": "酒店/旅游",
             "role_name": "IT 分析师/系统分析师",
             "role_id": "it_analyst",
             "tech_stack": [
@@ -485,13 +473,13 @@
             "work_summary": "Job Title- HOTEL BUSINESS ANALYST (Hospitality industry) POSITION SUMMARY: The Business Analyst should demonstrate strong business acumen and excellent analytical communication skills. He or she should be able to bridge ",
             "salary_min": 65000.0,
             "salary_max": 0,
-            "display_name": "酒店业务分析师"
+            "display_name": "IT 分析师/系统分析师"
           },
           {
             "title": "Information Security Manager - IT Security & GRC (HKD52k - 63k)",
             "company": "Lloyd Karson International Limited",
             "location": "大埔",
-            "industry_category": "人工智能/数据服务",
+            "industry_category": "其他",
             "role_name": "安全工程",
             "role_id": "security",
             "tech_stack": [
@@ -501,7 +489,7 @@
             "work_summary": "Our client is a Property Management Group with investment and funded to nurture the world s leading research institutes, startups and tech-driven enterprises, is now seeking an Information Security Manager - IT GRC (HKD5",
             "salary_min": 65000.0,
             "salary_max": 0,
-            "display_name": "信息安全经理"
+            "display_name": "安全工程"
           },
           {
             "title": "DevOps Engineer",
@@ -525,15 +513,15 @@
             "work_summary": "Responsibilities Design, maintain, and optimize pipelines for both structured and unstructured data, ensuring scalability, reliability, and high data quality. Build and maintain CI/CD pipelines for ETL processes, data as",
             "salary_min": 65000.0,
             "salary_max": 0,
-            "display_name": "运维工程师"
+            "display_name": "数据工程"
           },
           {
             "title": "Tech Lead / Lead Backend Developer (Node.js) – 8–15 Years Experience | Hybrid",
             "company": "TEKsystems",
             "location": "香港島",
             "industry_category": "其他",
-            "role_name": "后端开发",
-            "role_id": "backend",
+            "role_name": "工程经理/技术主管",
+            "role_id": "engineering_manager",
             "tech_stack": [
               "go",
               "node.js",
@@ -547,13 +535,13 @@
             "work_summary": "About the Company Our client is a large, well established enterprise organisation with a strong presence across the region. The business operates high volume, customer facing platforms and continues to invest heavily in ",
             "salary_min": 65000.0,
             "salary_max": 0,
-            "display_name": "后端开发主管"
+            "display_name": "工程经理/技术主管"
           },
           {
             "title": "DevOps Technical Project Manager",
             "company": "WallStone Partners & Company Limited",
             "location": "新蒲崗",
-            "industry_category": "其他",
+            "industry_category": "人工智能/数据服务",
             "role_name": "DevOps/SRE",
             "role_id": "devops",
             "tech_stack": [
@@ -569,7 +557,7 @@
             "work_summary": "Position Objective: Own the governance and lifecycle management of an enterprise DevOps platform, ensuring stability, compliance, and continuous improvement. Drive incremental enhancements, automation initiatives, and te",
             "salary_min": 65000.0,
             "salary_max": 0,
-            "display_name": "运维工程师"
+            "display_name": "DevOps/SRE"
           },
           {
             "title": "Senior DevOps Engineer | Up to 60K",
@@ -593,7 +581,7 @@
             "work_summary": "Responsibilities : Design and implement cloud infrastructure solutions with a focus on scalability, efficiency, and CDN optimization. Develop and enhance CI/CD pipelines to support rapid, reliable content delivery and de",
             "salary_min": 60000.0,
             "salary_max": 0,
-            "display_name": "运维工程师"
+            "display_name": "DevOps/SRE"
           },
           {
             "title": "Sr. Project Engineer / Assistant Engineering Manager (Home Appliances OEM/ODM)",
@@ -606,13 +594,13 @@
             "work_summary": "Ready for a New Challenge? Our Client is Looking for You! Position: Senior Project Engineer / Assistant Engineering Manager (Home Electrical Appliances OEM/ODM) Location and Working Hours: Kowloon Bay/Shunde District; Mo",
             "salary_min": 60000.0,
             "salary_max": 0,
-            "display_name": "项目工程师"
+            "display_name": "其他"
           },
           {
             "title": "AI Application R&D Specialist",
             "company": "China Life Insurance (Overseas) Company Limited",
             "location": "紅磡",
-            "industry_category": "保险/财富管理",
+            "industry_category": "互联网/软件服务",
             "role_name": "AI應用開發",
             "role_id": "ai_application",
             "tech_stack": [
@@ -629,14 +617,14 @@
             "work_summary": "Responsibilities Strategic Planning: Develop mid-to-long term AI R D strategies, technology roadmaps, and implementation plans aligned with company goals. System Architecture: Lead the design of an AI R D framework acros",
             "salary_min": 60000.0,
             "salary_max": 0,
-            "display_name": "AI应用研发"
+            "display_name": "AI應用開發"
           }
         ]
       }
     }
   },
   "tech_trend": {
-    "signature": "v10:1782267381.0341861:244:1782452058.8439736:6",
+    "signature": "v10:1782267381.0341861:244:1782531869.8265479:248",
     "data": {
       "llm_used": true,
       "from_cache": false,
@@ -645,7 +633,7 @@
         {
           "key": "tech_stack_demand",
           "title": "技术栈需求分析",
-          "summary": "Python 以 79 次高频出现稳居榜首，结合亚马逊云（AWS）、微软云（Azure）各 53 次及结构化查询语言（SQL）51 次，说明香港 IT 市场极度重视云原生开发与数据驱动能力。求职者必须将 Python 与至少一种云平台设为简历核心关键词，并搭配持续集成/持续交付（CI/CD）流水线经验以匹配 DevOps 类岗位。检索增强生成（RAG）达 33 次、机器学习运维（MLOps）达 24 次，反映大模型应用与模型交付已从概念进入工程落地阶段，掌握这些技能可获得差异化优势。样本多来自猎头与科技招聘平台，可能偏向中高端岗位，导致传统硬件、网络基础技术需求被低估。",
+          "summary": "Python（79次）以绝对优势成为最热门语言，远超Java（35次），这反映出香港IT市场正从传统企业开发转向人工智能与数据处理场景。云平台方面，亚马逊云（AWS，53次）和微软云（Azure，53次）并驾齐驱，且持续集成/持续交付（CI/CD，46次）、Kubernetes（44次）、Docker（41次）等自动化与容器技术也挤入高频榜单，说明云原生架构已成为香港技术团队的标配。另一个值得关注的点是检索增强生成（RAG，33次）和机器学习运维（MLOps，24次）的出现，表明大模型应用落地正在催生专门的工程化需求。候选人应将Python作为第一技能，同时掌握至少一个主流云平台和容器编排工具，简历中必须突出“AWS/Azure + Kubernetes + CI/CD”组合。",
           "evidence": [
             {
               "skill": "Python",
@@ -692,46 +680,46 @@
         {
           "key": "tech_category",
           "title": "细分技能类别分析",
-          "summary": "后端语言与服务端开发类别以 213 次累计需求居首，DevOps 与自动化交付类别 174 次紧随其后，这表明企业首先要求工程师具备扎实的代码产出能力，同时必须能将软件以自动化、可靠的方式交付到生产环境。云平台与基础设施和容器与编排类别的强需求进一步印证，具备 Kubernetes 和 Docker 经验的候选人能几乎横跨所有岗位，简历里应明确标注容器化与编排技能。AI 应用与大模型类别达 91 次，已经超过传统前端与移动开发，意味着掌握大模型调用、提示工程和 RAG 架构正在成为通用型技术素养，而非仅限数据科学家角色。",
+          "summary": "后端语言与服务端开发（426次）是需求量最大的技能类别，这与香港大量系统建设和维护岗位相符；DevOps与自动化交付（349次）和云平台与基础设施（278次）紧随其后，说明企业不仅需要开发人员，更需要能打通开发与运维全流程的人才。容器与编排（192次）和AI应用与大模型（182次）的计数接近，表明香港市场正从传统IT运维向容器化部署和AI能力落地并行迁移。相比之下，前端与移动开发（144次）和数据工程与分析（140次）虽有一定需求，但增速不如前两者。候选人应优先夯实后端开发和云DevOps基础，再根据兴趣选择AI或数据方向进行深化，简历中应多覆盖后端语言、CI/CD工具和云平台关键词。",
           "evidence": [
             {
               "category": "后端语言与服务端开发",
-              "count": 213
+              "count": 426
             },
             {
               "category": "DevOps 与自动化交付",
-              "count": 174
+              "count": 349
             },
             {
               "category": "云平台与基础设施",
-              "count": 139
+              "count": 278
             },
             {
               "category": "容器与编排",
-              "count": 96
+              "count": 192
             },
             {
               "category": "AI 应用与大模型",
-              "count": 91
+              "count": 182
             },
             {
               "category": "云平台与 DevOps",
-              "count": 86
+              "count": 172
             },
             {
               "category": "前端与移动开发",
-              "count": 72
+              "count": 144
             },
             {
               "category": "数据工程与分析",
-              "count": 70
+              "count": 140
             }
           ]
         },
         {
           "key": "role_classification",
           "title": "角色分类分析",
-          "summary": "AI 应用开发（37 个）与 DevOps/SRE（34 个）是需求量最大的两个角色，揭示香港企业目前正同时推进人工智能产品化与核心基础设施现代化，两头并重。后端开发（22 个）和通用数据科学（18 个）仍保持坚实基本盘，而设计师（16 个）与前端开发（15 个）需求也不低，反映出用户界面与体验在金融、Web3 等多行业的重视。从薪资中位数看，DevOps/SRE 平均约 72,917 港币，明显高于 AI 应用开发的 50,000 港币，说明基础设施稳定性价值被市场赋予更高溢价，求职者可据此调整薪资预期与谈判策略。",
+          "summary": "AI應用開發（37个）和DevOps/SRE（34个）是需求最大的两个角色，合计占样本约29%，这直接反映了香港IT产业的两大增长引擎：人工智能应用和运维自动化。后端开发（22个）和数据科学（通用，18个）仍保持稳定需求，但已不再是增长主力。薪资方面，工程经理/技术主管（约69K港币月薪）和DevOps/SRE（约68K）领跑，解决方案架构师（约62.5K）紧随其后，而产品管理（约32K）和移动开发（约33K）薪资较低。建议候选人在求职优先级上优先考虑AI應用開發或DevOps/SRE，既能获得更多工作机会，也能拿到较高薪资；如果追求技术深度，可向解决方案架构师或工程经理方向发展。",
           "evidence": [
             {
               "role_id": "ai_application",
@@ -778,177 +766,197 @@
         {
           "key": "role_distribution",
           "title": "角色分布分析",
-          "summary": "AI 应用开发与 DevOps/SRE 合计占比近三成，加上后端开发和数据科学通用岗位，四大角色已占据总样本约 46%，可见市场机会高度集中。数据科学家（4.9%）与安全工程（4.9%）虽占比稍低，但其专业壁垒高且替代性弱，适合有学术或安全背景的候选人长期深耕。由于样本量仅为 244 个且多源自猎头渠道，可能过度代表合同制或中高级岗位，初级和本地中小企业岗位的实际分布可能与此存在偏差，求职者在定位时还需参考其他来源。",
+          "summary": "在角色分布占比中，DevOps/SRE（11.4%）和AI應用開發（9.6%）继续领先，但解决方案架构师（8.3%）和产品管理（8.3%）的占比也很高，说明香港企业对高层次的架构设计和产品规划人才有持续需求。工程经理/技术主管（7.5%）和IT分析师/系统分析师（6.6%）占比接近，反映香港IT团队中需要大量既懂技术又懂业务分析的角色。后端开发（6.1%）和全栈开发（5.7%）等纯开发角色占比相对较小，但仍是基础岗位。候选人求职时，如果具备架构能力和技术管理经验，可以优先投递解决方案架构师或工程经理岗位；若更偏好技术执行，则选择DevOps或AI类角色机会更多。样本局限：角色分布仅统计了前8个角色共142个岗位，未覆盖全部244个，但已代表主要方向。",
           "evidence": [
-            {
-              "role_id": "ai_application",
-              "role_name": "AI應用開發",
-              "count": 37,
-              "percentage": 15.2
-            },
             {
               "role_id": "devops",
               "role_name": "DevOps/SRE",
-              "count": 34,
-              "percentage": 14.0
+              "count": 26,
+              "percentage": 11.4
+            },
+            {
+              "role_id": "ai_application",
+              "role_name": "AI應用開發",
+              "count": 22,
+              "percentage": 9.6
+            },
+            {
+              "role_id": "solution_architect",
+              "role_name": "解决方案架构师",
+              "count": 19,
+              "percentage": 8.3
+            },
+            {
+              "role_id": "product",
+              "role_name": "产品管理",
+              "count": 19,
+              "percentage": 8.3
+            },
+            {
+              "role_id": "engineering_manager",
+              "role_name": "工程经理/技术主管",
+              "count": 17,
+              "percentage": 7.5
+            },
+            {
+              "role_id": "it_analyst",
+              "role_name": "IT 分析师/系统分析师",
+              "count": 15,
+              "percentage": 6.6
             },
             {
               "role_id": "backend",
               "role_name": "后端开发",
-              "count": 22,
-              "percentage": 9.1
+              "count": 14,
+              "percentage": 6.1
             },
             {
-              "role_id": "data_science",
-              "role_name": "数据科学（通用）",
-              "count": 18,
-              "percentage": 7.4
-            },
-            {
-              "role_id": "design",
-              "role_name": "设计师",
-              "count": 16,
-              "percentage": 6.6
-            },
-            {
-              "role_id": "frontend",
-              "role_name": "前端开发",
-              "count": 15,
-              "percentage": 6.2
-            },
-            {
-              "role_id": "data_scientist",
-              "role_name": "数据科学家",
-              "count": 12,
-              "percentage": 4.9
-            },
-            {
-              "role_id": "security",
-              "role_name": "安全工程",
-              "count": 12,
-              "percentage": 4.9
+              "role_id": "fullstack",
+              "role_name": "全栈开发",
+              "count": 13,
+              "percentage": 5.7
             }
           ]
         },
         {
           "key": "soft_skill_demand",
           "title": "非技术能力画像",
-          "summary": "学历要求方面，学士学位出现 91 次成为基准门槛，硕士和博士合计仅 22 次但多出现在 AI 研发岗，有意竞争前沿研究型职位的候选人宜提升学历。语言要求英语以 220 次压倒性出现，粤语和普通话各 60 余次，简历必须注明英语流利程度并体现多语环境协作经验。个人能力中，沟通能力（139 次）、问题解决（67 次）及团队协作（66 次）远超其他项，候选人应在简历中用项目案例显性展示这些能力，面试时准备以 STAR 法则说明如何与跨职能持份者协作。\n跨行业知识以风险合规知识（113 次）和金融/金融科技知识（69 次）最突出，保险、AI、互联网行业紧随其后，求职定位金融科技或受监管行业时，须在简历中植入合规、监管报备等关键词；若无相关背景，可通过线上课程快速积累概念。资格证方面，CISSP（11 次）和 CISM（8 次）为安全岗必备，HKMA 等监管牌照对银行类 IT 岗是关键加分项，建议安全、风控方向候选人尽早持证。业务交付能力中需求分析高达 188 次、持份者管理 92 次、文档撰写 60 次，说明香港 IT 岗位高度重视将业务需求转化为技术方案的能力，候选人应将“需求分析”“持份者沟通”直接写入简历技能栏，并准备相关交付物成果来证明。",
+          "summary": "学历方面，学士学位（156次）是绝对基准，计算机相关学历（96次）被明确标注，硕士（22次）和博士（4次）仅在少数高级或研究型岗位出现，因此候选人无需过度追求高学历，但本科专业最好与计算机相关。语言要求上，英语（200次）几乎成为必备条件，粤语（69次）和普通话（60次）同样高频，三语能力在香港IT职场极具竞争力，简历中应明确标注语言等级。个人能力中，沟通能力（167次）、团队协作（153次）和问题解决（119次）是前三高频项，说明企业非常看重跨部门协作和独立攻克技术难题的能力，面试时应准备具体案例。跨行业知识方面，金融/金融科技知识（84次）和风险合规知识（79次）需求极高，这与香港作为国际金融中心直接相关；此外人工智能/数据服务知识（57次）也快速增长。资格证方面，CISSP（11次）和CISM（8次）等安全认证最受关注，ITIL（5次）和HKMA（4次）在金融客户对接中也有价值。业务交付能力中，需求分析（137次）、持份者管理（126次）和文档撰写（91次）是核心，表明候选人必须具备从需求调研到方案交付的全链条软实力。建议求职者简历中突出英语水平、金融行业背景、沟通协作案例，并考取安全或项目管理相关证书。",
           "evidence": [
             {
               "name": "溝通能力",
               "category": "soft_skill",
-              "count": 139
-            },
-            {
-              "name": "問題解決",
-              "category": "soft_skill",
-              "count": 67
+              "count": 167
             },
             {
               "name": "團隊協作",
               "category": "soft_skill",
-              "count": 66
+              "count": 153
             },
             {
-              "name": "主動性",
+              "name": "問題解決",
               "category": "soft_skill",
-              "count": 42
+              "count": 119
             },
             {
               "name": "領導力",
               "category": "soft_skill",
-              "count": 39
+              "count": 54
             },
             {
-              "name": "組織能力",
+              "name": "主動性",
               "category": "soft_skill",
-              "count": 15
+              "count": 40
             },
             {
               "name": "抗壓能力",
               "category": "soft_skill",
-              "count": 1
+              "count": 31
+            },
+            {
+              "name": "注重細節",
+              "category": "soft_skill",
+              "count": 28
+            },
+            {
+              "name": "組織能力",
+              "category": "soft_skill",
+              "count": 28
+            },
+            {
+              "name": "獨立工作能力",
+              "category": "soft_skill",
+              "count": 17
+            },
+            {
+              "name": "責任感",
+              "category": "soft_skill",
+              "count": 9
             },
             {
               "name": "需求分析",
               "category": "business_skill",
-              "count": 188
+              "count": 137
             },
             {
               "name": "持份者管理",
               "category": "business_skill",
-              "count": 92
-            },
-            {
-              "name": "客戶溝通",
-              "category": "business_skill",
-              "count": 65
+              "count": 126
             },
             {
               "name": "文檔撰寫",
               "category": "business_skill",
-              "count": 60
+              "count": 91
             },
             {
-              "name": "供應商管理",
+              "name": "客戶溝通",
               "category": "business_skill",
-              "count": 40
+              "count": 78
             },
             {
               "name": "項目管理",
               "category": "business_skill",
-              "count": 24
+              "count": 57
+            },
+            {
+              "name": "供應商管理",
+              "category": "business_skill",
+              "count": 41
             },
             {
               "name": "匯報/演示",
               "category": "business_skill",
-              "count": 19
+              "count": 23
             },
             {
-              "name": "風險合規知識",
-              "category": "domain_knowledge",
-              "count": 113
+              "name": "項目交付",
+              "category": "business_skill",
+              "count": 16
             },
             {
               "name": "金融/金融科技知識",
               "category": "domain_knowledge",
-              "count": 69
+              "count": 84
             },
             {
-              "name": "人工智能/数据服务",
+              "name": "風險合規知識",
               "category": "domain_knowledge",
-              "count": 65
+              "count": 79
             },
             {
-              "name": "保險/財富管理知識",
+              "name": "人工智能/數據服務知識",
               "category": "domain_knowledge",
-              "count": 47
+              "count": 57
             },
             {
-              "name": "互联网/软件服务",
+              "name": "互聯網/軟件服務知識",
               "category": "domain_knowledge",
-              "count": 46
+              "count": 38
+            },
+            {
+              "name": "企業應用/ERP系統集成知識",
+              "category": "domain_knowledge",
+              "count": 24
             },
             {
               "name": "電商/零售業務知識",
               "category": "domain_knowledge",
-              "count": 21
+              "count": 24
             },
             {
-              "name": "电信/云与基础设施",
+              "name": "保險/財富管理知識",
               "category": "domain_knowledge",
-              "count": 19
+              "count": 20
             },
             {
-              "name": "政府/公共服務知識",
+              "name": "電信/雲與基礎設施知識",
               "category": "domain_knowledge",
-              "count": 17
+              "count": 18
             },
             {
               "name": "英語",
               "category": "language",
-              "count": 220
+              "count": 200
             },
             {
               "name": "粵語",
@@ -963,27 +971,42 @@
             {
               "name": "中文",
               "category": "language",
-              "count": 57
+              "count": 58
+            },
+            {
+              "name": "普通話優先",
+              "category": "language",
+              "count": 1
             },
             {
               "name": "學士學位",
               "category": "education",
-              "count": 91
+              "count": 156
+            },
+            {
+              "name": "計算機相關學歷",
+              "category": "education",
+              "count": 96
             },
             {
               "name": "大專/文憑",
               "category": "education",
-              "count": 20
+              "count": 25
             },
             {
               "name": "碩士學位",
               "category": "education",
-              "count": 18
+              "count": 22
             },
             {
               "name": "博士學位",
               "category": "education",
               "count": 4
+            },
+            {
+              "name": "人工智能/機器學習相關學歷",
+              "category": "education",
+              "count": 1
             },
             {
               "name": "CISSP",
@@ -1011,26 +1034,26 @@
               "count": 4
             },
             {
-              "name": "PMP",
+              "name": "CCNP",
+              "category": "certification",
+              "count": 3
+            },
+            {
+              "name": "CEH",
+              "category": "certification",
+              "count": 3
+            },
+            {
+              "name": "CCNA",
               "category": "certification",
               "count": 2
-            },
-            {
-              "name": "CSM",
-              "category": "certification",
-              "count": 1
-            },
-            {
-              "name": "PRINCE2",
-              "category": "certification",
-              "count": 1
             }
           ]
         },
         {
           "key": "responsibility",
           "title": "岗位职责分析",
-          "summary": "AI/数据能力落地、需求分析与项目协作、系统开发与功能交付、团队带领与技术指导这四项职责的计数均在 230 左右，几乎持平，意味着香港 IT 从业者被期望具备复合型交付能力，不能只写代码或只做分析。安全合规与质量保障（183 次）和云基础设施与部署（156 次）也属高频职责，求职者应在简历中多维度呈现自己如何保障系统可靠性、应对审计与监管、以及主导云迁移或灾备项目。数据揭示的职责重叠性提示候选人，面试时需突出自己“从需求拿到生产，并兼顾安全与团队指导”的全旅程影响力，这是获得高阶职位的关键叙事。",
+          "summary": "岗位职责分布显示，AI/数据能力落地（237次）和需求分析与项目协作（232次）是出现频率最高的两项，几乎每两个岗位就有一个涉及AI应用或需求协调，这与香港企业正在推动数字化转型和AI赋能业务密切相关。系统开发与功能交付（229次）和团队带领与技术指导（228次）也极高，说明大多数岗位同时要求动手开发能力和技术领导力，尤其是中高级角色。安全合规与质量保障（183次）和云基础设施与部署（156次）紧跟其后，体现安全与云原生已融入日常职责。自动化与运维监控（145次）则是DevOps角色的典型职责。候选人应避免只写“编码”，而要在简历中强调自己如何推动AI项目落地、如何与业务方沟通需求、如何带领团队交付，这些往往比纯技术细节更吸引招聘方。",
           "evidence": [
             {
               "name": "AI/数据能力落地",
@@ -1065,7 +1088,7 @@
         {
           "key": "company_industry",
           "title": "公司行业分析",
-          "summary": "行业分布上，人工智能/数据服务以 65 次居首，互联网/软件服务 46 次和金融服务/金融科技 26 次形成第二梯队，整体呈现以 AI 驱动、金融与互联网双根基的格局。电信、云与基础设施行业同样有稳定需求，适合追求支撑大型基建设施的候选人。公司名单中高频出现 Robert Walters、TEKsystems 等猎头机构，说明样本偏向猎头发布的中短期或合约制岗位，这可能推高了技能混合程度和多岗合并描述的程度，求职者解读时需注意这部分岗位可能比长期雇员要求更杂。选择行业时，可优先瞄准 AI 产品公司、金融科技和云服务提供商，这三类行业需求明确且付薪能力较强。",
+          "summary": "人工智能/数据服务行业（65个）是最大的雇主方，占全部岗位的约27%，说明香港正涌现大量AI创业公司和数据服务提供商。互联网/软件服务（46个，约19%）和金融服务/金融科技（26个，约11%）分别位列第二和第三，其中金融科技（FinTech）仍是香港的支柱领域。电信/云与基础设施（19个）也有一定规模，与云平台需求旺盛一致。其他如医疗健康（4个）、保险/财富管理（3个）等虽然数量少，但往往薪资较高且对合规知识要求更严。建议候选人优先关注人工智能/数据服务和互联网公司，这些行业技术迭代快、岗位多；如果已有金融背景，可主攻金融科技方向，这类岗位对业务理解和风险合规知识要求高，竞争相对较小。样本局限：行业分布可能集中于科技和金融领域，缺少政府、教育等其他行业，但已反映香港IT招聘的主要流向。",
           "evidence": [
             {
               "name": "人工智能/数据服务",
@@ -1104,7 +1127,7 @@
         {
           "key": "tech_direction",
           "title": "技术方向分析",
-          "summary": "综合所有信号，香港 IT 已明确走向云原生全栈、AI 工程化与安全合规融合三大方向，简历中同时出现 Python、AWS/Azure、Docker、Kubernetes 和 CI/CD 几乎成为标配。AI 应用不再是独立孤岛，以 RAG、MLOps 为代表的工程化能力正在渗入后端、DevOps 和数据分析等所有角色，因此求职者即使非数据科学家，也必须掌握大模型接口调用与场景集成。安全方向以 CISSP 和风险合规知识双高为特征，表明金融监管下 DevSecOps 正成为独立优势，候选人可将“安全合规”与云原生并列打造个人标签。需要留意样本量有限且偏向猎头渠道，可能放大了对新潮技术整合的要求，求职者仍应结合目标公司的实际技术栈合理设定学习优先级，不必盲目追逐每一项新兴技术。",
+          "summary": "技术方向可归纳为三条主线：第一，AI应用与大模型方向，以检索增强生成（RAG，33次）、机器学习运维（MLOps，24次）为代表，是当前增长最快的方向，要求候选人掌握大模型调用、微调和部署流程；第二，云原生与DevOps方向，涵盖Kubernetes（44次）、Docker（41次）、持续集成/持续交付（CI/CD，46次）和多云平台（AWS/Azure/GCP），是几乎所有技术岗位的底层要求；第三，后端与数据处理方向，以Python（79次）、Java（35次）、结构化查询语言（SQL，51次）为核心，支撑业务系统开发。候选人应根据自身经验选择主攻方向：数据或AI背景可深挖RAG和MLOps，运维背景应强化Kubernetes和CI/CD，后端背景则巩固Python/Java并补充云技能。无论哪个方向，机器学习运维（MLOps）作为连接AI和运维的交叉技能，都值得特别关注。",
           "evidence": [
             {
               "skill": "Python",
@@ -1215,253 +1238,239 @@
         ],
         "role_distribution": [
           {
-            "role_id": "ai_application",
-            "role_name": "AI應用開發",
-            "count": 37,
-            "percentage": 15.2
-          },
-          {
             "role_id": "devops",
             "role_name": "DevOps/SRE",
-            "count": 34,
-            "percentage": 14.0
+            "count": 26,
+            "percentage": 11.4
           },
           {
-            "role_id": "backend",
-            "role_name": "后端开发",
+            "role_id": "ai_application",
+            "role_name": "AI應用開發",
             "count": 22,
-            "percentage": 9.1
-          },
-          {
-            "role_id": "data_science",
-            "role_name": "数据科学（通用）",
-            "count": 18,
-            "percentage": 7.4
-          },
-          {
-            "role_id": "design",
-            "role_name": "设计师",
-            "count": 16,
-            "percentage": 6.6
-          },
-          {
-            "role_id": "frontend",
-            "role_name": "前端开发",
-            "count": 15,
-            "percentage": 6.2
-          },
-          {
-            "role_id": "data_scientist",
-            "role_name": "数据科学家",
-            "count": 12,
-            "percentage": 4.9
-          },
-          {
-            "role_id": "security",
-            "role_name": "安全工程",
-            "count": 12,
-            "percentage": 4.9
-          },
-          {
-            "role_id": "it_analyst",
-            "role_name": "IT 分析师/系统分析师",
-            "count": 11,
-            "percentage": 4.5
-          },
-          {
-            "role_id": "engineering_manager",
-            "role_name": "工程经理/技术主管",
-            "count": 10,
-            "percentage": 4.1
+            "percentage": 9.6
           },
           {
             "role_id": "solution_architect",
             "role_name": "解决方案架构师",
-            "count": 9,
-            "percentage": 3.7
-          },
-          {
-            "role_id": "qa",
-            "role_name": "质量保证",
-            "count": 9,
-            "percentage": 3.7
-          },
-          {
-            "role_id": "data_engineer",
-            "role_name": "数据工程",
-            "count": 8,
-            "percentage": 3.3
-          },
-          {
-            "role_id": "blockchain",
-            "role_name": "区块链",
-            "count": 7,
-            "percentage": 2.9
-          },
-          {
-            "role_id": "ai_agent_dev",
-            "role_name": "AI Agent開發",
-            "count": 6,
-            "percentage": 2.5
+            "count": 19,
+            "percentage": 8.3
           },
           {
             "role_id": "product",
             "role_name": "产品管理",
-            "count": 6,
-            "percentage": 2.5
+            "count": 19,
+            "percentage": 8.3
           },
           {
-            "role_id": "ai_model_training",
-            "role_name": "模型訓練/微調",
-            "count": 3,
-            "percentage": 1.2
-          },
-          {
-            "role_id": "ml_engineer",
-            "role_name": "机器学习工程师",
-            "count": 3,
-            "percentage": 1.2
-          },
-          {
-            "role_id": "mobile",
-            "role_name": "移动开发",
-            "count": 3,
-            "percentage": 1.2
-          },
-          {
-            "role_id": "ai_prompt_engineer",
-            "role_name": "提示詞工程師",
-            "count": 2,
-            "percentage": 0.8
-          }
-        ],
-        "role_salary": [
-          {
-            "role_id": "devops",
-            "role_name": "DevOps/SRE",
-            "salary_avg": 72917.0,
-            "salary_min": 60000.0,
-            "salary_max": 100000.0,
-            "count": 6
-          },
-          {
-            "role_id": "design",
-            "role_name": "设计师",
-            "salary_avg": 32600.0,
-            "salary_min": 9000.0,
-            "salary_max": 40000.0,
-            "count": 5
-          },
-          {
-            "role_id": "frontend",
-            "role_name": "前端开发",
-            "salary_avg": 51800.0,
-            "salary_min": 25000.0,
-            "salary_max": 83000.0,
-            "count": 5
+            "role_id": "engineering_manager",
+            "role_name": "工程经理/技术主管",
+            "count": 17,
+            "percentage": 7.5
           },
           {
             "role_id": "it_analyst",
             "role_name": "IT 分析师/系统分析师",
-            "salary_avg": 46750.0,
+            "count": 15,
+            "percentage": 6.6
+          },
+          {
+            "role_id": "backend",
+            "role_name": "后端开发",
+            "count": 14,
+            "percentage": 6.1
+          },
+          {
+            "role_id": "fullstack",
+            "role_name": "全栈开发",
+            "count": 13,
+            "percentage": 5.7
+          },
+          {
+            "role_id": "qa",
+            "role_name": "质量保证",
+            "count": 13,
+            "percentage": 5.7
+          },
+          {
+            "role_id": "design",
+            "role_name": "设计师",
+            "count": 12,
+            "percentage": 5.3
+          },
+          {
+            "role_id": "security",
+            "role_name": "安全工程",
+            "count": 11,
+            "percentage": 4.8
+          },
+          {
+            "role_id": "data_scientist",
+            "role_name": "数据科学家",
+            "count": 10,
+            "percentage": 4.4
+          },
+          {
+            "role_id": "ml_engineer",
+            "role_name": "机器学习工程师",
+            "count": 9,
+            "percentage": 3.9
+          },
+          {
+            "role_id": "ai_agent_dev",
+            "role_name": "AI Agent開發",
+            "count": 7,
+            "percentage": 3.1
+          },
+          {
+            "role_id": "data_engineer",
+            "role_name": "数据工程",
+            "count": 7,
+            "percentage": 3.1
+          },
+          {
+            "role_id": "mobile",
+            "role_name": "移动开发",
+            "count": 6,
+            "percentage": 2.6
+          },
+          {
+            "role_id": "ai_model_training",
+            "role_name": "模型訓練/微調",
+            "count": 4,
+            "percentage": 1.8
+          },
+          {
+            "role_id": "frontend",
+            "role_name": "前端开发",
+            "count": 3,
+            "percentage": 1.3
+          },
+          {
+            "role_id": "blockchain",
+            "role_name": "区块链",
+            "count": 1,
+            "percentage": 0.4
+          }
+        ],
+        "role_salary": [
+          {
+            "role_id": "it_analyst",
+            "role_name": "IT 分析师/系统分析师",
+            "salary_avg": 45750.0,
             "salary_min": 30000.0,
             "salary_max": 65000.0,
             "count": 4
           },
           {
-            "role_id": "ai_application",
-            "role_name": "AI應用開發",
-            "salary_avg": 50000.0,
-            "salary_min": 30000.0,
-            "salary_max": 80000.0,
-            "count": 3
-          },
-          {
-            "role_id": "backend",
-            "role_name": "后端开发",
-            "salary_avg": 53333.0,
-            "salary_min": 35000.0,
-            "salary_max": 65000.0,
-            "count": 3
-          },
-          {
-            "role_id": "data_science",
-            "role_name": "数据科学（通用）",
-            "salary_avg": 52500.0,
-            "salary_min": 45000.0,
-            "salary_max": 60000.0,
-            "count": 2
+            "role_id": "product",
+            "role_name": "产品管理",
+            "salary_avg": 32250.0,
+            "salary_min": 9000.0,
+            "salary_max": 50000.0,
+            "count": 4
           },
           {
             "role_id": "solution_architect",
             "role_name": "解决方案架构师",
-            "salary_avg": 87500.0,
-            "salary_min": 70000.0,
+            "salary_avg": 62500.0,
+            "salary_min": 35000.0,
             "salary_max": 105000.0,
-            "count": 2
+            "count": 4
           },
           {
-            "role_id": "mobile",
-            "role_name": "移动开发",
-            "salary_avg": 27500.0,
-            "salary_min": 27000.0,
-            "salary_max": 28000.0,
-            "count": 2
+            "role_id": "fullstack",
+            "role_name": "全栈开发",
+            "salary_avg": 40000.0,
+            "salary_min": 25000.0,
+            "salary_max": 58000.0,
+            "count": 4
+          },
+          {
+            "role_id": "ai_application",
+            "role_name": "AI應用開發",
+            "salary_avg": 43333.0,
+            "salary_min": 30000.0,
+            "salary_max": 60000.0,
+            "count": 3
+          },
+          {
+            "role_id": "devops",
+            "role_name": "DevOps/SRE",
+            "salary_avg": 68333.0,
+            "salary_min": 60000.0,
+            "salary_max": 80000.0,
+            "count": 3
           },
           {
             "role_id": "engineering_manager",
             "role_name": "工程经理/技术主管",
-            "salary_avg": 47500.0,
-            "salary_min": 35000.0,
-            "salary_max": 60000.0,
-            "count": 2
+            "salary_avg": 69333.0,
+            "salary_min": 60000.0,
+            "salary_max": 83000.0,
+            "count": 3
           },
           {
-            "role_id": "security",
-            "role_name": "安全工程",
-            "salary_avg": 47500.0,
-            "salary_min": 30000.0,
-            "salary_max": 65000.0,
-            "count": 2
-          },
-          {
-            "role_id": "product",
-            "role_name": "产品管理",
-            "salary_avg": 40000.0,
-            "salary_min": 30000.0,
-            "salary_max": 50000.0,
-            "count": 2
+            "role_id": "mobile",
+            "role_name": "移动开发",
+            "salary_avg": 33333.0,
+            "salary_min": 27000.0,
+            "salary_max": 45000.0,
+            "count": 3
           },
           {
             "role_id": "ai_agent_dev",
             "role_name": "AI Agent開發",
-            "salary_avg": 40000.0,
+            "salary_avg": 70000.0,
             "salary_min": 40000.0,
-            "salary_max": 40000.0,
-            "count": 1
-          },
-          {
-            "role_id": "ai_prompt_engineer",
-            "role_name": "提示詞工程師",
-            "salary_avg": 38000.0,
-            "salary_min": 38000.0,
-            "salary_max": 38000.0,
-            "count": 1
+            "salary_max": 100000.0,
+            "count": 2
           },
           {
             "role_id": "data_engineer",
             "role_name": "数据工程",
-            "salary_avg": 45833.0,
+            "salary_avg": 55416.0,
             "salary_min": 45833.0,
-            "salary_max": 45833.0,
-            "count": 1
+            "salary_max": 65000.0,
+            "count": 2
+          },
+          {
+            "role_id": "backend",
+            "role_name": "后端开发",
+            "salary_avg": 57750.0,
+            "salary_min": 48000.0,
+            "salary_max": 67500.0,
+            "count": 2
           },
           {
             "role_id": "qa",
             "role_name": "质量保证",
-            "salary_avg": 38000.0,
-            "salary_min": 38000.0,
+            "salary_avg": 34000.0,
+            "salary_min": 30000.0,
             "salary_max": 38000.0,
+            "count": 2
+          },
+          {
+            "role_id": "design",
+            "role_name": "设计师",
+            "salary_avg": 37000.0,
+            "salary_min": 34000.0,
+            "salary_max": 40000.0,
+            "count": 2
+          },
+          {
+            "role_id": "ml_engineer",
+            "role_name": "机器学习工程师",
+            "salary_avg": 80000.0,
+            "salary_min": 80000.0,
+            "salary_max": 80000.0,
+            "count": 1
+          },
+          {
+            "role_id": "security",
+            "role_name": "安全工程",
+            "salary_avg": 65000.0,
+            "salary_min": 65000.0,
+            "salary_max": 65000.0,
             "count": 1
           }
         ],
@@ -1570,59 +1579,59 @@
         "skill_category_distribution": [
           {
             "category": "后端语言与服务端开发",
-            "count": 213
+            "count": 426
           },
           {
             "category": "DevOps 与自动化交付",
-            "count": 174
+            "count": 349
           },
           {
             "category": "云平台与基础设施",
-            "count": 139
+            "count": 278
           },
           {
             "category": "容器与编排",
-            "count": 96
+            "count": 192
           },
           {
             "category": "AI 应用与大模型",
-            "count": 91
+            "count": 182
           },
           {
             "category": "云平台与 DevOps",
-            "count": 86
+            "count": 172
           },
           {
             "category": "前端与移动开发",
-            "count": 72
+            "count": 144
           },
           {
             "category": "数据工程与分析",
-            "count": 70
+            "count": 140
           },
           {
             "category": "机器学习与深度学习",
-            "count": 41
+            "count": 82
           },
           {
             "category": "数据库与缓存",
-            "count": 40
+            "count": 80
           },
           {
             "category": "框架与开发库",
-            "count": 39
+            "count": 78
           },
           {
             "category": "数据库与数据存储",
-            "count": 20
+            "count": 40
           },
           {
             "category": "编程语言",
-            "count": 9
+            "count": 18
           },
           {
             "category": "测试与质量工程",
-            "count": 6
+            "count": 12
           }
         ],
         "responsibility_distribution": [
@@ -1701,117 +1710,137 @@
           {
             "name": "溝通能力",
             "category": "soft_skill",
-            "count": 139
-          },
-          {
-            "name": "問題解決",
-            "category": "soft_skill",
-            "count": 67
+            "count": 167
           },
           {
             "name": "團隊協作",
             "category": "soft_skill",
-            "count": 66
+            "count": 153
           },
           {
-            "name": "主動性",
+            "name": "問題解決",
             "category": "soft_skill",
-            "count": 42
+            "count": 119
           },
           {
             "name": "領導力",
             "category": "soft_skill",
-            "count": 39
+            "count": 54
           },
           {
-            "name": "組織能力",
+            "name": "主動性",
             "category": "soft_skill",
-            "count": 15
+            "count": 40
           },
           {
             "name": "抗壓能力",
             "category": "soft_skill",
-            "count": 1
+            "count": 31
+          },
+          {
+            "name": "注重細節",
+            "category": "soft_skill",
+            "count": 28
+          },
+          {
+            "name": "組織能力",
+            "category": "soft_skill",
+            "count": 28
+          },
+          {
+            "name": "獨立工作能力",
+            "category": "soft_skill",
+            "count": 17
+          },
+          {
+            "name": "責任感",
+            "category": "soft_skill",
+            "count": 9
           },
           {
             "name": "需求分析",
             "category": "business_skill",
-            "count": 188
+            "count": 137
           },
           {
             "name": "持份者管理",
             "category": "business_skill",
-            "count": 92
-          },
-          {
-            "name": "客戶溝通",
-            "category": "business_skill",
-            "count": 65
+            "count": 126
           },
           {
             "name": "文檔撰寫",
             "category": "business_skill",
-            "count": 60
+            "count": 91
           },
           {
-            "name": "供應商管理",
+            "name": "客戶溝通",
             "category": "business_skill",
-            "count": 40
+            "count": 78
           },
           {
             "name": "項目管理",
             "category": "business_skill",
-            "count": 24
+            "count": 57
+          },
+          {
+            "name": "供應商管理",
+            "category": "business_skill",
+            "count": 41
           },
           {
             "name": "匯報/演示",
             "category": "business_skill",
-            "count": 19
+            "count": 23
           },
           {
-            "name": "風險合規知識",
-            "category": "domain_knowledge",
-            "count": 113
+            "name": "項目交付",
+            "category": "business_skill",
+            "count": 16
           },
           {
             "name": "金融/金融科技知識",
             "category": "domain_knowledge",
-            "count": 69
+            "count": 84
           },
           {
-            "name": "人工智能/数据服务",
+            "name": "風險合規知識",
             "category": "domain_knowledge",
-            "count": 65
+            "count": 79
           },
           {
-            "name": "保險/財富管理知識",
+            "name": "人工智能/數據服務知識",
             "category": "domain_knowledge",
-            "count": 47
+            "count": 57
           },
           {
-            "name": "互联网/软件服务",
+            "name": "互聯網/軟件服務知識",
             "category": "domain_knowledge",
-            "count": 46
+            "count": 38
+          },
+          {
+            "name": "企業應用/ERP系統集成知識",
+            "category": "domain_knowledge",
+            "count": 24
           },
           {
             "name": "電商/零售業務知識",
             "category": "domain_knowledge",
-            "count": 21
+            "count": 24
           },
           {
-            "name": "电信/云与基础设施",
+            "name": "保險/財富管理知識",
             "category": "domain_knowledge",
-            "count": 19
+            "count": 20
           },
           {
-            "name": "政府/公共服務知識",
+            "name": "電信/雲與基礎設施知識",
             "category": "domain_knowledge",
-            "count": 17
+            "count": 18
           },
           {
             "name": "英語",
             "category": "language",
-            "count": 220
+            "count": 200
           },
           {
             "name": "粵語",
@@ -1826,27 +1855,42 @@
           {
             "name": "中文",
             "category": "language",
-            "count": 57
+            "count": 58
+          },
+          {
+            "name": "普通話優先",
+            "category": "language",
+            "count": 1
           },
           {
             "name": "學士學位",
             "category": "education",
-            "count": 91
+            "count": 156
+          },
+          {
+            "name": "計算機相關學歷",
+            "category": "education",
+            "count": 96
           },
           {
             "name": "大專/文憑",
             "category": "education",
-            "count": 20
+            "count": 25
           },
           {
             "name": "碩士學位",
             "category": "education",
-            "count": 18
+            "count": 22
           },
           {
             "name": "博士學位",
             "category": "education",
             "count": 4
+          },
+          {
+            "name": "人工智能/機器學習相關學歷",
+            "category": "education",
+            "count": 1
           },
           {
             "name": "CISSP",
@@ -1874,19 +1918,19 @@
             "count": 4
           },
           {
-            "name": "PMP",
+            "name": "CCNP",
+            "category": "certification",
+            "count": 3
+          },
+          {
+            "name": "CEH",
+            "category": "certification",
+            "count": 3
+          },
+          {
+            "name": "CCNA",
             "category": "certification",
             "count": 2
-          },
-          {
-            "name": "CSM",
-            "category": "certification",
-            "count": 1
-          },
-          {
-            "name": "PRINCE2",
-            "category": "certification",
-            "count": 1
           }
         ],
         "company_distribution": [
@@ -2211,124 +2255,144 @@
     }
   },
   "soft_skill_distribution": {
-    "signature": "v4:1782452058.8439736:6:244",
+    "signature": "v4:1782531869.8265479:248:244",
     "data": {
       "llm_used": false,
       "items": [
         {
           "name": "溝通能力",
           "category": "soft_skill",
-          "count": 139
-        },
-        {
-          "name": "問題解決",
-          "category": "soft_skill",
-          "count": 67
+          "count": 167
         },
         {
           "name": "團隊協作",
           "category": "soft_skill",
-          "count": 66
+          "count": 153
         },
         {
-          "name": "主動性",
+          "name": "問題解決",
           "category": "soft_skill",
-          "count": 42
+          "count": 119
         },
         {
           "name": "領導力",
           "category": "soft_skill",
-          "count": 39
+          "count": 54
         },
         {
-          "name": "組織能力",
+          "name": "主動性",
           "category": "soft_skill",
-          "count": 15
+          "count": 40
         },
         {
           "name": "抗壓能力",
           "category": "soft_skill",
-          "count": 1
+          "count": 31
+        },
+        {
+          "name": "注重細節",
+          "category": "soft_skill",
+          "count": 28
+        },
+        {
+          "name": "組織能力",
+          "category": "soft_skill",
+          "count": 28
+        },
+        {
+          "name": "獨立工作能力",
+          "category": "soft_skill",
+          "count": 17
+        },
+        {
+          "name": "責任感",
+          "category": "soft_skill",
+          "count": 9
         },
         {
           "name": "需求分析",
           "category": "business_skill",
-          "count": 188
+          "count": 137
         },
         {
           "name": "持份者管理",
           "category": "business_skill",
-          "count": 92
-        },
-        {
-          "name": "客戶溝通",
-          "category": "business_skill",
-          "count": 65
+          "count": 126
         },
         {
           "name": "文檔撰寫",
           "category": "business_skill",
-          "count": 60
+          "count": 91
         },
         {
-          "name": "供應商管理",
+          "name": "客戶溝通",
           "category": "business_skill",
-          "count": 40
+          "count": 78
         },
         {
           "name": "項目管理",
           "category": "business_skill",
-          "count": 24
+          "count": 57
+        },
+        {
+          "name": "供應商管理",
+          "category": "business_skill",
+          "count": 41
         },
         {
           "name": "匯報/演示",
           "category": "business_skill",
-          "count": 19
+          "count": 23
         },
         {
-          "name": "風險合規知識",
-          "category": "domain_knowledge",
-          "count": 113
+          "name": "項目交付",
+          "category": "business_skill",
+          "count": 16
         },
         {
           "name": "金融/金融科技知識",
           "category": "domain_knowledge",
-          "count": 69
+          "count": 84
         },
         {
-          "name": "人工智能/数据服务",
+          "name": "風險合規知識",
           "category": "domain_knowledge",
-          "count": 65
+          "count": 79
         },
         {
-          "name": "保險/財富管理知識",
+          "name": "人工智能/數據服務知識",
           "category": "domain_knowledge",
-          "count": 47
+          "count": 57
         },
         {
-          "name": "互联网/软件服务",
+          "name": "互聯網/軟件服務知識",
           "category": "domain_knowledge",
-          "count": 46
+          "count": 38
+        },
+        {
+          "name": "企業應用/ERP系統集成知識",
+          "category": "domain_knowledge",
+          "count": 24
         },
         {
           "name": "電商/零售業務知識",
           "category": "domain_knowledge",
-          "count": 21
+          "count": 24
         },
         {
-          "name": "电信/云与基础设施",
+          "name": "保險/財富管理知識",
           "category": "domain_knowledge",
-          "count": 19
+          "count": 20
         },
         {
-          "name": "政府/公共服務知識",
+          "name": "電信/雲與基礎設施知識",
           "category": "domain_knowledge",
-          "count": 17
+          "count": 18
         },
         {
           "name": "英語",
           "category": "language",
-          "count": 220
+          "count": 200
         },
         {
           "name": "粵語",
@@ -2343,27 +2407,42 @@
         {
           "name": "中文",
           "category": "language",
-          "count": 57
+          "count": 58
+        },
+        {
+          "name": "普通話優先",
+          "category": "language",
+          "count": 1
         },
         {
           "name": "學士學位",
           "category": "education",
-          "count": 91
+          "count": 156
+        },
+        {
+          "name": "計算機相關學歷",
+          "category": "education",
+          "count": 96
         },
         {
           "name": "大專/文憑",
           "category": "education",
-          "count": 20
+          "count": 25
         },
         {
           "name": "碩士學位",
           "category": "education",
-          "count": 18
+          "count": 22
         },
         {
           "name": "博士學位",
           "category": "education",
           "count": 4
+        },
+        {
+          "name": "人工智能/機器學習相關學歷",
+          "category": "education",
+          "count": 1
         },
         {
           "name": "CISSP",
@@ -2391,19 +2470,19 @@
           "count": 4
         },
         {
-          "name": "PMP",
+          "name": "CCNP",
+          "category": "certification",
+          "count": 3
+        },
+        {
+          "name": "CEH",
+          "category": "certification",
+          "count": 3
+        },
+        {
+          "name": "CCNA",
           "category": "certification",
           "count": 2
-        },
-        {
-          "name": "CSM",
-          "category": "certification",
-          "count": 1
-        },
-        {
-          "name": "PRINCE2",
-          "category": "certification",
-          "count": 1
         }
       ]
     }

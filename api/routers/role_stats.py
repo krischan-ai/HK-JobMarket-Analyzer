@@ -208,7 +208,10 @@ def run_classification(req: RunClassificationRequest = RunClassificationRequest(
     classifier = _get_classifier()
 
     if req.mode == "full":
-        classifier.clear_cache()
+        # 不删除磁盘缓存，仅标记强制重新分类（分类期间保留旧缓存供其他页面读取）
+        classifier._force_reclassify = True
+    else:
+        classifier._force_reclassify = False
 
     # 安全转换 NaN 值
     def _safe_str(v) -> str:
@@ -266,10 +269,13 @@ def _run_classify_in_background(req: RunClassificationRequest):
     logger.info("Classify-bg: LLM=%s, total=%d, use_llm=%s", llm_mode, len(df), req.use_llm)
 
     _classify_progress = {"running": True, "progress": 0, "total": len(df), "done": 0, "message": "正在初始化分類...", "llm_mode": llm_mode}
-    _classify_result = []
+    # 4.6b：不在分类启动时清空 _classify_result，保留上一次完整结果供前端展示
 
     if req.mode == "full":
-        classifier.clear_cache()
+        # 不删除磁盘缓存，仅标记强制重新分类（分类期间保留旧缓存供其他页面读取）
+        classifier._force_reclassify = True
+    else:
+        classifier._force_reclassify = False
 
     skill_extractor = RuleBasedSkillExtractor()
     skill_extractor.clear_cache()
@@ -281,10 +287,26 @@ def _run_classify_in_background(req: RunClassificationRequest):
     try:
         from api.routers.stats import _call_llm_for_industry_batch, _infer_industry_with_rules, _job_industry_record
         industry_records = [_job_industry_record(row, idx) for idx, (_, row) in enumerate(df.iterrows())]
-        llm_industry = _call_llm_for_industry_batch(industry_records[:50])
-        for record in industry_records:
-            idx = int(record["idx"])
-            industry_by_idx[idx] = llm_industry.get(idx) or _infer_industry_with_rules(record)
+        # 全量分批 LLM 行业归类，每批 50 条（4.6a：去除原 [:50] 限制）
+        batch_size = 50
+        for batch_start in range(0, len(industry_records), batch_size):
+            batch = industry_records[batch_start:batch_start + batch_size]
+            try:
+                llm_industry = _call_llm_for_industry_batch(batch)
+            except Exception as batch_err:
+                logger.warning("Industry LLM batch %d-%d failed, fallback to rules: %s",
+                               batch_start, batch_start + len(batch), batch_err)
+                llm_industry = {}
+            for record in batch:
+                idx = int(record["idx"])
+                industry_by_idx[idx] = llm_industry.get(idx) or _infer_industry_with_rules(record)
+            # 更新进度（行业归类阶段约占 0-8%）
+            _classify_progress = {
+                "running": True, "progress": min(8, int(8 * (batch_start + len(batch)) / max(1, len(industry_records)))),
+                "total": len(df), "done": 0,
+                "message": f"正在歸類行業... {batch_start + len(batch)}/{len(industry_records)}",
+                "llm_mode": llm_mode,
+            }
     except Exception as e:
         logger.warning("Industry classification fallback to rules: %s", e)
         try:
@@ -453,6 +475,8 @@ def _run_classify_in_background(req: RunClassificationRequest):
         if cache_key in classifier._cache:
             classifier._cache[cache_key]["_job_id"] = str(job.get("job_id", ""))
     classifier._save_cache()
+    # 重置强制重新分类标志，后续单岗位分类可正常命中缓存
+    classifier._force_reclassify = False
 
     now_ts = datetime.now(timezone.utc).isoformat()
     _classify_result = results
@@ -508,8 +532,7 @@ def classify_jobs(req: RunClassificationRequest = RunClassificationRequest()):
     if df.empty:
         raise HTTPException(status_code=400, detail="No job data available")
 
-    # 重置状态
-    _classify_result = []
+    # 重置状态（4.6b：不清空 _classify_result，保留旧结果供前端展示）
     _classify_progress = {"running": True, "progress": 0, "total": len(df), "done": 0, "message": "正在啟動...", "llm_mode": False}
 
     # 启动后台线程
