@@ -39,6 +39,10 @@
       <el-icon><Aim /></el-icon>
       <span>角色分類</span>
     </el-menu-item>
+    <el-menu-item index="/taxonomy-review">
+      <el-icon><Filter /></el-icon>
+      <span>詞庫審核</span>
+    </el-menu-item>
     <el-menu-item-group title="知識庫">
       <el-menu-item index="/knowledge">
         <el-icon><Collection /></el-icon>

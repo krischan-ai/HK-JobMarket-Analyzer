@@ -404,11 +404,12 @@ def location_distribution():
 
 
 _trend_analysis_cache: dict[str, Any] = {}
-_TREND_ANALYSIS_CONTEXT_VERSION = "v10"
+_TREND_ANALYSIS_CONTEXT_VERSION = "v11"
 _salary_analysis_cache: dict[str, Any] = {}
 _SALARY_ANALYSIS_CONTEXT_VERSION = "v4"
 _INDUSTRY_DISTRIBUTION_VERSION = "v3"
 _SOFT_SKILL_DISTRIBUTION_VERSION = "v4"
+_SCENARIO_CAPABILITY_VERSION = "v1"
 _ANALYSIS_CACHE_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "cache" / "ai_analysis_cache.json"
 
 
@@ -431,9 +432,15 @@ def _role_cache_stamp_and_count() -> tuple[float, int]:
         return 0, 0
 
 
+def _taxonomy_stamp() -> float:
+    """正式词库晋升 overlay 的 mtime；候选晋升/确认后变化，使派生缓存失效（§5.2）。"""
+    path = Path(__file__).resolve().parent.parent.parent / "data" / "taxonomy" / "skill_taxonomy.json"
+    return path.stat().st_mtime if path.exists() else 0
+
+
 def _analysis_signature(version: str, df: pd.DataFrame) -> str:
     role_stamp, role_count = _role_cache_stamp_and_count()
-    return f"{version}:{_jobs_csv_stamp()}:{len(df)}:{role_stamp}:{role_count}"
+    return f"{version}:{_jobs_csv_stamp()}:{len(df)}:{role_stamp}:{role_count}:{_taxonomy_stamp()}"
 
 
 def _load_analysis_cache() -> dict[str, Any]:
@@ -813,7 +820,7 @@ def _collect_llm_industry_distribution(df: pd.DataFrame, top_n: int = 10, use_ll
 
 def _soft_skill_cache_signature(df: pd.DataFrame) -> str:
     role_stamp, role_count = _role_cache_stamp_and_count()
-    return f"{_SOFT_SKILL_DISTRIBUTION_VERSION}:{role_stamp}:{role_count}:{len(df)}"
+    return f"{_SOFT_SKILL_DISTRIBUTION_VERSION}:{role_stamp}:{role_count}:{len(df)}:{_taxonomy_stamp()}"
 
 
 _NON_TECH_CATEGORY_LIMITS = {
@@ -1150,6 +1157,140 @@ def _aggregate_soft_skills_from_cache(df: pd.DataFrame | None = None) -> list[di
     return items
 
 
+# v1.5-p2：跨行业六维场景能力统计（消费角色分类缓存中的 cross_industry_profile / summary_tags）
+_CROSS_INDUSTRY_DIMENSIONS = (
+    "industry_context", "business_scenario", "solution_domain",
+    "delivery_motion", "compliance_standard", "system_or_asset",
+)
+_CROSS_INDUSTRY_DIMENSION_TITLES = {
+    "industry_context": "行業/客戶場景",
+    "business_scenario": "業務場景",
+    "solution_domain": "技術方案方向",
+    "delivery_motion": "交付動作",
+    "compliance_standard": "合規/標準",
+    "system_or_asset": "系統/設備對象",
+}
+_CROSS_INDUSTRY_DIMENSION_LIMIT = 10
+_CROSS_INDUSTRY_SUMMARY_LIMIT = 12
+# 与岗位卡片展示门槛一致（§11.6）：跨行业原子标签默认只统计高置信项
+_CROSS_INDUSTRY_CONFIDENCE_MIN = 0.75
+
+
+def _load_cross_industry_by_job() -> dict[str, dict]:
+    """从 role_cache.json 读取 _job_id -> {cross_industry_profile, job_context_profile} 映射。"""
+    try:
+        from src.analyzer.role_classifier import CACHE_PATH
+        cache_data = json.loads(CACHE_PATH.read_text(encoding="utf-8")) if CACHE_PATH.exists() else {}
+    except (OSError, json.JSONDecodeError):
+        cache_data = {}
+    result: dict[str, dict] = {}
+    if isinstance(cache_data, dict):
+        for entry in cache_data.values():
+            if not isinstance(entry, dict):
+                continue
+            job_id = _safe_text(entry.get("_job_id"))
+            if not job_id:
+                continue
+            cip = entry.get("cross_industry_profile")
+            jcp = entry.get("job_context_profile")
+            if isinstance(cip, dict) or isinstance(jcp, dict):
+                result[job_id] = {
+                    "cross_industry_profile": cip if isinstance(cip, dict) else {},
+                    "job_context_profile": jcp if isinstance(jcp, dict) else {},
+                }
+    return result
+
+
+def _passes_cross_industry_confidence(tag: dict) -> bool:
+    raw = tag.get("confidence")
+    if raw is None:
+        return True  # 缺失置信度时不抑制，避免漏掉规则来源的标签
+    try:
+        return float(raw) >= _CROSS_INDUSTRY_CONFIDENCE_MIN
+    except (TypeError, ValueError):
+        return True
+
+
+def _aggregate_cross_industry_from_cache(df: pd.DataFrame | None = None) -> dict[str, Any]:
+    """聚合跨行业六维原子标签与组合画像（summary_tags），用于趋势页场景化能力统计。
+
+    纯计算，不触发 LLM；数据来源是角色分类一次性产出的 cross_industry_profile / job_context_profile。
+    返回 {"dimensions": [{dimension,title,items:[{name,count}]}], "summary_tags": [{name,count,supporting_dimensions}]}。
+    """
+    if df is None:
+        df = load_jobs_df()
+    empty = {"dimensions": [], "summary_tags": []}
+    if df.empty:
+        return empty
+
+    signature = f"{_SCENARIO_CAPABILITY_VERSION}:" + _soft_skill_cache_signature(df)
+    cached = _get_disk_cached_analysis("scenario_capability", signature)
+    if cached and isinstance(cached.get("dimensions"), list):
+        return {"dimensions": cached["dimensions"], "summary_tags": cached.get("summary_tags", [])}
+
+    profile_by_job = _load_cross_industry_by_job()
+    if not profile_by_job:
+        return empty
+
+    dim_counters: dict[str, Counter[str]] = {dim: Counter() for dim in _CROSS_INDUSTRY_DIMENSIONS}
+    summary_counter: Counter[str] = Counter()
+    summary_dims: dict[str, set[str]] = {}
+
+    for _, row in df.iterrows():
+        profile = profile_by_job.get(_safe_text(row.get("job_id")))
+        if not profile:
+            continue
+        cip = profile.get("cross_industry_profile", {})
+        for dim in _CROSS_INDUSTRY_DIMENSIONS:
+            seen: set[str] = set()
+            for tag in cip.get(dim, []) if isinstance(cip, dict) else []:
+                if not isinstance(tag, dict) or not _passes_cross_industry_confidence(tag):
+                    continue
+                name = _safe_text(tag.get("name"))
+                if name and name not in seen:
+                    seen.add(name)
+                    dim_counters[dim][name] += 1
+
+        jcp = profile.get("job_context_profile", {})
+        seen_tags: set[str] = set()
+        for tag in jcp.get("summary_tags", []) if isinstance(jcp, dict) else []:
+            if not isinstance(tag, dict) or not _passes_cross_industry_confidence(tag):
+                continue
+            name = _safe_text(tag.get("name"))
+            if not name or name in seen_tags:
+                continue
+            seen_tags.add(name)
+            summary_counter[name] += 1
+            dims = tag.get("supporting_dimensions")
+            if isinstance(dims, list):
+                summary_dims.setdefault(name, set()).update(_safe_text(d) for d in dims if _safe_text(d))
+
+    dimensions = [
+        {
+            "dimension": dim,
+            "title": _CROSS_INDUSTRY_DIMENSION_TITLES[dim],
+            "items": [{"name": name, "count": count} for name, count in dim_counters[dim].most_common(_CROSS_INDUSTRY_DIMENSION_LIMIT)],
+        }
+        for dim in _CROSS_INDUSTRY_DIMENSIONS
+        if dim_counters[dim]
+    ]
+    summary_tags = [
+        {
+            "name": name,
+            "count": count,
+            "supporting_dimensions": sorted(summary_dims.get(name, set())),
+        }
+        for name, count in summary_counter.most_common(_CROSS_INDUSTRY_SUMMARY_LIMIT)
+    ]
+
+    result = {"dimensions": dimensions, "summary_tags": summary_tags}
+    if dimensions or summary_tags:
+        cache = _load_analysis_cache()
+        cache["scenario_capability"] = {"signature": signature, "data": {"llm_used": False, **result}}
+        _save_analysis_cache(cache)
+    return result
+
+
 def _sample_jobs_for_analysis(df: pd.DataFrame, limit: int = 12) -> list[dict[str, str]]:
     if df.empty:
         return []
@@ -1184,6 +1325,7 @@ def _build_trend_context(df: pd.DataFrame, use_llm: bool = True) -> dict[str, An
         "responsibility_distribution": _collect_responsibility_stats(df),
         "industry_distribution": _collect_llm_industry_distribution(df, top_n=10, use_llm=use_llm),
         "soft_skill_demand": _aggregate_soft_skills_from_cache(df),
+        "scenario_capability": _aggregate_cross_industry_from_cache(df),
         "company_distribution": _counter_from_column(df, "company", top_n=10),
         "location_distribution": [
             {"name": name, "count": count}
@@ -1192,6 +1334,22 @@ def _build_trend_context(df: pd.DataFrame, use_llm: bool = True) -> dict[str, An
         "education_distribution": _counter_from_column(df, "education_required", top_n=8),
         "language_distribution": _counter_from_column(df, "languages_required", top_n=8),
         "knowledge_base_samples": _sample_jobs_for_analysis(df),
+    }
+
+
+def _compact_scenario_capability(scenario: dict[str, Any]) -> dict[str, Any]:
+    if not isinstance(scenario, dict):
+        return {"dimensions": [], "summary_tags": []}
+    return {
+        "dimensions": [
+            {
+                "dimension": dim.get("dimension"),
+                "title": dim.get("title"),
+                "items": (dim.get("items") or [])[:6],
+            }
+            for dim in scenario.get("dimensions", [])[:6]
+        ],
+        "summary_tags": scenario.get("summary_tags", [])[:8],
     }
 
 
@@ -1214,6 +1372,7 @@ def _compact_trend_context(context: dict[str, Any]) -> dict[str, Any]:
             category: items[:8]
             for category, items in non_tech_by_category.items()
         },
+        "scenario_capability": _compact_scenario_capability(context.get("scenario_capability", {})),
         "company_distribution": context.get("company_distribution", [])[:8],
         "location_distribution": context.get("location_distribution", [])[:8],
         "education_distribution": context.get("education_distribution", [])[:6],
@@ -1228,6 +1387,23 @@ def _compact_trend_context(context: dict[str, Any]) -> dict[str, Any]:
             for item in context.get("knowledge_base_samples", [])[:6]
         ],
     }
+
+
+def _scenario_evidence_items(context: dict[str, Any], limit: int = 12) -> list[dict[str, Any]]:
+    """把场景化能力统计扁平化为 [{name, count}] 证据项，供图表与 evidence 展示。"""
+    scenario = context.get("scenario_capability") or {}
+    items: list[dict[str, Any]] = []
+    for tag in scenario.get("summary_tags", []):
+        name = _safe_text(tag.get("name"))
+        if name:
+            items.append({"name": f"組合畫像｜{name}", "count": tag.get("count", 0)})
+    for dim in scenario.get("dimensions", []):
+        title = _safe_text(dim.get("title"))
+        for entry in (dim.get("items") or [])[:3]:
+            name = _safe_text(entry.get("name"))
+            if name:
+                items.append({"name": f"{title}｜{name}", "count": entry.get("count", 0)})
+    return items[:limit]
 
 
 def _fallback_trend_sections(context: dict[str, Any]) -> list[dict[str, Any]]:
@@ -1254,6 +1430,17 @@ def _fallback_trend_sections(context: dict[str, Any]) -> list[dict[str, Any]]:
         for category, items in non_tech_by_category.items()
         if items
     ) or "暂无非技术能力统计"
+    scenario = context.get("scenario_capability") or {}
+    scenario_dims = scenario.get("dimensions", [])
+    scenario_summary_parts = []
+    for dim in scenario_dims[:4]:
+        names = "、".join([f"{x.get('name')}({x.get('count')})" for x in (dim.get("items") or [])[:3]])
+        if names:
+            scenario_summary_parts.append(f"{dim.get('title')}：{names}")
+    combo_tags = "、".join([f"{x.get('name')}({x.get('count')})" for x in scenario.get("summary_tags", [])[:5]])
+    scenario_summary = "；".join(scenario_summary_parts) or "暂无跨行业场景标签，待角色分类产出六维画像后生成"
+    if combo_tags:
+        scenario_summary += f"。高频组合画像：{combo_tags}"
     return [
         {"key": "tech_stack_demand", "title": "技术栈需求分析", "summary": f"技术栈榜单显示：{skills}。这些高频技术说明香港 IT 岗位更偏向云平台、后端工程、数据处理与自动化交付的组合能力，单一工具会被放在完整交付链路里评估。", "evidence": context.get("tech_stack_ranking", [])[:8]},
         {"key": "tech_category", "title": "细分技能类别分析", "summary": f"细分类别占比中较突出的方向包括：{categories}。相比原始大类，这些类别更能反映岗位真实能力结构，适合用来判断候选人技能组合是否均衡。", "evidence": context.get("skill_category_distribution", [])[:6]},
@@ -1262,6 +1449,7 @@ def _fallback_trend_sections(context: dict[str, Any]) -> list[dict[str, Any]]:
         {"key": "soft_skill_demand", "title": "非技术能力画像", "summary": f"基于岗位缓存、结构化字段和 JD 关键词聚合后，非技术能力画像包括：{non_tech_summary}。这部分不仅包含沟通、團隊協作等个人能力，也覆盖普通話/粵語/英語等语言门槛、金融/保险/合规等行业知识、资格证与业务交付能力；求职者应在简历中用项目场景和业务结果证明这些能力。", "evidence": context.get("soft_skill_demand", [])[:18]},
         {"key": "responsibility", "title": "岗位职责分析", "summary": "从样本 JD 看，职责通常围绕系统开发、AI/数据能力落地、云基础设施交付、跨团队协作和质量/安全要求展开。技术型岗位不只看工具名，还强调端到端交付和业务场景理解。", "evidence": context.get("knowledge_base_samples", [])[:5]},
         {"key": "company_industry", "title": "公司行业分析", "summary": f"基于公司名称、岗位标题和 JD 业务语境归类后，行业集中在：{industries}。行业排名反映的是岗位需求来自哪些业务场景，而不是公司名称出现次数；求职时应结合目标行业补充对应业务词汇、监管语境和项目案例。", "evidence": context.get("industry_distribution", [])[:5]},
+        {"key": "scenario_capability", "title": "场景化能力分析", "summary": f"跨行业六维画像显示，岗位需求并非纯技术，而是「技术 + 行业客户 + 业务场景 + 交付动作 + 合规标准 + 系统对象」的复合能力：{scenario_summary}。这说明香港 IT 岗位越来越要求把 AI/数据/自动化能力落地到具体行业系统和合规语境中；求职者应在简历里用行业场景和业务结果证明技术，而非只罗列工具名。", "evidence": _scenario_evidence_items(context)},
         {"key": "tech_direction", "title": "技术方向分析", "summary": f"技术栈高频项包括：{skills}。整体方向偏向云平台、AI 应用、数据工程、DevOps 自动化和全栈开发能力组合，简称类技术名已在图表中补充中文全称。", "evidence": context.get("tech_stack_ranking", [])[:8]},
     ]
 
@@ -1275,6 +1463,7 @@ def _trend_section_specs(context: dict[str, Any]) -> list[dict[str, Any]]:
         {"key": "soft_skill_demand", "title": "非技术能力画像", "evidence": context.get("soft_skill_demand", [])[:48]},
         {"key": "responsibility", "title": "岗位职责分析", "evidence": context.get("responsibility_distribution", [])[:8]},
         {"key": "company_industry", "title": "公司行业分析", "evidence": context.get("industry_distribution", [])[:8]},
+        {"key": "scenario_capability", "title": "场景化能力分析", "evidence": _scenario_evidence_items(context)},
         {"key": "tech_direction", "title": "技术方向分析", "evidence": context.get("tech_stack_ranking", [])[:8]},
     ]
 
@@ -1314,7 +1503,7 @@ def _call_llm_for_trend_analysis(context: dict[str, Any]) -> list[dict[str, Any]
     section_specs = _trend_section_specs(context)
     prompt = (
         "你是香港 IT 招聘市场分析师。请只基于下面的岗位知识库统计和样本 JD，"
-        "按下面 8 个标题输出纯文本分析。每个标题必须单独成行，格式为：### 标题。"
+        "按下面 9 个标题输出纯文本分析。每个标题必须单独成行，格式为：### 标题。"
         "每个标题下写 3-5 句中文，不能只复述出现次数；"
         "必须解释这些数据对香港 IT 行情的意义、对候选人技能组合/简历关键词/求职优先级的建议、以及样本局限。"
         "技术简称必须补充中文解释，例如 持续集成/持续交付（CI/CD）。不要输出 JSON。\n\n"
@@ -1325,6 +1514,12 @@ def _call_llm_for_trend_analysis(context: dict[str, Any]) -> list[dict[str, Any]
         "业务交付能力（需求分析、持份者管理、项目管理、文档/汇报、客户沟通等）。"
         "这些计数已在上下文 non_tech_ability_by_category 中按类别提供，请直接引用高频项和计数，"
         "并说明这些非计算机专业能力对香港 IT 求职定位、简历关键词和面试准备的启示。\n\n"
+        "特别注意：「场景化能力分析」一节必须基于上下文 scenario_capability 字段，"
+        "它把岗位拆为六个维度：行業/客戶場景、業務場景、技術方案方向、交付動作、合規/標準、系統/設備對象，"
+        "并给出由多维度共同触发的组合画像 summary_tags。请引用各维度高频标签和组合画像，"
+        "重点表达：哪些行业场景正在吸收 AI/数据/自动化能力、哪些技术需要配合行业系统或合规标准落地、"
+        "哪些岗位更偏售前方案/系统集成/内部自动化/平台开发或交付实施。"
+        "不要只说『AI 和云平台需求高』，要把技术与行业场景结合表达。\n\n"
         "标题顺序：\n"
         + "\n".join([f"### {spec['title']}" for spec in section_specs]) +
         "\n\n"

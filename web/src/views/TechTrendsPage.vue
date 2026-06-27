@@ -107,6 +107,96 @@
       </el-col>
     </el-row>
 
+    <el-row :gutter="16" style="margin-bottom: 16px">
+      <el-col :span="24">
+        <el-card>
+          <template #header>
+            <div class="scenario-header">
+              <strong>场景化能力 · 跨行业画像</strong>
+              <el-tag size="small" type="info">技术 + 行业客户 + 业务场景 + 交付 + 合规 + 系统对象</el-tag>
+            </div>
+          </template>
+
+          <template v-if="hasScenario">
+            <div v-if="scenarioSummaryTags.length" class="scenario-block">
+              <div class="scenario-block-title">高频组合画像（多维度共同触发）</div>
+              <div class="scenario-tags">
+                <el-tag
+                  v-for="tag in scenarioSummaryTags"
+                  :key="tag.name"
+                  type="success"
+                  effect="plain"
+                  size="large"
+                  class="scenario-combo-tag"
+                >
+                  {{ tag.name }} · {{ tag.count }}
+                </el-tag>
+              </div>
+            </div>
+
+            <div
+              v-for="dim in scenarioDimensions"
+              :key="dim.dimension"
+              class="scenario-block"
+            >
+              <div class="scenario-block-title">{{ dim.title }}</div>
+              <div class="scenario-tags">
+                <el-tag
+                  v-for="item in dim.items"
+                  :key="item.name"
+                  :type="dimensionTagType(dim.dimension)"
+                  effect="light"
+                  size="default"
+                >
+                  {{ item.name }} · {{ item.count }}
+                </el-tag>
+              </div>
+            </div>
+          </template>
+          <el-empty
+            v-else
+            description="暂无跨行业场景标签；在角色分类页完成一次「分类全部」后，六维画像会自动产出。"
+            :image-size="80"
+          />
+
+          <AnalysisSummary
+            :section="findSection('scenario_capability')"
+            :loading="statsStore.techTrendLoading"
+            :error="statsStore.techTrendError"
+            fallback-title="场景化能力分析"
+            :total-jobs="totalJobs"
+          />
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <el-row v-if="emergingCandidates.length" :gutter="16" style="margin-bottom: 16px">
+      <el-col :span="24">
+        <el-card>
+          <template #header>
+            <div class="scenario-header">
+              <strong>新兴场景 · 待确认标签</strong>
+              <el-button text type="primary" @click="goReview">前往词库审核 →</el-button>
+            </div>
+          </template>
+          <p class="emerging-hint">
+            以下是角色分类发现、但尚未进入正式词库的高频候选标签，仅供参考，不计入上方主榜单。
+          </p>
+          <div class="scenario-tags">
+            <el-tag
+              v-for="cand in emergingCandidates"
+              :key="cand.name"
+              type="warning"
+              effect="plain"
+              size="default"
+            >
+              {{ cand.name }} · {{ cand.support_count }}
+            </el-tag>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
+
     <section class="analysis-section">
       <div class="section-header">
         <h3>知识库智能总结</h3>
@@ -159,17 +249,21 @@
 
 <script lang="ts" setup>
 import { computed, defineComponent, h, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElAlert, ElMessage, ElSkeleton } from 'element-plus'
 import VChart from 'vue-echarts'
 import { useStatsStore } from '@/stores/stats'
 import CategoryPieChart from '@/components/charts/CategoryPieChart.vue'
 import RoleDistributionChart from '@/components/RoleDistributionChart.vue'
 import LLMStatusCard from '@/components/LLMStatusCard.vue'
+import { taxonomyApi, type TaxonomyCandidate } from '@/api/taxonomy'
 import type { TechTrendSection } from '@/types'
 
 const statsStore = useStatsStore()
+const router = useRouter()
 const pageSize = 20
 const skillPage = ref(1)
+const emergingCandidates = ref<TaxonomyCandidate[]>([])
 
 onMounted(() => {
   void Promise.all([
@@ -179,7 +273,23 @@ onMounted(() => {
     statsStore.fetchLLMStatus(),
   ])
   void loadAnalysis(false)
+  void loadEmergingCandidates()
 })
+
+async function loadEmergingCandidates() {
+  try {
+    const overview = await taxonomyApi.overview()
+    emergingCandidates.value = (overview.candidates || [])
+      .filter(c => c.confidence_avg >= 0.75)
+      .slice(0, 15)
+  } catch {
+    emergingCandidates.value = []
+  }
+}
+
+function goReview() {
+  void router.push('/taxonomy-review')
+}
 
 onBeforeUnmount(() => {
   statsStore.cancelTechTrendAnalysis()
@@ -196,6 +306,39 @@ const knowledgeSections = computed(() => {
   const sections = statsStore.techTrendAnalysis?.sections || []
   return sections.filter(section => ['soft_skill_demand', 'responsibility', 'company_industry', 'tech_direction'].includes(sectionKind(section)))
 })
+
+const scenarioCapability = computed(() => {
+  const context = statsStore.techTrendAnalysis?.context as Record<string, any> | undefined
+  const scenario = context?.scenario_capability
+  return scenario && typeof scenario === 'object' ? scenario : { dimensions: [], summary_tags: [] }
+})
+
+const scenarioDimensions = computed<Array<{ dimension: string; title: string; items: Array<{ name: string; count: number }> }>>(
+  () => {
+    const dims = scenarioCapability.value.dimensions
+    return Array.isArray(dims) ? dims : []
+  },
+)
+
+const scenarioSummaryTags = computed<Array<{ name: string; count: number }>>(() => {
+  const tags = scenarioCapability.value.summary_tags
+  return Array.isArray(tags) ? tags : []
+})
+
+const hasScenario = computed(() => scenarioDimensions.value.length > 0 || scenarioSummaryTags.value.length > 0)
+
+const _DIMENSION_TAG_TYPES: Record<string, string> = {
+  industry_context: 'danger',
+  business_scenario: 'warning',
+  solution_domain: 'primary',
+  delivery_motion: 'success',
+  compliance_standard: 'info',
+  system_or_asset: '',
+}
+
+function dimensionTagType(dimension: string) {
+  return _DIMENSION_TAG_TYPES[dimension] ?? ''
+}
 
 const analysisStatus = computed(() => {
   if (statsStore.techTrendLoading) return { text: 'AI 分析中', type: 'warning' as const }
@@ -244,6 +387,7 @@ function sectionKind(section: { key?: string; title?: string }) {
   if (key.includes('role_distribution') || title.includes('角色分布')) return 'role_distribution'
   if (key.includes('role') || title.includes('角色分类')) return 'role_classification'
   if (key.includes('soft_skill') || title.includes('软技能') || title.includes('非技术能力')) return 'soft_skill_demand'
+  if (key.includes('scenario') || title.includes('场景化') || title.includes('場景化')) return 'scenario_capability'
   if (key.includes('responsibility') || title.includes('岗位职责')) return 'responsibility'
   if (key.includes('company') || title.includes('公司') || title.includes('行业')) return 'company_industry'
   if (key.includes('tech_direction') || title.includes('技术方向')) return 'tech_direction'
@@ -466,6 +610,46 @@ const AnalysisSummary = defineComponent({
   font-size: 12px;
   line-height: 1.65;
   white-space: pre-wrap;
+}
+
+.scenario-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.scenario-block {
+  margin-bottom: 14px;
+}
+
+.scenario-block:last-of-type {
+  margin-bottom: 0;
+}
+
+.scenario-block-title {
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #303133;
+}
+
+.scenario-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.scenario-combo-tag {
+  font-weight: 600;
+}
+
+.emerging-hint {
+  margin: 0 0 12px;
+  color: #909399;
+  font-size: 12px;
+  line-height: 1.6;
 }
 
 .analysis-section {
