@@ -332,7 +332,9 @@ class RoleClassifier:
             "model": self.model,
             "messages": messages,
             "temperature": 0.1,
-            "max_tokens": 8192,
+            # 16384：长 JD（售前/架构/管理岗）结构化输出可达 6000-9700 字符，
+            # 8192 token 上限会截断响应导致 JSON 解析失败、静默降级到规则引擎。
+            "max_tokens": 16384,
         }
         url = f"{self.api_base}/chat/completions"
         resp = requests.post(url, headers=headers, json=payload, timeout=self.timeout, proxies={"http": None, "https": None})

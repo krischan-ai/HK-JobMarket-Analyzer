@@ -2255,139 +2255,144 @@
     }
   },
   "soft_skill_distribution": {
-    "signature": "v4:1782545151.0294805:248:244:0",
+    "signature": "v4:1782562911.42513:248:244:0",
     "data": {
       "llm_used": false,
       "items": [
         {
           "name": "溝通能力",
           "category": "soft_skill",
-          "count": 135
-        },
-        {
-          "name": "問題解決",
-          "category": "soft_skill",
-          "count": 66
+          "count": 106
         },
         {
           "name": "團隊協作",
           "category": "soft_skill",
-          "count": 65
+          "count": 91
+        },
+        {
+          "name": "問題解決",
+          "category": "soft_skill",
+          "count": 54
         },
         {
           "name": "領導力",
           "category": "soft_skill",
-          "count": 39
-        },
-        {
-          "name": "主動性",
-          "category": "soft_skill",
-          "count": 36
-        },
-        {
-          "name": "組織能力",
-          "category": "soft_skill",
-          "count": 15
-        },
-        {
-          "name": "团队合作",
-          "category": "soft_skill",
-          "count": 2
-        },
-        {
-          "name": "独立工作能力",
-          "category": "soft_skill",
-          "count": 2
+          "count": 35
         },
         {
           "name": "抗壓能力",
           "category": "soft_skill",
-          "count": 1
+          "count": 19
+        },
+        {
+          "name": "問題解決能力",
+          "category": "soft_skill",
+          "count": 18
+        },
+        {
+          "name": "分析能力",
+          "category": "soft_skill",
+          "count": 17
+        },
+        {
+          "name": "注重細節",
+          "category": "soft_skill",
+          "count": 14
+        },
+        {
+          "name": "獨立工作能力",
+          "category": "soft_skill",
+          "count": 14
+        },
+        {
+          "name": "主動性",
+          "category": "soft_skill",
+          "count": 12
         },
         {
           "name": "需求分析",
           "category": "business_skill",
-          "count": 126
-        },
-        {
-          "name": "持份者管理",
-          "category": "business_skill",
-          "count": 92
-        },
-        {
-          "name": "客戶溝通",
-          "category": "business_skill",
           "count": 64
-        },
-        {
-          "name": "文檔撰寫",
-          "category": "business_skill",
-          "count": 59
-        },
-        {
-          "name": "供應商管理",
-          "category": "business_skill",
-          "count": 36
         },
         {
           "name": "項目管理",
           "category": "business_skill",
+          "count": 31
+        },
+        {
+          "name": "利益相關者管理",
+          "category": "business_skill",
           "count": 23
         },
         {
-          "name": "匯報/演示",
+          "name": "文檔編寫",
           "category": "business_skill",
-          "count": 16
+          "count": 22
         },
         {
-          "name": "客户沟通",
+          "name": "供應商管理",
           "category": "business_skill",
+          "count": 19
+        },
+        {
+          "name": "客戶溝通",
+          "category": "business_skill",
+          "count": 11
+        },
+        {
+          "name": "跨部門協作",
+          "category": "business_skill",
+          "count": 9
+        },
+        {
+          "name": "技術文檔編寫",
+          "category": "business_skill",
+          "count": 8
+        },
+        {
+          "name": "金融/金融科技知識",
+          "category": "domain_knowledge",
+          "count": 25
+        },
+        {
+          "name": "電商/零售業務知識",
+          "category": "domain_knowledge",
+          "count": 6
+        },
+        {
+          "name": "人工智能/數據服務知識",
+          "category": "domain_knowledge",
+          "count": 5
+        },
+        {
+          "name": "政府/公共部門業務知識",
+          "category": "domain_knowledge",
+          "count": 4
+        },
+        {
+          "name": "保險/財富管理知識",
+          "category": "domain_knowledge",
+          "count": 3
+        },
+        {
+          "name": "金融/銀行業務知識",
+          "category": "domain_knowledge",
           "count": 3
         },
         {
           "name": "風險合規知識",
           "category": "domain_knowledge",
-          "count": 76
+          "count": 3
         },
         {
-          "name": "金融/金融科技知識",
+          "name": "金融/財務知識",
           "category": "domain_knowledge",
-          "count": 65
-        },
-        {
-          "name": "人工智能/數據服務知識",
-          "category": "domain_knowledge",
-          "count": 56
-        },
-        {
-          "name": "互聯網/軟件服務知識",
-          "category": "domain_knowledge",
-          "count": 38
-        },
-        {
-          "name": "企業應用/ERP系統集成知識",
-          "category": "domain_knowledge",
-          "count": 24
-        },
-        {
-          "name": "電商/零售業務知識",
-          "category": "domain_knowledge",
-          "count": 21
-        },
-        {
-          "name": "保險/財富管理知識",
-          "category": "domain_knowledge",
-          "count": 17
-        },
-        {
-          "name": "電信/雲與基礎設施知識",
-          "category": "domain_knowledge",
-          "count": 17
+          "count": 2
         },
         {
           "name": "英語",
           "category": "language",
-          "count": 200
+          "count": 130
         },
         {
           "name": "粵語",
@@ -2397,22 +2402,37 @@
         {
           "name": "普通話",
           "category": "language",
-          "count": 60
+          "count": 56
         },
         {
           "name": "中文",
           "category": "language",
-          "count": 57
+          "count": 30
         },
         {
-          "name": "英语",
+          "name": "Cantonese and English",
+          "category": "language",
+          "count": 1
+        },
+        {
+          "name": "英語流利",
           "category": "language",
           "count": 1
         },
         {
           "name": "學士學位",
           "category": "education",
-          "count": 91
+          "count": 134
+        },
+        {
+          "name": "計算機相關學歷",
+          "category": "education",
+          "count": 31
+        },
+        {
+          "name": "碩士學位",
+          "category": "education",
+          "count": 20
         },
         {
           "name": "大專/文憑",
@@ -2420,44 +2440,29 @@
           "count": 20
         },
         {
-          "name": "碩士學位",
+          "name": "碩士優先",
           "category": "education",
-          "count": 18
+          "count": 8
         },
         {
-          "name": "博士學位",
+          "name": "高級文憑",
           "category": "education",
-          "count": 4
-        },
-        {
-          "name": "AI / Environmental / Computer Science Engineering 相关学位",
-          "category": "education",
-          "count": 1
-        },
-        {
-          "name": "CISSP",
-          "category": "certification",
-          "count": 11
+          "count": 5
         },
         {
           "name": "CISM",
           "category": "certification",
-          "count": 8
-        },
-        {
-          "name": "ITIL",
-          "category": "certification",
-          "count": 5
-        },
-        {
-          "name": "HKMA",
-          "category": "certification",
           "count": 4
         },
         {
-          "name": "CISA",
+          "name": "CISSP",
           "category": "certification",
-          "count": 4
+          "count": 3
+        },
+        {
+          "name": "AI相關證書",
+          "category": "certification",
+          "count": 2
         },
         {
           "name": "PMP",
@@ -2465,12 +2470,22 @@
           "count": 2
         },
         {
-          "name": "PRINCE2",
+          "name": "MCSE",
+          "category": "certification",
+          "count": 2
+        },
+        {
+          "name": "人工智能相關證書",
           "category": "certification",
           "count": 1
         },
         {
-          "name": "CSM",
+          "name": "CISA",
+          "category": "certification",
+          "count": 1
+        },
+        {
+          "name": "Cloud Data Platform 或 Databricks 認證",
           "category": "certification",
           "count": 1
         }
@@ -2478,7 +2493,7 @@
     }
   },
   "scenario_capability": {
-    "signature": "v1:v4:1782545151.0294805:248:244:0",
+    "signature": "v1:v4:1782562911.42513:248:244:0",
     "data": {
       "llm_used": false,
       "dimensions": [
@@ -2487,8 +2502,44 @@
           "title": "行業/客戶場景",
           "items": [
             {
-              "name": "政府/公共部门",
-              "count": 1
+              "name": "金融/銀行",
+              "count": 33
+            },
+            {
+              "name": "金融/金融科技業務",
+              "count": 13
+            },
+            {
+              "name": "零售/電商",
+              "count": 13
+            },
+            {
+              "name": "政府/公共部門",
+              "count": 8
+            },
+            {
+              "name": "保險/財富管理業務",
+              "count": 5
+            },
+            {
+              "name": "金融/金融科技",
+              "count": 5
+            },
+            {
+              "name": "教育",
+              "count": 3
+            },
+            {
+              "name": "酒店/旅遊業",
+              "count": 3
+            },
+            {
+              "name": "物流",
+              "count": 3
+            },
+            {
+              "name": "工業/製造業",
+              "count": 2
             }
           ]
         },
@@ -2497,11 +2548,43 @@
           "title": "業務場景",
           "items": [
             {
-              "name": "水处理设施监测",
+              "name": "支付",
+              "count": 6
+            },
+            {
+              "name": "風險管理",
+              "count": 4
+            },
+            {
+              "name": "訂單管理",
+              "count": 3
+            },
+            {
+              "name": "量化交易",
+              "count": 2
+            },
+            {
+              "name": "客戶入職",
+              "count": 2
+            },
+            {
+              "name": "採購管理",
+              "count": 2
+            },
+            {
+              "name": "支付處理",
+              "count": 2
+            },
+            {
+              "name": "安全事件監控",
+              "count": 2
+            },
+            {
+              "name": "AI 可行性研究",
               "count": 1
             },
             {
-              "name": "设备状态监测",
+              "name": "數據管道生命週期管理",
               "count": 1
             }
           ]
@@ -2511,20 +2594,44 @@
           "title": "技術方案方向",
           "items": [
             {
-              "name": "网络安全",
+              "name": "AI 方案",
+              "count": 19
+            },
+            {
+              "name": "數據平台",
+              "count": 8
+            },
+            {
+              "name": "網絡安全方案",
+              "count": 4
+            },
+            {
+              "name": "AI平台",
+              "count": 3
+            },
+            {
+              "name": "AI 基礎設施",
               "count": 2
             },
             {
-              "name": "Digital Twin 解决方案",
-              "count": 1
+              "name": "AI 解決方案",
+              "count": 2
             },
             {
-              "name": "IT 基础设施方案设计",
-              "count": 1
+              "name": "交易系統",
+              "count": 2
             },
             {
-              "name": "AI 解决方案",
-              "count": 1
+              "name": "金融科技方案",
+              "count": 2
+            },
+            {
+              "name": "雲端基礎設施方案",
+              "count": 2
+            },
+            {
+              "name": "AI 平台",
+              "count": 2
             }
           ]
         },
@@ -2533,32 +2640,44 @@
           "title": "交付動作",
           "items": [
             {
-              "name": "POC 测试",
-              "count": 1
-            },
-            {
-              "name": "方案设计",
-              "count": 1
-            },
-            {
-              "name": "技术提案",
-              "count": 1
-            },
-            {
-              "name": "方案演示",
-              "count": 1
-            },
-            {
               "name": "需求分析",
-              "count": 1
+              "count": 36
             },
             {
-              "name": "投标",
-              "count": 1
+              "name": "實施交付",
+              "count": 20
             },
             {
-              "name": "售前到项目交付衔接",
-              "count": 1
+              "name": "方案設計",
+              "count": 19
+            },
+            {
+              "name": "POC 測試",
+              "count": 17
+            },
+            {
+              "name": "售前支持",
+              "count": 10
+            },
+            {
+              "name": "技術提案",
+              "count": 9
+            },
+            {
+              "name": "系統集成",
+              "count": 7
+            },
+            {
+              "name": "用戶驗收測試",
+              "count": 6
+            },
+            {
+              "name": "項目管理",
+              "count": 6
+            },
+            {
+              "name": "系統設計",
+              "count": 6
             }
           ]
         },
@@ -2567,15 +2686,43 @@
           "title": "合規/標準",
           "items": [
             {
-              "name": "信息安全合规",
+              "name": "ISO 27001",
+              "count": 10
+            },
+            {
+              "name": "金融監管合規",
+              "count": 7
+            },
+            {
+              "name": "NIST",
+              "count": 4
+            },
+            {
+              "name": "數據隱私合規",
+              "count": 3
+            },
+            {
+              "name": "ISO 9001",
               "count": 2
             },
             {
-              "name": "ISO 27001",
+              "name": "PDPO",
+              "count": 2
+            },
+            {
+              "name": "金融法規合規 (香港/澳門/新加坡)",
               "count": 1
             },
             {
-              "name": "政府合规",
+              "name": "數據安全與隱私法規",
+              "count": 1
+            },
+            {
+              "name": "集團技術標準",
+              "count": 1
+            },
+            {
+              "name": "AI 治理",
               "count": 1
             }
           ]
@@ -2585,12 +2732,44 @@
           "title": "系統/設備對象",
           "items": [
             {
-              "name": "傳感器",
-              "count": 1
+              "name": "伺服器",
+              "count": 4
             },
             {
-              "name": "机械设备",
-              "count": 1
+              "name": "網絡設備",
+              "count": 4
+            },
+            {
+              "name": "傳感器",
+              "count": 3
+            },
+            {
+              "name": "CRM系統",
+              "count": 3
+            },
+            {
+              "name": "防火牆",
+              "count": 3
+            },
+            {
+              "name": "交易平台",
+              "count": 2
+            },
+            {
+              "name": "ERP 系統",
+              "count": 2
+            },
+            {
+              "name": "支付網關",
+              "count": 2
+            },
+            {
+              "name": "網頁平台",
+              "count": 2
+            },
+            {
+              "name": "移動應用",
+              "count": 2
             }
           ]
         }
@@ -2598,12 +2777,47 @@
       "summary_tags": [
         {
           "name": "政府公用事業 AI/Digital Twin 售前解決方案",
-          "count": 1,
+          "count": 18,
           "supporting_dimensions": [
             "business_scenario",
             "delivery_motion",
             "industry_context",
             "solution_domain"
+          ]
+        },
+        {
+          "name": "金融數據平台與合規場景",
+          "count": 10,
+          "supporting_dimensions": [
+            "compliance_standard",
+            "industry_context",
+            "solution_domain"
+          ]
+        },
+        {
+          "name": "零售/電商 ERP 系統集成",
+          "count": 5,
+          "supporting_dimensions": [
+            "business_scenario",
+            "industry_context",
+            "solution_domain"
+          ]
+        },
+        {
+          "name": "電商支付與零售系統開發",
+          "count": 4,
+          "supporting_dimensions": [
+            "business_scenario",
+            "industry_context"
+          ]
+        },
+        {
+          "name": "樓宇設施與 IoT 系統方案",
+          "count": 2,
+          "supporting_dimensions": [
+            "compliance_standard",
+            "solution_domain",
+            "system_or_asset"
           ]
         }
       ]

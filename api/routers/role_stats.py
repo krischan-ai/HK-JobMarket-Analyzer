@@ -100,7 +100,9 @@ def _normalize_taxonomy_candidates(value) -> list[dict]:
 
 
 def _get_classifier() -> RoleClassifier:
-    return RoleClassifier()
+    # 较长超时：deepseek-v4-flash 单次结构化分类约 15-30s，并发下更慢；
+    # 30s 默认会在批量并发时大面积 Read timeout 并静默降级到规则引擎。
+    return RoleClassifier(timeout=90)
 
 
 def _safe_role_text(row) -> str:
@@ -431,7 +433,10 @@ def _run_classify_in_background(req: RunClassificationRequest):
         cache_key = classifier._make_cache_key(classify_text)
 
         with cache_lock:
-            if cache_key in classifier._cache:
+            # full 模式（_force_reclassify=True）跳过缓存命中，强制用 LLM 重算；
+            # 但不删除旧缓存——每条结果在算完后原地覆盖写回，其他页面读到的始终是
+            # 旧值或新值，不会出现空缓存/加载中状态。
+            if not classifier._force_reclassify and cache_key in classifier._cache:
                 cached = classifier._cache[cache_key]
                 cls_result = RoleResult(
                     role_id=cached.get("role_id", "other"),
@@ -508,7 +513,9 @@ def _run_classify_in_background(req: RunClassificationRequest):
         }
 
     # 并发分类
-    workers = min(8, total)
+    # LLM 模式下降低并发，避免供应商端排队导致整批超时降级到规则引擎；
+    # 规则模式无网络瓶颈，可保持高并发。
+    workers = min(4 if llm_mode else 8, total)
     results_map: dict[int, dict] = {}
     with ThreadPoolExecutor(max_workers=workers) as pool:
         futures = {pool.submit(_classify_one, job, idx): idx for idx, job in enumerate(jobs)}
