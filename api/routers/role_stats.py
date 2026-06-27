@@ -48,6 +48,20 @@ def _normalize_soft_skills(value) -> dict[str, list[str]]:
     return _empty_soft_skills()
 
 
+def _empty_tag_profile() -> dict[str, list[dict]]:
+    return {"technical": [], "non_technical": []}
+
+
+def _normalize_tag_profile(value) -> dict[str, list[dict]]:
+    result = _empty_tag_profile()
+    if isinstance(value, dict):
+        for bucket in result:
+            items = value.get(bucket, [])
+            if isinstance(items, list):
+                result[bucket] = [item for item in items if isinstance(item, dict) and item.get("name")]
+    return result
+
+
 def _get_classifier() -> RoleClassifier:
     return RoleClassifier()
 
@@ -368,6 +382,7 @@ def _run_classify_in_background(req: RunClassificationRequest):
                 "salary_max": _safe_float(job.get("salary_max")),
                 "skills": [], "is_insurance_sales": False, "insurance_score": 0,
                 "soft_skills": _empty_soft_skills(),
+                "tag_profile": _empty_tag_profile(),
                 "llm_is_insurance": False, "llm_confidence": "", "llm_explanation": "",
             }
 
@@ -384,6 +399,7 @@ def _run_classify_in_background(req: RunClassificationRequest):
                     role_name=cached.get("role_name", "其他"),
                     confidence=cached.get("confidence", "low"),
                     soft_skills=_normalize_soft_skills(cached.get("soft_skills")),
+                    tag_profile=_normalize_tag_profile(cached.get("tag_profile")),
                 )
                 from_cache = True
             else:
@@ -404,6 +420,7 @@ def _run_classify_in_background(req: RunClassificationRequest):
                     "role_name": cls_result.role_name,
                     "confidence": cls_result.confidence,
                     "soft_skills": cls_result.soft_skills,
+                    "tag_profile": cls_result.tag_profile,
                 }
                 classifier._save_cache()
 
@@ -435,6 +452,7 @@ def _run_classify_in_background(req: RunClassificationRequest):
             "salary_max": _safe_float(job.get("salary_max")),
             "skills": flat_skills,
             "soft_skills": cls_result.soft_skills,
+            "tag_profile": cls_result.tag_profile,
             "is_insurance_sales": is_ins,
             "insurance_score": ins_score,
             "llm_is_insurance": _safe_bool(job.get("llm_is_insurance")),
@@ -457,6 +475,7 @@ def _run_classify_in_background(req: RunClassificationRequest):
                     "role_id": "other", "role_name": "其他", "role_confidence": "low",
                     "salary_min": 0.0, "salary_max": 0.0, "skills": [],
                     "soft_skills": _empty_soft_skills(),
+                    "tag_profile": _empty_tag_profile(),
                 }
             done_count = len(results_map)
             pct = 8 + round(done_count / total * 82, 0)

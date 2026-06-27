@@ -12,6 +12,7 @@ import requests
 
 from config.settings import settings
 from src.analyzer.role_prompt import ROLE_DEFINITIONS, build_role_classify_messages
+from src.analyzer.skill_postprocessor import postprocess_tag_profile
 from src.llm_config_manager import LLMConfigManager
 from src.logger import get_logger
 
@@ -30,6 +31,10 @@ class RoleResult:
         "domain_knowledge": [],
         "certification": [],
         "business_skill": [],
+    })
+    tag_profile: dict[str, list[dict]] = field(default_factory=lambda: {
+        "technical": [],
+        "non_technical": [],
     })
 
 
@@ -105,6 +110,25 @@ class RoleClassifier:
                 result[key] = [str(item).strip() for item in raw_items if str(item).strip()]
         return result
 
+    @staticmethod
+    def _empty_tag_profile() -> dict[str, list[dict]]:
+        return {"technical": [], "non_technical": []}
+
+    @staticmethod
+    def _normalize_tag_profile(value: Any, run_postprocess: bool = False) -> dict[str, list[dict]]:
+        """规整 tag_profile。run_postprocess=True 时对 LLM 原始输出执行后处理治理；
+        从缓存读取已治理结果时按原样校验结构。"""
+        if run_postprocess:
+            return postprocess_tag_profile(value)
+        result = {"technical": [], "non_technical": []}
+        if not isinstance(value, dict):
+            return result
+        for bucket in result:
+            items = value.get(bucket, [])
+            if isinstance(items, list):
+                result[bucket] = [item for item in items if isinstance(item, dict) and item.get("name")]
+        return result
+
     def classify(self, jd_text: str) -> RoleResult:
         if not jd_text or not isinstance(jd_text, str):
             return RoleResult(role_id="other", role_name="其他", confidence="low")
@@ -117,6 +141,7 @@ class RoleClassifier:
                 role_name=cached.get("role_name", "其他"),
                 confidence=cached.get("confidence", "low"),
                 soft_skills=self._normalize_soft_skills(cached.get("soft_skills")),
+                tag_profile=self._normalize_tag_profile(cached.get("tag_profile")),
             )
 
         if self.available:
@@ -129,6 +154,7 @@ class RoleClassifier:
             "role_name": result.role_name,
             "confidence": result.confidence,
             "soft_skills": result.soft_skills,
+            "tag_profile": result.tag_profile,
         }
         self._save_cache()
         return result
@@ -198,6 +224,7 @@ class RoleClassifier:
                     role_name=ROLE_DEFINITIONS.get(role_id, {}).get("name", "其他"),
                     confidence=parsed.get("confidence", "medium"),
                     soft_skills=self._normalize_soft_skills(parsed.get("soft_skills")),
+                    tag_profile=self._normalize_tag_profile(parsed.get("tag_profile"), run_postprocess=True),
                 )
             except json.JSONDecodeError:
                 self.logger.warning("LLM non-JSON response at attempt %d, using rules", attempt + 1)
@@ -223,7 +250,7 @@ class RoleClassifier:
             "model": self.model,
             "messages": messages,
             "temperature": 0.1,
-            "max_tokens": 4096,
+            "max_tokens": 6144,
         }
         url = f"{self.api_base}/chat/completions"
         resp = requests.post(url, headers=headers, json=payload, timeout=self.timeout, proxies={"http": None, "https": None})
@@ -349,12 +376,14 @@ class RoleClassifier:
                     job["role_name"] = result.role_name
                     job["role_confidence"] = result.confidence
                     job["soft_skills"] = result.soft_skills
+                    job["tag_profile"] = result.tag_profile
                 except Exception as e:
                     self.logger.warning("Failed to classify job %s: %s", job.get("job_id", "?"), e)
                     job["role_id"] = "other"
                     job["role_name"] = "其他"
                     job["role_confidence"] = "low"
                     job["soft_skills"] = self._normalize_soft_skills({})
+                    job["tag_profile"] = self._empty_tag_profile()
                 results.append(job)
             if i + batch_size < len(jobs):
                 self.logger.info("Classified %d/%d jobs", i + batch_size, len(jobs))

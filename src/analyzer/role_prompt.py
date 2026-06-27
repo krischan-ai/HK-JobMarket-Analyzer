@@ -137,6 +137,10 @@ Return ONLY valid JSON with these fields:
   - "domain_knowledge": non-computer domain or industry knowledge requirements
   - "certification": professional qualifications or certificates
   - "business_skill": business, compliance, stakeholder, documentation, or project delivery skills
+- "tag_profile": object with two arrays of evidence-backed structured tags:
+  - "technical": technical skills/tools (programming_languages, frameworks_libraries, databases, cloud_devops, automation_toolkit, ai_api, ai_framework, ai_concepts, infrastructure, security_compliance, office_tools)
+  - "non_technical": business_skill, domain_knowledge, soft_skill, education, language, certification, experience
+  Each tag is an object: {"name","category","requirement_level","confidence","evidence"}
 
 Role reference (distinguish carefully):
 frontend=前端开发, backend=后端开发, fullstack=全栈开发, mobile=移动开发,
@@ -173,8 +177,17 @@ Soft skill extraction rules:
 - Extract business_skill for stakeholder management, requirement gathering, documentation, presentation, project management, vendor management, customer-facing communication, compliance reporting.
 - If a category is not mentioned, return an empty array for that category.
 
+tag_profile extraction rules (evidence-driven, doc §11.5):
+1. Every tag MUST cite a short JD quote in "evidence" (<=160 chars). No evidence => do not mark it as "required".
+2. requirement_level is one of: "required" (essential/required/proficiency in/experience with), "preferred" (preferred/nice to have/familiarity with), "example" (skills after e.g./such as/like/one of, unless the same clause also says must/essential/required), "inferred" (reasonable but not stated in JD; confidence must be <=0.7).
+3. Put OpenAI/Anthropic/Claude into category "ai_api"; LangChain/LlamaIndex into "ai_framework"; LLM/RAG/vector database into "ai_concepts". Do not output a standalone "llama" tag for LlamaIndex.
+4. Do NOT extract domain/industry knowledge from benefits, location, or company-intro text; prefer responsibilities/requirements/qualifications.
+5. Do NOT output "英語"/English as a language requirement merely because the JD is written in English; only when it explicitly requires English.
+6. PowerPoint/Excel/MS Office go to category "office_tools", never into core technical stack.
+7. "confidence" is a 0-1 float.
+
 Example output:
-{"role_id":"frontend","role_name":"前端开发","confidence":"high","soft_skills":{"education":["學士學位"],"language":["英語","粵語"],"soft_skill":["溝通能力","團隊協作"],"domain_knowledge":["金融/金融科技知識"],"certification":["PMP"],"business_skill":["需求分析","持份者管理"]}}
+{"role_id":"frontend","role_name":"前端开发","confidence":"high","soft_skills":{"education":["學士學位"],"language":["英語","粵語"],"soft_skill":["溝通能力","團隊協作"],"domain_knowledge":["金融/金融科技知識"],"certification":["PMP"],"business_skill":["需求分析","持份者管理"]},"tag_profile":{"technical":[{"name":"Python","category":"programming_languages","requirement_level":"required","confidence":0.98,"evidence":"Python (essential for AI/automation)"},{"name":"JavaScript","category":"programming_languages","requirement_level":"example","confidence":0.7,"evidence":"e.g., JavaScript/TypeScript, Go, or Java"},{"name":"OpenAI","category":"ai_api","requirement_level":"required","confidence":0.92,"evidence":"AI APIs (OpenAI, Anthropic)"}],"non_technical":[{"name":"流程自動化","category":"business_skill","requirement_level":"required","confidence":0.95,"evidence":"Workflow Automation"}]}}
 
 Job description:
 """ + jd_text[:3000]

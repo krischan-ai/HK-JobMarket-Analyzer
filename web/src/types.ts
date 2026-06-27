@@ -27,6 +27,7 @@ export interface JobItem {
   languages_required?: string[]
   tech_stack?: string[]
   soft_skills?: SoftSkillTags
+  tag_profile?: TagProfile
   job_type?: string
 }
 
@@ -37,6 +38,22 @@ export interface SoftSkillTags {
   domain_knowledge?: string[]
   certification?: string[]
   business_skill?: string[]
+}
+
+export type RequirementLevel = 'required' | 'preferred' | 'example' | 'inferred'
+
+export interface StructuredTag {
+  name: string
+  category: string
+  requirement_level: RequirementLevel
+  source?: string
+  confidence: number
+  evidence?: string
+}
+
+export interface TagProfile {
+  technical: StructuredTag[]
+  non_technical: StructuredTag[]
 }
 
 export interface JobListResponse {

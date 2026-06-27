@@ -120,6 +120,28 @@
         </div>
       </div>
 
+      <!-- 結構化標籤畫像（v1.2 證據驅動） -->
+      <div v-if="tagProfileGroups.length" class="detail-section">
+        <h4 class="detail-section__title">標籤畫像（依要求層級）</h4>
+        <div v-for="group in tagProfileGroups" :key="group.level" class="detail-skill-group">
+          <span class="detail-skill-group__label">
+            <el-tag size="small" :type="levelTagType(group.level)" effect="dark">{{ group.label }}</el-tag>
+          </span>
+          <div class="detail-skill-group__tags">
+            <el-tag
+              v-for="tag in group.tags"
+              :key="group.level + tag.category + tag.name"
+              size="small"
+              :type="levelTagType(group.level)"
+              effect="plain"
+              :title="tag.evidence ? `證據：${tag.evidence}` : ''"
+            >
+              {{ tag.name }}
+            </el-tag>
+          </div>
+        </div>
+      </div>
+
       <!-- JD 正文 -->
       <div class="detail-section">
         <h4 class="detail-section__title">職位描述</h4>
@@ -320,6 +342,35 @@ const softSkillGroups = computed(() => {
     { category: 'business_skill', label: '業務交付', skills: softSkills.business_skill ?? [] },
   ].filter((group) => group.skills.length > 0)
 })
+
+const _levelMeta: Array<{ level: string; label: string }> = [
+  { level: 'required', label: '必需' },
+  { level: 'preferred', label: '加分' },
+  { level: 'example', label: '示例' },
+  { level: 'inferred', label: '推斷' },
+]
+
+const tagProfileGroups = computed(() => {
+  const tp = props.job?.tag_profile
+  if (!tp) return []
+  const all = [...(tp.technical ?? []), ...(tp.non_technical ?? [])].filter((t) => t && t.name)
+  return _levelMeta
+    .map(({ level, label }) => ({
+      level,
+      label,
+      tags: all
+        .filter((t) => t.requirement_level === level)
+        .sort((a, b) => (b.confidence ?? 0) - (a.confidence ?? 0)),
+    }))
+    .filter((group) => group.tags.length > 0)
+})
+
+function levelTagType(level: string): '' | 'success' | 'warning' | 'danger' | 'info' {
+  if (level === 'required') return 'danger'
+  if (level === 'preferred') return 'warning'
+  if (level === 'example') return 'info'
+  return ''
+}
 
 const techStackList = computed(() => {
   return props.job?.tech_stack ?? []

@@ -992,6 +992,63 @@ def _scan_non_tech_labels_from_text(text: str) -> dict[str, set[str]]:
     return bucket
 
 
+# v1.2：统计默认只计 required/preferred（doc §11.7）；example 不进榜单，inferred 单列
+_STATS_REQUIREMENT_LEVELS = frozenset({"required", "preferred"})
+
+
+def _load_tag_profile_by_job() -> dict[str, dict]:
+    """从 role_cache.json 读取 _job_id -> tag_profile 映射。"""
+    try:
+        from src.analyzer.role_classifier import CACHE_PATH
+        cache_data = json.loads(CACHE_PATH.read_text(encoding="utf-8")) if CACHE_PATH.exists() else {}
+    except (OSError, json.JSONDecodeError):
+        cache_data = {}
+    result: dict[str, dict] = {}
+    if isinstance(cache_data, dict):
+        for entry in cache_data.values():
+            if not isinstance(entry, dict):
+                continue
+            job_id = _safe_text(entry.get("_job_id"))
+            tp = entry.get("tag_profile")
+            if job_id and isinstance(tp, dict):
+                result[job_id] = tp
+    return result
+
+
+def _aggregate_tech_stack_from_tag_profile(df: pd.DataFrame, top_n: int = 20) -> list[dict[str, Any]] | None:
+    """从 tag_profile.technical 聚合技术栈榜单，默认只计 required/preferred。
+    无任何 tag_profile 技术标签时返回 None，交由调用方 fallback 到 _collect_skill_stats。"""
+    tp_by_job = _load_tag_profile_by_job()
+    if not tp_by_job:
+        return None
+    counter: Counter[str] = Counter()
+    cat_by_name: dict[str, str] = {}
+    seen = False
+    for _, row in df.iterrows():
+        tp = tp_by_job.get(_safe_text(row.get("job_id")))
+        if not isinstance(tp, dict):
+            continue
+        names_in_job: set[str] = set()
+        for tag in tp.get("technical", []):
+            if not isinstance(tag, dict):
+                continue
+            if str(tag.get("requirement_level")) not in _STATS_REQUIREMENT_LEVELS:
+                continue
+            name = _safe_text(tag.get("name"))
+            if not name or name in names_in_job:
+                continue
+            seen = True
+            names_in_job.add(name)
+            counter[name] += 1
+            cat_by_name.setdefault(name, _safe_text(tag.get("category")))
+    if not seen:
+        return None
+    return [
+        {"skill": name, "category": cat_by_name.get(name, ""), "count": count}
+        for name, count in counter.most_common(top_n)
+    ]
+
+
 def _aggregate_soft_skills_from_cache(df: pd.DataFrame | None = None) -> list[dict[str, Any]]:
     if df is None:
         df = load_jobs_df()
@@ -1019,40 +1076,64 @@ def _aggregate_soft_skills_from_cache(df: pd.DataFrame | None = None) -> list[di
             if job_id and isinstance(entry.get("soft_skills"), dict):
                 soft_by_job[job_id] = entry["soft_skills"]
 
+    # v1.2：优先使用治理后的 tag_profile.non_technical（按 requirement_level 过滤）
+    tp_by_job = _load_tag_profile_by_job()
+
     for idx, row in df.iterrows():
         job_bucket: dict[str, set[str]] = {category: set() for category in _NON_TECH_CATEGORY_LIMITS}
         job_id = _safe_text(row.get("job_id"))
 
-        cached_soft = soft_by_job.get(job_id, {})
-        if isinstance(cached_soft, dict):
-            for category in _NON_TECH_CATEGORY_LIMITS:
-                for item in cached_soft.get(category, []):
-                    _add_label(job_bucket, category, item)
-
+        # 结构化列字段始终采用（可靠来源）
         for item in _iter_listish(row.get("languages_required")):
             _add_label(job_bucket, "language", item)
         if _safe_text(row.get("education_required")):
             _add_label(job_bucket, "education", row.get("education_required"))
 
-        jd = " ".join([
-            _safe_text(row.get("title")),
-            _safe_text(row.get("company")),
-            _safe_text(row.get("industry_category")),
-            _safe_text(row.get("jd_text")),
-            _safe_text(row.get("jd_raw")),
-            _safe_text(row.get("kb_document_text")),
-        ])
-        scanned = _scan_non_tech_labels_from_text(jd)
-        for category, labels in scanned.items():
-            for label in labels:
-                _add_label(job_bucket, category, label)
+        tp = tp_by_job.get(job_id)
+        tp_tags = tp.get("non_technical", []) if isinstance(tp, dict) else []
+        has_governed = any(
+            isinstance(t, dict) and str(t.get("requirement_level")) in _STATS_REQUIREMENT_LEVELS
+            for t in tp_tags
+        )
 
-        try:
-            industry = _infer_industry_with_rules(_job_industry_record(row, int(idx)))
-            if industry and industry != "其他":
-                _add_label(job_bucket, "domain_knowledge", industry)
-        except Exception:
-            pass
+        if has_governed:
+            # 优先：治理后的非技术标签，只计 required/preferred
+            for tag in tp_tags:
+                if not isinstance(tag, dict):
+                    continue
+                if str(tag.get("requirement_level")) not in _STATS_REQUIREMENT_LEVELS:
+                    continue
+                category = _safe_text(tag.get("category"))
+                name = _safe_text(tag.get("name"))
+                if category in _NON_TECH_CATEGORY_LIMITS and name:
+                    job_bucket[category].add(name)
+        else:
+            # fallback：旧 soft_skills 缓存 + JD 文本扫描 + 行业规则推断
+            cached_soft = soft_by_job.get(job_id, {})
+            if isinstance(cached_soft, dict):
+                for category in _NON_TECH_CATEGORY_LIMITS:
+                    for item in cached_soft.get(category, []):
+                        _add_label(job_bucket, category, item)
+
+            jd = " ".join([
+                _safe_text(row.get("title")),
+                _safe_text(row.get("company")),
+                _safe_text(row.get("industry_category")),
+                _safe_text(row.get("jd_text")),
+                _safe_text(row.get("jd_raw")),
+                _safe_text(row.get("kb_document_text")),
+            ])
+            scanned = _scan_non_tech_labels_from_text(jd)
+            for category, labels in scanned.items():
+                for label in labels:
+                    _add_label(job_bucket, category, label)
+
+            try:
+                industry = _infer_industry_with_rules(_job_industry_record(row, int(idx)))
+                if industry and industry != "其他":
+                    _add_label(job_bucket, "domain_knowledge", industry)
+            except Exception:
+                pass
 
         for category, labels in job_bucket.items():
             for label in labels:
@@ -1091,12 +1172,14 @@ def _build_trend_context(df: pd.DataFrame, use_llm: bool = True) -> dict[str, An
     from api.routers.role_stats import role_distribution, role_salary
 
     market = compute_market_insights(top_n=12)
+    # v1.2：优先用 tag_profile（required/preferred）技术栈榜单，无数据时 fallback 到列抽取统计
+    tech_stack_ranking = _aggregate_tech_stack_from_tag_profile(df, top_n=20) or _collect_skill_stats(df, top_n=20)
     return {
         "total_jobs": len(df),
         "role_demand_ranking": market.get("role_demand_ranking", []),
         "role_distribution": role_distribution(),
         "role_salary": role_salary(),
-        "tech_stack_ranking": _collect_skill_stats(df, top_n=20),
+        "tech_stack_ranking": tech_stack_ranking,
         "skill_category_distribution": category_distribution(),
         "responsibility_distribution": _collect_responsibility_stats(df),
         "industry_distribution": _collect_llm_industry_distribution(df, top_n=10, use_llm=use_llm),

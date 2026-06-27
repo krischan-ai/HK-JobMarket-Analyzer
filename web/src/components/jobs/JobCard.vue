@@ -29,6 +29,19 @@
       </el-tag>
       <span v-if="skillList.length > 4" class="job-card__skill-more">+{{ skillList.length - 4 }}</span>
     </div>
+    <div v-if="tagProfileTags.length" class="job-card__skills job-card__skills--profile">
+      <el-tag
+        v-for="tag in tagProfileTags.slice(0, 8)"
+        :key="'tp-' + tag.category + tag.name"
+        size="small"
+        :type="levelTagType(tag.requirement_level)"
+        effect="light"
+        :title="tag.evidence || ''"
+      >
+        {{ tag.name }}
+      </el-tag>
+      <span v-if="tagProfileTags.length > 8" class="job-card__skill-more">+{{ tagProfileTags.length - 8 }}</span>
+    </div>
     <div v-if="softSkillList.length" class="job-card__skills job-card__skills--soft">
       <el-tag
         v-for="tag in softSkillList.slice(0, 8)"
@@ -105,6 +118,26 @@ const softSkillList = computed(() => {
     ...(softSkills.education ?? []).map((name) => ({ name, category: 'education' })),
   ].filter((item) => item.name)
 })
+
+const tagProfileTags = computed(() => {
+  const tp = props.job.tag_profile
+  if (!tp) return []
+  const all = [...(tp.technical ?? []), ...(tp.non_technical ?? [])]
+  return all
+    .filter(
+      (t) =>
+        t && t.name &&
+        (t.requirement_level === 'required' || t.requirement_level === 'preferred') &&
+        (t.confidence ?? 0) >= 0.75,
+    )
+    .sort((a, b) => (b.confidence ?? 0) - (a.confidence ?? 0))
+})
+
+function levelTagType(level: string): '' | 'success' | 'warning' | 'danger' | 'info' {
+  if (level === 'required') return 'danger'
+  if (level === 'preferred') return 'warning'
+  return 'info'
+}
 
 function skillTagType(cat: string): '' | 'success' | 'warning' | 'danger' | 'info' {
   return (skillTagColors[cat] || 'info') as '' | 'success' | 'warning' | 'danger' | 'info'

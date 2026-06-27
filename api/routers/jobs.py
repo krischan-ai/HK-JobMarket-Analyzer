@@ -142,6 +142,33 @@ def _soft_skills_by_job_id() -> dict[str, dict[str, list[str]]]:
     return result
 
 
+def _tag_profile_by_job_id() -> dict[str, dict]:
+    """从 role_cache.json 读取 _job_id -> tag_profile（v1.2 结构化标签）。"""
+    try:
+        from src.analyzer.role_classifier import CACHE_PATH
+        if not CACHE_PATH.exists():
+            return {}
+        with open(CACHE_PATH, "r", encoding="utf-8") as f:
+            cache_data = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+    result: dict[str, dict] = {}
+    if not isinstance(cache_data, dict):
+        return result
+    for entry in cache_data.values():
+        if not isinstance(entry, dict):
+            continue
+        job_id = str(entry.get("_job_id") or "").strip()
+        tp = entry.get("tag_profile")
+        if job_id and isinstance(tp, dict):
+            result[job_id] = {
+                "technical": [t for t in tp.get("technical", []) if isinstance(t, dict) and t.get("name")],
+                "non_technical": [t for t in tp.get("non_technical", []) if isinstance(t, dict) and t.get("name")],
+            }
+    return result
+
+
 @router.get("")
 def list_jobs(
     keyword: str = Query(default=None),
@@ -189,6 +216,7 @@ def list_jobs(
     except Exception:
         classified_industries = {}
     soft_skills_by_job = _soft_skills_by_job_id()
+    tag_profile_by_job = _tag_profile_by_job_id()
 
     items = []
     for _, row in df_page.iterrows():
@@ -227,6 +255,7 @@ def list_jobs(
             "languages_required": _safe_list(row, "languages_required"),
             "tech_stack": _safe_list(row, "tech_stack"),
             "soft_skills": soft_skills,
+            "tag_profile": tag_profile_by_job.get(job_id, {"technical": [], "non_technical": []}),
             "job_type": _safe_str(row, "job_type"),
             "import_time": import_time,
         })
