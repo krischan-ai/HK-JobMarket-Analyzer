@@ -15,6 +15,12 @@ class ResumeAnalysis(TypedDict, total=False):
 class JDAnalysis(TypedDict, total=False):
     required_skills: list[str]
     preferred_skills: list[str]
+    example_skills: list[str]          # 备选/示例技能池（e.g. 任一即可），不计入硬性缺口
+    inferred_skills: list[str]         # 合理推断技能
+    soft_skills: dict[str, list[str]]  # 六类软技能（学历/语言/能力/行业/认证/业务）
+    cross_industry_profile: dict       # 跨行业六维（行业/场景/方案/交付/合规/系统资产）
+    tag_evidence: dict[str, str]       # 标签名 → JD 原文证据
+    reused_from_cache: bool            # 是否复用了统计侧治理好的标签
     responsibilities: list[str]
     min_experience: Optional[float]
     education_required: Optional[str]
@@ -31,6 +37,8 @@ class GapAnalysis(TypedDict, total=False):
     experience_gap: Optional[str]
     keyword_suggestions: list[dict]
     market_demand_analysis: Optional[str]
+    cross_industry_alignment: Optional[str]   # 跨行业能力对齐（业务场景/交付动作/行业知识）
+    emerging_suggestions: list[dict]          # 前瞻补强：高置信新兴场景候选标签
 
 
 class PolishSuggestion(TypedDict, total=False):

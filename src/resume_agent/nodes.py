@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from collections import Counter
 from typing import Any
 
@@ -11,6 +12,14 @@ from src.knowledge_base.hybrid_search import HybridJobSearch, HybridSearchOption
 from src.logger import get_logger
 
 from .llm import ResumeLLMClient
+from .market_data import (
+    candidate_capability_hints,
+    load_job_tag_profile,
+    load_taxonomy,
+    normalize_keywords,
+    split_jd_by_requirement,
+    tag_names,
+)
 from .market_insights import compute_market_insights
 from .prompts import (
     GAP_ANALYSIS_PROMPT,
@@ -206,23 +215,106 @@ def parse_resume(state: AgentState, llm: ResumeLLMClient) -> dict[str, Any]:
     return {"resume": parsed}
 
 
-def analyze_jd(state: AgentState, llm: ResumeLLMClient) -> dict[str, Any]:
-    content = llm.chat_json(
-        JD_ANALYSIS_SYSTEM_PROMPT,
-        JD_ANALYSIS_PROMPT.format(jd_text=compact_text(state["target_jd_text"], 10000)),
-    )
-    jd_data = parse_llm_json(content)
-    if not isinstance(jd_data, dict):
-        raise ResumeAgentError("JD analyzer returned non-object JSON")
+_YEARS_RE = re.compile(r"(\d+(?:\.\d+)?)\s*(?:\+|＋|以上)?\s*(?:年|years?\b)", re.IGNORECASE)
 
-    role = RoleClassifier().classify(state["target_jd_text"])
+
+def _parse_years(*texts: str) -> float | None:
+    """从经验类标签名/证据里抽取最小经验年限（取最大命中值，贴近 JD 门槛）。"""
+    best: float | None = None
+    for text in texts:
+        for match in _YEARS_RE.finditer(text or ""):
+            try:
+                value = float(match.group(1))
+            except ValueError:
+                continue
+            if best is None or value > best:
+                best = value
+    return best
+
+
+def _jd_from_tag_profile(reused: dict[str, Any]) -> dict[str, Any]:
+    """命中库内治理标签时，确定性派生 JDAnalysis，免一次重解析 LLM 调用。
+
+    口径与统计侧统一：required/preferred/example/inferred 直接来自治理后的
+    requirement_level；跨行业六维、软技能、标签证据一并透出供下游使用。
+    """
+    tag_profile = reused.get("tag_profile") or {}
+    cross = reused.get("cross_industry_profile") or {}
+    soft = reused.get("soft_skills") or {}
+    buckets = split_jd_by_requirement(tag_profile)
+
+    tag_evidence: dict[str, str] = {}
+    experience_texts: list[str] = []
+    for group in ("technical", "non_technical"):
+        for tag in tag_profile.get(group, []) or []:
+            if not isinstance(tag, dict):
+                continue
+            name = str(tag.get("name") or "").strip()
+            if name and tag.get("evidence"):
+                tag_evidence[name] = str(tag.get("evidence"))
+            if str(tag.get("category") or "") == "experience":
+                experience_texts.append(name)
+                if tag.get("evidence"):
+                    experience_texts.append(str(tag.get("evidence")))
+
+    # 职责优先用跨行业「交付动作 + 业务场景」表达，回退到 required 标签名。
+    responsibilities = tag_names(cross.get("delivery_motion") or [])
+    responsibilities += [n for n in tag_names(cross.get("business_scenario") or []) if n not in responsibilities]
+    if not responsibilities:
+        responsibilities = tag_names(buckets["required"])[:8]
+
+    education = [str(e) for e in (soft.get("education") or []) if e]
+    languages = [str(lang) for lang in (soft.get("language") or []) if lang]
+
+    return {
+        "required_skills": tag_names(buckets["required"]),
+        "preferred_skills": tag_names(buckets["preferred"]),
+        "example_skills": tag_names(buckets["example"]),
+        "inferred_skills": tag_names(buckets["inferred"]),
+        "soft_skills": soft,
+        "cross_industry_profile": cross,
+        "tag_evidence": tag_evidence,
+        "responsibilities": responsibilities[:10],
+        "min_experience": _parse_years(*experience_texts),
+        "education_required": education[0] if education else None,
+        "language_requirements": languages,
+        "key_requirements": tag_names(buckets["required"])[:10],
+        "reused_from_cache": True,
+    }
+
+
+def _attach_role(jd_data: dict[str, Any], state: AgentState, role_basis: str) -> dict[str, Any]:
+    role = RoleClassifier().classify(role_basis)
     jd_data["role_category"] = role.role_id
     jd_data["role_name"] = role.role_name
     if state.get("target_role"):
         jd_data["target_role"] = state["target_role"]
-    for key in ("required_skills", "preferred_skills", "responsibilities", "language_requirements", "key_requirements"):
+    for key in ("required_skills", "preferred_skills", "example_skills", "inferred_skills",
+                "responsibilities", "language_requirements", "key_requirements"):
         jd_data[key] = [str(item) for item in ensure_list(jd_data.get(key)) if item]
-    return {"jd": jd_data}
+    return jd_data
+
+
+def analyze_jd(state: AgentState, llm: ResumeLLMClient) -> dict[str, Any]:
+    jd_text = state["target_jd_text"]
+
+    # 优先复用统计侧已治理的分层标签：命中库内岗位则免重解析，且 example/inferred
+    # 备选池被显式分桶，下游差距与评分不再把示例当硬要求（修复§13.1）。
+    reused = load_job_tag_profile(jd_text)
+    if reused:
+        jd_data = _jd_from_tag_profile(reused)
+        logger.info("analyze_jd reused governed tag_profile from role cache")
+        return {"jd": _attach_role(jd_data, state, jd_text)}
+
+    content = llm.chat_json(
+        JD_ANALYSIS_SYSTEM_PROMPT,
+        JD_ANALYSIS_PROMPT.format(jd_text=compact_text(jd_text, 10000)),
+    )
+    jd_data = parse_llm_json(content)
+    if not isinstance(jd_data, dict):
+        raise ResumeAgentError("JD analyzer returned non-object JSON")
+    jd_data["reused_from_cache"] = False
+    return {"jd": _attach_role(jd_data, state, jd_text)}
 
 
 def synthesize_market_jd(state: AgentState, llm: ResumeLLMClient) -> dict[str, Any]:
@@ -640,14 +732,17 @@ def build_job_research(state: AgentState) -> dict[str, Any]:
 
 
 def gap_analysis(state: AgentState, llm: ResumeLLMClient) -> dict[str, Any]:
+    jd = state.get("jd") or {}
     content = llm.chat_json(
         GAP_ANALYSIS_SYSTEM_PROMPT,
         GAP_ANALYSIS_PROMPT.format(
             resume=as_json(state.get("resume") or {}),
-            jd=as_json(state.get("jd") or {}),
+            jd=as_json(jd),
             matched_jobs=as_json(state.get("matched_jobs") or []),
             market_context=as_json(state.get("market_context") or {}),
             market_insights=as_json(state.get("market_insights") or {}),
+            cross_industry_profile=as_json(jd.get("cross_industry_profile") or {}),
+            example_skills=as_json(jd.get("example_skills") or []),
         ),
     )
     gap = parse_llm_json(content)
@@ -658,18 +753,40 @@ def gap_analysis(state: AgentState, llm: ResumeLLMClient) -> dict[str, Any]:
     gap["keyword_suggestions"] = [item for item in ensure_list(gap.get("keyword_suggestions")) if isinstance(item, dict)]
     if gap.get("market_demand_analysis") is not None:
         gap["market_demand_analysis"] = str(gap["market_demand_analysis"])
+    if gap.get("cross_industry_alignment") is not None:
+        gap["cross_industry_alignment"] = str(gap["cross_industry_alignment"])
+
+    # 守卫（修复§13.1「示例当硬要求」）：备选/推断技能池不计入硬性缺口，
+    # 即便 LLM 误把 "e.g. Go/Java 任一" 当成缺失，也在此剔除。
+    excluded = {
+        str(s).strip().lower()
+        for s in (jd.get("example_skills") or []) + (jd.get("inferred_skills") or [])
+        if str(s).strip()
+    }
+    if excluded:
+        gap["missing_skills"] = [s for s in gap["missing_skills"] if s.strip().lower() not in excluded]
+
+    # 前瞻补强：接入高置信新兴场景候选标签，作为"市场正在出现、简历尚缺"的建议。
+    reused = load_job_tag_profile(state.get("target_jd_text") or "")
+    hints = candidate_capability_hints(reused.get("taxonomy_candidates")) if reused else []
+    gap["emerging_suggestions"] = [
+        {"name": h["name"], "category": h["category"], "evidence": h["evidence"]} for h in hints
+    ]
     return {"gap": gap}
 
 
 def generate_polish(state: AgentState, llm: ResumeLLMClient) -> dict[str, Any]:
+    jd = state.get("jd") or {}
+    taxonomy = load_taxonomy()
     content = llm.chat_json(
         POLISH_SYSTEM_PROMPT,
         POLISH_PROMPT.format(
             resume_text=compact_text(state["resume_text"], 14000),
             resume=as_json(state.get("resume") or {}),
-            jd=as_json(state.get("jd") or {}),
+            jd=as_json(jd),
             gap=as_json(state.get("gap") or {}),
             market_context=as_json(state.get("market_context") or {}),
+            cross_industry_profile=as_json(jd.get("cross_industry_profile") or {}),
         ),
         temperature=0.25,
         max_tokens=8192,  # 逐段润色输出较长，避免 JSON 被截断
@@ -696,7 +813,12 @@ def generate_polish(state: AgentState, llm: ResumeLLMClient) -> dict[str, Any]:
             "original": str(item.get("original") or ""),
             "suggested": str(item.get("suggested") or ""),
             "changes": [str(change) for change in ensure_list(item.get("changes")) if change],
-            "keywords_added": [str(keyword) for keyword in ensure_list(item.get("keywords_added")) if keyword],
+            # 词库归一：同义异形统一规范写法、剔除误判负例（福利里的 insurance、
+            # 地点 Tai Po 误命中 ai 等），保证 ATS 关键词一致（§13.5.3）。
+            "keywords_added": normalize_keywords(
+                [str(keyword) for keyword in ensure_list(item.get("keywords_added")) if keyword],
+                taxonomy,
+            ),
         })
     return {"polish_suggestions": normalized}
 

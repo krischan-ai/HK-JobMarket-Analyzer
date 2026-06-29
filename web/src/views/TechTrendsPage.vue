@@ -6,6 +6,13 @@
         <p>技能榜单、角色分类、非技术能力画像和知识库智能总结。</p>
       </div>
       <div class="header-actions">
+        <el-button
+          type="primary"
+          :loading="statsStore.techTrendLoading"
+          @click="refreshTrendSummary"
+        >
+          刷新智能总结
+        </el-button>
         <el-tag :type="analysisStatus.type">{{ analysisStatus.text }}</el-tag>
       </div>
     </div>
@@ -200,7 +207,16 @@
     <section class="analysis-section">
       <div class="section-header">
         <h3>知识库智能总结</h3>
-        <el-tag :type="analysisStatus.type">{{ analysisStatus.text }}</el-tag>
+        <div class="section-actions">
+          <el-button
+            size="small"
+            :loading="statsStore.techTrendLoading"
+            @click="refreshTrendSummary"
+          >
+            只刷新总结
+          </el-button>
+          <el-tag :type="analysisStatus.type">{{ analysisStatus.text }}</el-tag>
+        </div>
       </div>
 
       <el-alert
@@ -221,7 +237,7 @@
       />
 
       <div v-if="statsStore.techTrendLoading" class="loading-state">
-        <el-alert title="分析会在角色分类完成后自动生成；当前正在读取缓存或生成本地摘要。" type="info" show-icon :closable="false" />
+        <el-alert title="正在生成知识库智能总结；本操作只刷新技术趋势分析，不会重新执行全库角色分类。" type="info" show-icon :closable="false" />
         <el-skeleton :rows="8" animated />
       </div>
       <el-row v-else :gutter="16">
@@ -355,6 +371,15 @@ async function loadAnalysis(refresh: boolean) {
     await statsStore.fetchTechTrendAnalysis(refresh)
   } catch {
     // 页面内已显示错误提示。
+  }
+}
+
+async function refreshTrendSummary() {
+  await loadAnalysis(true)
+  if (statsStore.techTrendAnalysis?.llm_used) {
+    ElMessage.success('知识库智能总结已刷新')
+  } else if (statsStore.techTrendAnalysis?.warning) {
+    ElMessage.warning(statsStore.techTrendAnalysis.warning)
   }
 }
 
@@ -562,6 +587,13 @@ const AnalysisSummary = defineComponent({
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
+}
+
+.section-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   flex-shrink: 0;
 }
 

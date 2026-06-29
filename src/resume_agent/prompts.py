@@ -202,7 +202,9 @@ GAP_ANALYSIS_SYSTEM_PROMPT = """你是专业的简历-JD 匹配分析专家。�
 原则：
 - 不建议编造经历。
 - 可以建议把真实经历换成更贴近 JD 的表达角度。
-- 关键词建议要给出 priority 和 placement。
+- 关键词建议要给出 priority 和 placement；priority 应参考 JD 标签的 requirement_level（required > preferred）与置信度。
+- 区分硬性要求与备选/示例池：JD 中以「e.g. / 任一 / 例如」列出的备选技能（如 Go/Java/JS 任选其一）不是缺失的硬技能，绝不能放进 missing_skills。
+- 跨行业能力对齐：不要只比技术栈，要把候选人真实经历映射到「业务场景 / 交付动作 / 行业知识」维度，区分「会 Python」与「会在该行业场景落地 Python」。
 - 只返回 JSON 对象，不要输出解释。"""
 
 GAP_ANALYSIS_PROMPT = """请基于以下信息进行差距分析。
@@ -212,6 +214,12 @@ GAP_ANALYSIS_PROMPT = """请基于以下信息进行差距分析。
 
 ## 目标 JD
 {jd}
+
+## 备选/示例技能池（JD 中列举的可选项，满足其一即可，禁止计入 missing_skills）
+{example_skills}
+
+## 目标岗位跨行业六维画像（行业 / 业务场景 / 方案领域 / 交付动作 / 合规 / 系统资产）
+{cross_industry_profile}
 
 ## 香港相似岗位参考
 {matched_jobs}
@@ -224,6 +232,8 @@ GAP_ANALYSIS_PROMPT = """请基于以下信息进行差距分析。
 
 判断要求：
 - 结合 market_context 与 market_insights 判断关键词优先级：目标岗位语义主题、整库高需求方向、且简历真实涉及的技能优先级更高。
+- `missing_skills` 只放 JD 明确要求（required/preferred）且简历缺失的技能，不要把上面「备选/示例技能池」里的任何一项当成缺口。
+- `cross_industry_alignment` 用 2-4 句说明候选人经历在跨行业六维上的契合与缺口：哪些业务场景/交付动作/行业知识已有真实锚点、哪些只是技术会但缺场景落地证据。
 - `market_demand_analysis` 中要明确点名 role_demand_ranking 里需求量最高的几个岗位方向、tech_stack_themes 里的关键技术主题，并结合候选人简历说明应优先补强/突出哪些方向与技术。
 
 返回 JSON:
@@ -232,6 +242,7 @@ GAP_ANALYSIS_PROMPT = """请基于以下信息进行差距分析。
   "missing_skills": ["Kubernetes"],
   "weak_skills": ["AWS"],
   "experience_gap": "缺少云部署成果描述",
+  "cross_industry_alignment": "候选人有金融支付场景的 Python 落地经验，与目标岗位的业务场景维度契合；但缺少政府/公用事业的交付与合规证据。",
   "keyword_suggestions": [
     {{"keyword": "AWS Lambda", "priority": "high", "placement": "工作经验"}}
   ],
@@ -245,6 +256,9 @@ POLISH_SYSTEM_PROMPT = """你是专业的香港 IT 简历润色专家。请根�
 - 如果原文没有数字成果，可以建议补充可核实指标，但不要自行创造具体数字。
 - 英文岗位优先使用英文专业表达。
 - 工作经历尽量用动作动词和 STAR 结构。
+- 关键词写法保持业界规范标准写法（如 Proof-Of-Concept 用规范的 POC 测试写法、CI/CD、Kubernetes），避免同义异形导致 ATS 漏匹配。
+- 不要把福利/地点等误判词（如福利里的 insurance、地点 Tai Po）当成「市场技能要求」写进简历。
+- 跨行业经历改写：把真实经历自然融入目标岗位的业务场景与交付动作，不只是堆技术名词，但不得编造行业经历。
 - 每个 suggested 应是完整可替换片段。
 - 只返回 JSON 数组，不要输出解释。"""
 
@@ -261,6 +275,9 @@ POLISH_PROMPT = """请为以下简历生成逐段润色建议。
 
 ## 差距分析
 {gap}
+
+## 目标岗位跨行业六维画像（把经历融入对应业务场景/交付动作/行业知识）
+{cross_industry_profile}
 
 ## 香港市场上下文（参考典型措辞与高频技能优化简历表达）
 {market_context}
@@ -279,8 +296,8 @@ POLISH_PROMPT = """请为以下简历生成逐段润色建议。
 
 SCORE_SYSTEM_PROMPT = """你是简历质量评分专家。请对润色建议进行 1-10 分多维评分，并详细讲解每个维度的评分原因。
 维度：
-- keyword_coverage: JD / 目标画像关键词覆盖
-- experience_alignment: 经历与职责匹配
+- keyword_coverage: JD 关键词覆盖。**只统计 required_skills 与 preferred_skills 这类硬性/加分要求**；example_skills（备选/示例池）与 inferred_skills（推断项）不参与覆盖率计算，避免分数被备选噪声拉偏。
+- experience_alignment: 经历与职责匹配；结合 soft_skills.business_skill 与 cross_industry_profile.business_scenario 判断是否在目标业务场景中有真实落地证据，而非仅技术会用。
 - skill_relevance: 技能相关性
 - language_quality: 语言质量
 overall_score 为综合分。

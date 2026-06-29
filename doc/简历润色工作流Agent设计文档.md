@@ -1,8 +1,8 @@
 # 简历润色工作流 Agent 设计文档
 
-**版本**: v1.1  
-**日期**: 2026-06-24  
-**状态**: 规划增强
+**版本**: v1.2  
+**日期**: 2026-06-28  
+**状态**: 第 13 章已落地（见 §13.10 落地说明）
 
 ---
 
@@ -12,6 +12,7 @@
 |------|------|---------|--------|
 | v1.0 | 2026-06-23 | 初始版本 | - |
 | v1.1 | 2026-06-24 | 增补 JobResearch、输入体检、证据审计、面试深挖、质量闸门与求职全链路工作流设计 | - |
+| v1.2 | 2026-06-28 | 新增第 13 章：复用统计分析重构产出的结构化标签资产（`tag_profile` 分层、`cross_industry_profile` 六维、`soft_skills` 六类、`job_context_profile` 组合画像、`skill_taxonomy` 词库与聚合榜单），改造 `analyze_jd`/`market_insights`/`gap_analysis`/`score`，修复"示例当硬要求""跨行业能力被压扁"两处与统计文档 §11.1 同源缺陷 | - |
 
 ---
 
@@ -29,6 +30,7 @@
 10. [文件清单](#10-文件清单)
 11. [里程碑规划](#11-里程碑规划)
 12. [v2.9 增强工作流设计](#12-v29-增强工作流设计)
+13. [复用统计分析数据](#13-复用统计分析数据)
 
 ---
 
@@ -1545,6 +1547,251 @@ P4：
   - `面试准备/01-简历bullet逐条深挖.md`
   - `面试准备/02-表达状态与自我介绍.md`
   - `面试准备/99-面后复盘题库.md`
+
+---
+
+## 13. 复用统计分析数据
+
+### 13.1 设计背景
+
+统计分析架构重构（见 `doc/统计分析架构重构方案.md`）已经把角色分类链路从"扁平字符串技能列表"升级为**证据驱动、分层、跨行业六维的结构化标签资产**，逐岗位持久化在 `role_cache.json`，并产出一系列治理后的聚合榜单。
+
+但当前简历润色 Agent 几乎没有复用这批资产：
+
+- `analyze_jd` 节点用一套独立、较弱的 Prompt **重新解析目标 JD**，只粗暴二分成 `required_skills` / `preferred_skills`，没有证据、置信度和层级。
+- `src/resume_agent/market_insights.py` 只消费两样最粗的数据：
+  - 从 `jobs.csv` 的 `skills` 字段数出来的**裸技术词频**（未按 `requirement_level` 过滤，PowerPoint/Excel 等会混入）。
+  - `role_cache.json` 里的 `role_id`。在 `_build()` 中重建 `RoleResult` 时**显式丢弃了** `soft_skills` / `tag_profile` / `cross_industry_profile`。
+
+由此带来两处与统计文档 §11.1 同源的质量缺陷，在简历侧被重新复现：
+
+| 缺陷 | 现象 | 与统计文档对应 |
+|------|------|---------------|
+| 示例当硬要求 | JD 中 "e.g. JavaScript/Go/Java 任一" 的备选语言池，被简历 Agent 当成缺失的硬技能，差距分析和评分都被噪声拉偏 | §11.1「示例技能被当成强要求」 |
+| 跨行业能力被压扁 | 只比技术栈，无法区分"会 Python"和"会在金融支付/政府水务场景落地 Python"，简历改写丢失行业迁移价值 | §11.1/§11.10「跨行业复合背景被压扁」 |
+
+本章定义简历工作流**复用统计分析数据**的接入方案：把"自己用弱 Prompt 重新解析 JD + 数裸技能词频"替换为"直接消费已治理好的结构化标签 + 聚合榜单"。
+
+### 13.2 可复用的统计分析数据资产
+
+| 数据资产 | 位置 | 结构要点 | 简历侧消费方 |
+|---------|------|---------|-------------|
+| `tag_profile` | `role_cache.json` 每条记录 | `technical` / `non_technical` / `experience`，每标签含 `name`/`category`/`requirement_level`(required/preferred/example/inferred)/`confidence`/`evidence` | `analyze_jd`、`gap_analysis`、`score` |
+| `cross_industry_profile` | `role_cache.json` | 六维：`industry_context`/`business_scenario`/`solution_domain`/`delivery_motion`/`compliance_standard`/`system_or_asset` | `JobResearch`、经历-能力匹配矩阵 |
+| `job_context_profile.summary_tags` | `role_cache.json` | 由 ≥2 维证据触发的组合画像（如"政府公用事业 AI/Digital Twin 售前解决方案"） | `JobResearch` 改写靶心、自我介绍 |
+| `soft_skills`（六类） | `role_cache.json` | `education`/`language`/`soft_skill`/`domain_knowledge`/`certification`/`business_skill`，已同义归并为规范中文 | `analyze_jd` 非技术维度、`score.experience_alignment` |
+| `taxonomy_candidates` | `role_cache.json` + `data/taxonomy/taxonomy_candidates.json` | 高置信新兴场景候选标签 | `gap_analysis` 前瞻补强建议 |
+| `skill_taxonomy.json` + `taxonomy_aliases.json` | `data/taxonomy/` | 正式词库规范写法 + 别名映射（如 `Proof-Of-Concept`→`POC 測試`） | 关键词归一、ATS 适配 |
+| `taxonomy_rejections.json` | `data/taxonomy/` | 误判词与负例语境（福利里的 insurance、Tai Po 等） | 证据审计、防止误判词写进简历 |
+| `tech_stack_ranking`（已过滤） | `compute_market_insights()` / `stats.py` | 仅统计 required/preferred，排除办公工具 | `JobResearch` 市场上下文 |
+| `场景化能力统计` | `stats.py`（§11.10.5） | 跨行业能力趋势（金融支付/零售 ERP/政府投标 POC/物流 TMS/设备监测…） | `JobResearch` 趋势表达 |
+| `role_salary` / `salary_by_role` | `stats.py` 薪资分析 | 按角色薪资分布 | `JobResearch` 薪资定位 |
+
+> 隐私边界不变：简历工作流只**读**上述数据，不写回 `role_cache.json` / 词库；用户简历原文仍不持久化。
+
+### 13.3 复用策略总览
+
+```text
+role_cache.json / data/taxonomy/*.json / 聚合榜单（统计侧已产出）
+        │  只读复用
+        ▼
+┌────────────────────────────────────────────────────────────┐
+│ 新增桥接层：src/resume_agent/market_data.py                  │
+│  · load_job_tag_profile(job_id|jd_text)  → tag_profile       │
+│  · load_cross_industry_profile(...)      → 六维 + summary    │
+│  · load_taxonomy()                       → 词库/别名/拒绝表  │
+│  · market_capability_stats()             → 场景化能力统计    │
+└────────────────────────────────────────────────────────────┘
+        │
+        ├─→ analyze_jd        复用 tag_profile + soft_skills（命中库内岗位则免重解析）
+        ├─→ JobResearch       复用 cross_industry_profile / summary_tags / 聚合榜单 / 薪资
+        ├─→ gap_analysis      按 requirement_level 加权；example 不算缺口；接 taxonomy_candidates 补强
+        ├─→ generate_polish   用 skill_taxonomy 规范写法 + 别名归一，保证 ATS 关键词一致
+        ├─→ score             keyword_coverage 仅对 required/preferred 计算
+        └─→ evidence_audit    用 tag_profile.evidence + rejections 校验关键词是否为真实硬要求
+```
+
+### 13.4 新增桥接模块：`market_data.py`
+
+为避免在多个节点里散落读取 `role_cache.json` 和词库文件，新增统一只读桥接层。
+
+```python
+# src/resume_agent/market_data.py（新增）
+
+from __future__ import annotations
+from typing import Any, Optional
+
+from src.analyzer.role_classifier import RoleClassifier
+
+
+def load_job_tag_profile(jd_text: str) -> Optional[dict[str, Any]]:
+    """命中库内已分类岗位时返回治理后的 tag_profile，否则 None。
+
+    优先用 RoleClassifier 的缓存键匹配；未命中时调用方应回退到
+    LLM 解析（analyze_jd 原有逻辑）。
+    """
+    classifier = RoleClassifier()
+    cache_key = classifier._make_cache_key(jd_text)
+    cached = classifier._cache.get(cache_key)
+    if not cached:
+        return None
+    return {
+        "tag_profile": cached.get("tag_profile") or {},
+        "soft_skills": cached.get("soft_skills") or {},
+        "cross_industry_profile": cached.get("cross_industry_profile") or {},
+        "job_context_profile": cached.get("job_context_profile") or {},
+    }
+
+
+def split_jd_by_requirement(tag_profile: dict) -> dict[str, list[dict]]:
+    """把 tag_profile 拆成 required / preferred / example / inferred 四桶。
+
+    example/inferred 不进入硬性技能差距统计（修复§13.1「示例当硬要求」）。
+    """
+    buckets = {"required": [], "preferred": [], "example": [], "inferred": []}
+    for group in ("technical", "non_technical", "experience"):
+        for tag in tag_profile.get(group, []) or []:
+            level = tag.get("requirement_level", "required")
+            buckets.setdefault(level, []).append(tag)
+    return buckets
+
+
+def load_taxonomy() -> dict[str, Any]:
+    """加载正式词库 / 别名 / 拒绝列表，供关键词归一与误判抑制。"""
+    import json
+    from config.settings import settings
+    base = settings.data_dir / "taxonomy"
+    out: dict[str, Any] = {}
+    for name in ("skill_taxonomy", "taxonomy_aliases", "taxonomy_rejections",
+                 "taxonomy_candidates"):
+        path = base / f"{name}.json"
+        try:
+            out[name] = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            out[name] = {}
+    return out
+```
+
+### 13.5 节点改造点
+
+#### 13.5.1 `analyze_jd`：优先复用 `tag_profile`，免重解析
+
+```python
+def analyze_jd(state: AgentState, llm) -> dict:
+    from src.resume_agent.market_data import load_job_tag_profile, split_jd_by_requirement
+
+    reused = load_job_tag_profile(state["target_jd_text"])
+    if reused and reused["tag_profile"]:
+        # 命中库内岗位：直接采用治理后的分层标签，省一次 LLM 调用、口径与统计侧统一
+        buckets = split_jd_by_requirement(reused["tag_profile"])
+        jd_data = {
+            "required_skills": [t["name"] for t in buckets["required"]],
+            "preferred_skills": [t["name"] for t in buckets["preferred"]],
+            "example_skills":   [t["name"] for t in buckets["example"]],   # 备选池，不计缺口
+            "inferred_skills":  [t["name"] for t in buckets["inferred"]],
+            "soft_skills": reused["soft_skills"],
+            "cross_industry_profile": reused["cross_industry_profile"],
+            "tag_evidence": {t["name"]: t.get("evidence", "")
+                             for g in reused["tag_profile"].values() for t in g},
+            "reused_from_cache": True,
+        }
+    else:
+        # 未命中：回退到原 LLM 解析逻辑
+        jd_data = _llm_analyze_jd(state["target_jd_text"], llm)
+        jd_data["reused_from_cache"] = False
+    # 角色分类仍复用 RoleClassifier
+    ...
+    return {"jd": jd_data}
+```
+
+`JDAnalysis`（`state.py`）相应扩展字段：
+
+```python
+class JDAnalysis(TypedDict, total=False):
+    required_skills: list[str]
+    preferred_skills: list[str]
+    example_skills: list[str]          # 新增：备选/示例技能池，不计入硬性缺口
+    inferred_skills: list[str]         # 新增：合理推断技能
+    soft_skills: dict[str, list[str]]  # 新增：六类软技能（学历/语言/能力/行业/认证/业务）
+    cross_industry_profile: dict       # 新增：跨行业六维
+    tag_evidence: dict[str, str]       # 新增：标签→JD 原文证据
+    responsibilities: list[str]
+    min_experience: Optional[float]
+    role_category: str
+    key_requirements: list[str]
+    reused_from_cache: bool            # 新增：是否复用了统计侧缓存
+```
+
+#### 13.5.2 `gap_analysis`：按层级加权 + 跨行业维度对齐
+
+- `missing_skills` 只对 `required` 计入硬缺口；`preferred` 单列为"加分项缺口"；`example_skills` **不计缺口**（备选语言池满足其一即可）。
+- 在 Prompt 中传入 `cross_industry_profile`，要求把用户经历映射到"业务场景 / 交付动作 / 行业知识"维度，而不仅技术栈——区分"会 Python"与"会在该行业场景落地 Python"。
+- `keyword_suggestions` 的 `priority` 直接由 `requirement_level` + `confidence` 推导，替代拍脑袋打分。
+- 接入 `taxonomy_candidates` 中的高置信新兴场景标签，作为"市场正在出现、你简历尚缺"的前瞻补强建议（喂给 Stage 4 补强建议）。
+
+#### 13.5.3 `generate_polish`：词库归一保证 ATS 一致
+
+- 写进简历的关键词，统一用 `skill_taxonomy.json` 的规范写法，并经 `taxonomy_aliases.json` 归并同义异形（如 `Proof-Of-Concept`→`POC 測試`），避免 ATS 因写法差异漏匹配。
+- 命中 `taxonomy_rejections.json` 负例语境的词（福利里的 insurance、地点 Tai Po 误命中 ai 等）禁止作为"市场要求"写入简历。
+
+#### 13.5.4 `score`：覆盖率只算硬要求
+
+- `keyword_coverage` 仅对 `required` + `preferred` 计算覆盖比例，`example` / `inferred` 不参与，避免分数被备选/推断噪声拉偏。
+- `experience_alignment` 引入 `soft_skills.business_skill` 与 `cross_industry_profile.business_scenario` 作为对齐依据。
+
+#### 13.5.5 `evidence_audit`（v2.9 Stage 6）：双向证据锚点
+
+- 用户简历 claim 侧已有 `ClaimEvidence`（§12.7）；本章补充**市场要求侧**证据锚点：`tag_profile.evidence` 提供"该关键词在真实 JD 里到底是 required 还是来自福利/地点误命中"，避免把误判关键词当成硬要求塞进简历后在面试被追问崩塌。
+
+### 13.6 `market_insights.py` 改造
+
+将 [`_build()`](file:///e:/文档/Project/HK-JobMarket-Analyzer/src/resume_agent/market_insights.py) 中的统计逻辑升级：
+
+1. **技术栈榜单**：从直接数 `jobs.csv` 的裸 `skills`，改为优先读 `role_cache.json` 的 `tag_profile`，只统计 `required` / `preferred`，排除办公工具；缓存缺失时再回退到 `skills` 词频。
+2. **保留 `tag_profile` / `cross_industry_profile`**：`_build()` 重建 `RoleResult` 时不再丢弃这些字段，向 `JobResearch` 透出。
+3. **新增场景化能力统计**：复用统计侧 `场景化能力统计`（§11.10.5），让 `JobResearchReport` 能表达"哪些行业场景在吸收 AI/自动化能力"，而非只说"AI 和云需求高"。
+4. **新增薪资定位**：透出 `role_salary` / `salary_by_role`，补全 `JobResearchReport` 目前缺失的薪资参考。
+
+### 13.7 与统计侧的耦合与降级
+
+| 场景 | 策略 |
+|------|------|
+| `role_cache.json` 未分类该 JD | `analyze_jd` 自动回退 LLM 解析（`reused_from_cache=False`），功能不阻塞 |
+| 词库文件缺失 | `load_taxonomy()` 返回空结构，关键词归一退化为原样写入 |
+| 统计侧字段缺失（旧缓存） | 读取默认空结构，按"无该维度"处理，与统计文档 §11.11.3 兼容策略一致 |
+| 仅只读耦合 | 简历工作流不写 `role_cache.json` / 词库，不触发统计侧缓存失效，两系统单向依赖 |
+
+### 13.8 文件清单补充
+
+| 文件 | 改动 |
+|------|------|
+| `src/resume_agent/market_data.py`（新增） | 统一只读桥接层：`load_job_tag_profile` / `split_jd_by_requirement` / `load_taxonomy` / `market_capability_stats` |
+| `src/resume_agent/market_insights.py` | 技术栈榜单按 `requirement_level` 过滤；保留 `tag_profile`/`cross_industry_profile`；新增场景化能力与薪资定位 |
+| `src/resume_agent/nodes.py` | `analyze_jd` 优先复用 `tag_profile`；`gap_analysis`/`generate_polish`/`score` 按本章改造 |
+| `src/resume_agent/state.py` | `JDAnalysis` 扩展 `example_skills`/`inferred_skills`/`soft_skills`/`cross_industry_profile`/`tag_evidence`/`reused_from_cache` |
+| `src/resume_agent/prompts.py` | `GAP_ANALYSIS_PROMPT` 传入跨行业六维；`POLISH_PROMPT` 加入词库规范写法约束 |
+
+### 13.9 落地优先级
+
+| 优先级 | 内容 | 修复缺陷 |
+|--------|------|---------|
+| P0 | 新增 `market_data.py`；`analyze_jd` 复用 `tag_profile` 并按层级拆桶；`gap_analysis` 中 `example` 不计缺口 | §13.1「示例当硬要求」 |
+| P1 | `gap_analysis`/`JobResearch` 接入 `cross_industry_profile` 六维与 `summary_tags` | §13.1「跨行业能力被压扁」 |
+| P2 | `generate_polish` 接入 `skill_taxonomy`/别名归一；`score.keyword_coverage` 只算硬要求 | ATS 关键词一致性、评分准确性 |
+| P3 | `market_insights.py` 接入场景化能力统计与薪资定位；`evidence_audit` 接入市场侧证据锚点 | JobResearch 表达力、证据审计 |
+
+### 13.10 落地说明（实现与设计稿的差异）
+
+实现时对照真实代码与 `role_cache.json` 数据结构，对设计稿做了如下务实校正：
+
+1. **`tag_profile` 仅有 `technical` / `non_technical` 两个桶**（无独立 `experience` 组，经验类标签以 `category="experience"` 归在 `non_technical` 下）。因此 `split_jd_by_requirement` 遍历真实存在的两个分组，按 `requirement_level` 拆 `required/preferred/example/inferred` 四桶。实测全库分布：required 2781 / preferred 434 / example 372 / inferred 8，example 量级可观，修复"示例当硬要求"确有价值。
+2. **`analyze_jd` 命中缓存即免重解析**：`load_job_tag_profile` 直接命中 `RoleClassifier._cache`，命中则由 `_jd_from_tag_profile` 确定性派生 JDAnalysis（职责取自跨行业 `delivery_motion`+`business_scenario`，`min_experience` 用正则从经验标签解析，语言/学历取自 `soft_skills`），不再调一次 JD 解析 LLM；未命中回退原 LLM 逻辑，`reused_from_cache` 标记来源。
+3. **`gap_analysis` 双保险**：除在 Prompt 中声明备选池不算缺口外，节点层再做确定性守卫，强制把 `example_skills`/`inferred_skills` 从 `missing_skills` 剔除；并接入 `taxonomy_candidates` 高置信新兴标签为 `emerging_suggestions`。
+4. **词库文件可选**：`data/taxonomy/` 当前仅有 `taxonomy_candidates.json`，`skill_taxonomy/aliases/rejections` 暂缺。`load_taxonomy` 缺失即返回空结构，`normalize_keywords` 退化为去重去空（仍保证 ATS 一致性），与 §13.7 降级策略一致；词库补齐后自动生效。
+5. **`market_insights` 技术栈榜单**改为优先从 `role_cache.json` 的 `technical` 桶统计（仅 `required/preferred`、排除 `office_tools`），缓存缺失回退裸 `skills` 词频；缓存签名追加 `role_cache.json` 的 mtime 以正确失效。
+6. **新增回归测试** `tests/test_resume_market_data.py` 覆盖分桶、词库归一、缓存复用、example 守卫等核心逻辑（全部通过）。
+
+> 已落地优先级：P0/P1/P2 + P3 的 `market_insights` 技术栈口径统一。P3 余项（场景化能力统计、薪资定位、`evidence_audit` 市场侧证据锚点）待后续接入统计侧 `stats.py` 产物。
 
 ---
 
