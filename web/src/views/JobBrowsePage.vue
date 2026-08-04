@@ -50,11 +50,12 @@
         <!-- 分页 -->
         <div v-if="store.total > store.pageSize" class="job-list-pagination">
           <el-pagination
+            small
             :current-page="store.currentPage"
             :page-size="store.pageSize"
             :total="store.total"
             :page-sizes="[10, 20, 50]"
-            layout="total, sizes, prev, pager, next"
+            layout="prev, pager, next, sizes"
             @current-change="(p: number) => store.goToPage(p)"
             @size-change="(s: number) => store.goToPage(1, s)"
           />
@@ -95,25 +96,23 @@ onMounted(() => {
 .job-browse {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 120px);
+  min-height: calc(100vh - 120px);
 }
 .job-browse__body {
   display: flex;
   gap: 16px;
-  flex: 1;
-  min-height: 0;
+  align-items: flex-start;
 }
 .job-browse__left {
-  width: 45%;
-  min-width: 380px;
+  width: 33.333%;
+  min-width: 300px;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  min-height: 0;
 }
 .job-browse__right {
   flex: 1;
   min-width: 0;
-  overflow: hidden;
 }
 .job-list-header {
   font-size: 13px;
@@ -127,15 +126,10 @@ onMounted(() => {
   color: #e6a23c;
 }
 .job-list-cards {
-  flex: 1;
-  overflow-y: auto;
-  min-height: 0;
   padding-right: 4px;
 }
 .job-list-loading {
-  flex: 1;
-  overflow-y: auto;
-  min-height: 0;
+  padding-right: 4px;
 }
 .job-card-skeleton {
   padding: 12px 14px;
@@ -172,5 +166,11 @@ onMounted(() => {
   margin-top: 12px;
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.job-list-pagination :deep(.el-pagination) {
+  justify-content: center;
+  flex-wrap: wrap;
 }
 </style>

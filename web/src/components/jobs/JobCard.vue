@@ -29,6 +29,31 @@
       </el-tag>
       <span v-if="skillList.length > 4" class="job-card__skill-more">+{{ skillList.length - 4 }}</span>
     </div>
+    <div v-if="tagProfileTags.length" class="job-card__skills job-card__skills--profile">
+      <el-tag
+        v-for="tag in tagProfileTags.slice(0, 8)"
+        :key="'tp-' + tag.category + tag.name"
+        size="small"
+        :type="levelTagType(tag.requirement_level)"
+        effect="light"
+        :title="tag.evidence || ''"
+      >
+        {{ tag.name }}
+      </el-tag>
+      <span v-if="tagProfileTags.length > 8" class="job-card__skill-more">+{{ tagProfileTags.length - 8 }}</span>
+    </div>
+    <div v-if="softSkillList.length" class="job-card__skills job-card__skills--soft">
+      <el-tag
+        v-for="tag in softSkillList.slice(0, 8)"
+        :key="tag.category + tag.name"
+        size="small"
+        :type="softSkillTagType(tag.category)"
+        effect="plain"
+      >
+        {{ tag.name }}
+      </el-tag>
+      <span v-if="softSkillList.length > 8" class="job-card__skill-more">+{{ softSkillList.length - 8 }}</span>
+    </div>
     <div class="job-card__footer">
       <span class="job-card__source">{{ job.source }}</span>
       <span class="job-card__footer-right">
@@ -81,8 +106,49 @@ const skillList = computed(() => {
   return list
 })
 
+const softSkillList = computed(() => {
+  const softSkills = props.job.soft_skills
+  if (!softSkills) return []
+  return [
+    ...(softSkills.language ?? []).map((name) => ({ name, category: 'language' })),
+    ...(softSkills.domain_knowledge ?? []).map((name) => ({ name, category: 'domain_knowledge' })),
+    ...(softSkills.certification ?? []).map((name) => ({ name, category: 'certification' })),
+    ...(softSkills.business_skill ?? []).map((name) => ({ name, category: 'business_skill' })),
+    ...(softSkills.soft_skill ?? []).map((name) => ({ name, category: 'soft_skill' })),
+    ...(softSkills.education ?? []).map((name) => ({ name, category: 'education' })),
+  ].filter((item) => item.name)
+})
+
+const tagProfileTags = computed(() => {
+  const tp = props.job.tag_profile
+  if (!tp) return []
+  const all = [...(tp.technical ?? []), ...(tp.non_technical ?? [])]
+  return all
+    .filter(
+      (t) =>
+        t && t.name &&
+        (t.requirement_level === 'required' || t.requirement_level === 'preferred') &&
+        (t.confidence ?? 0) >= 0.75,
+    )
+    .sort((a, b) => (b.confidence ?? 0) - (a.confidence ?? 0))
+})
+
+function levelTagType(level: string): '' | 'success' | 'warning' | 'danger' | 'info' {
+  if (level === 'required') return 'danger'
+  if (level === 'preferred') return 'warning'
+  return 'info'
+}
+
 function skillTagType(cat: string): '' | 'success' | 'warning' | 'danger' | 'info' {
   return (skillTagColors[cat] || 'info') as '' | 'success' | 'warning' | 'danger' | 'info'
+}
+
+function softSkillTagType(cat: string): '' | 'success' | 'warning' | 'danger' | 'info' {
+  if (cat === 'education') return 'danger'
+  if (cat === 'language') return 'warning'
+  if (cat === 'domain_knowledge') return 'success'
+  if (cat === 'certification') return 'danger'
+  return 'info'
 }
 
 function formatSalary(min?: number, max?: number): string {
@@ -152,6 +218,9 @@ function formatSalary(min?: number, max?: number): string {
   flex-wrap: wrap;
   gap: 4px;
   align-items: center;
+}
+.job-card__skills--soft {
+  margin-top: 5px;
 }
 .job-card__skill-more {
   font-size: 11px;

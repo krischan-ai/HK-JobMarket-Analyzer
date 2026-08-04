@@ -16,6 +16,72 @@ export interface JobItem {
   employment_type?: string
   industry_category?: string
   application_volume?: string
+  employer_questions?: string[]
+  is_insurance_sales?: boolean
+  insurance_score?: number | null
+  insurance_reasons?: string[]
+  work_mode?: string
+  posted_days_ago?: number | null
+  company_size?: string
+  education_required?: string
+  languages_required?: string[]
+  tech_stack?: string[]
+  soft_skills?: SoftSkillTags
+  tag_profile?: TagProfile
+  cross_industry_profile?: CrossIndustryProfile
+  job_context_profile?: JobContextProfile
+  job_type?: string
+}
+
+export interface SoftSkillTags {
+  education: string[]
+  language: string[]
+  soft_skill: string[]
+  domain_knowledge?: string[]
+  certification?: string[]
+  business_skill?: string[]
+}
+
+export type RequirementLevel = 'required' | 'preferred' | 'example' | 'inferred'
+
+export interface StructuredTag {
+  name: string
+  category: string
+  requirement_level: RequirementLevel
+  source?: string
+  confidence: number
+  evidence?: string
+}
+
+export interface TagProfile {
+  technical: StructuredTag[]
+  non_technical: StructuredTag[]
+}
+
+export type CrossIndustryDimension =
+  | 'industry_context'
+  | 'business_scenario'
+  | 'solution_domain'
+  | 'delivery_motion'
+  | 'compliance_standard'
+  | 'system_or_asset'
+
+export interface DimensionTag {
+  name: string
+  confidence: number
+  evidence?: string
+}
+
+export type CrossIndustryProfile = Record<CrossIndustryDimension, DimensionTag[]>
+
+export interface SummaryTag {
+  name: string
+  confidence: number
+  supporting_dimensions: string[]
+}
+
+export interface JobContextProfile {
+  summary_tags: SummaryTag[]
 }
 
 export interface JobListResponse {
@@ -119,3 +185,23 @@ export interface ClassificationResult {
   duration_ms: number
   message: string
 }
+
+export type ClassifiedSoftSkills = SoftSkillTags
+
+export interface TechTrendSection {
+  key: string
+  title: string
+  summary: string
+  evidence?: Array<string | Record<string, unknown>>
+}
+
+export interface TechTrendAnalysis {
+  llm_used: boolean
+  from_cache?: boolean
+  analysis_status?: 'cached' | 'completed' | 'fallback' | string
+  warning?: string
+  sections: TechTrendSection[]
+  context?: Record<string, unknown>
+}
+
+export type SalaryAnalysis = TechTrendAnalysis

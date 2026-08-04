@@ -1,0 +1,7 @@
+# Optional dependencies for future LangGraph orchestration.
+langgraph>=0.2,<0.3
+langchain-openai>=0.2,<0.3
+langchain-core>=0.3,<0.4
+
+# PDF 简历读取（v2.8）
+pypdf>=4,<6

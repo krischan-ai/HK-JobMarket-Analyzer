@@ -8,6 +8,7 @@ from scripts.crawl_utils import (
     deduplicate, build_existing_keys, build_dedup_key,
     load_progress, mark_keyword_completed,
     jd_contains_tech, is_insurance_sales,
+    parse_job_fields,
 )
 
 PROXY = "http://127.0.0.1:10808"
@@ -203,12 +204,35 @@ async def search_jobsdb(page, keyword, max_pages=3):
                                     const workTypeEl = document.querySelector('[data-automation="jobDetailWorkType"]');
                                     const classEl = document.querySelector('[data-automation="jobClassification"]');
                                     const volEl = document.querySelector('[data-automation="jobAppicationVolume"]');
+                                    let questions = [];
+                                    const headings = document.querySelectorAll('h2');
+                                    for (const h of headings) {
+                                        if ((h.textContent || '').trim().toLowerCase() === 'employer questions') {
+                                            let container = h.parentElement;
+                                            while (container && container.tagName !== 'SECTION' && container.parentElement) {
+                                                container = container.parentElement;
+                                            }
+                                            if (container) {
+                                                const seen = new Set();
+                                                const items = container.querySelectorAll('li');
+                                                for (const item of items) {
+                                                    const t = (item.textContent || '').trim();
+                                                    if (t && t.length > 10 && t.length < 300 && !seen.has(t)) {
+                                                        seen.add(t);
+                                                        questions.push(t);
+                                                    }
+                                                }
+                                            }
+                                            break;
+                                        }
+                                    }
                                     
                                     return {
                                         jd_text: jdText.length > 100 ? jdText : (fullText.length > 100 ? fullText : ''),
                                         employment_type: workTypeEl ? workTypeEl.textContent.trim() : '',
                                         industry_category: classEl ? classEl.textContent.trim() : '',
                                         application_volume: volEl ? volEl.textContent.trim() : '',
+                                        employer_questions: questions,
                                     };
                                 }""")
                                 jd_full = panel_data.get("jd_text", "")
@@ -216,6 +240,7 @@ async def search_jobsdb(page, keyword, max_pages=3):
                                     "employment_type": panel_data.get("employment_type", ""),
                                     "industry_category": panel_data.get("industry_category", ""),
                                     "application_volume": panel_data.get("application_volume", ""),
+                                    "employer_questions": panel_data.get("employer_questions", []),
                                 }
                                 if len(jd_full.strip()) > 100:
                                     break
@@ -241,12 +266,35 @@ async def search_jobsdb(page, keyword, max_pages=3):
                                         const workTypeEl = document.querySelector('[data-automation="jobDetailWorkType"]');
                                         const classEl = document.querySelector('[data-automation="jobClassification"]');
                                         const volEl = document.querySelector('[data-automation="jobAppicationVolume"]');
+                                        let questions = [];
+                                        const headings = document.querySelectorAll('h2');
+                                        for (const h of headings) {
+                                            if ((h.textContent || '').trim().toLowerCase() === 'employer questions') {
+                                                let container = h.parentElement;
+                                                while (container && container.tagName !== 'SECTION' && container.parentElement) {
+                                                    container = container.parentElement;
+                                                }
+                                                if (container) {
+                                                    const seen = new Set();
+                                                    const items = container.querySelectorAll('li');
+                                                    for (const item of items) {
+                                                        const t = (item.textContent || '').trim();
+                                                        if (t && t.length > 10 && t.length < 300 && !seen.has(t)) {
+                                                            seen.add(t);
+                                                            questions.push(t);
+                                                        }
+                                                    }
+                                                }
+                                                break;
+                                            }
+                                        }
                                         
                                         return {
                                             jd_text: jdText.length > 100 ? jdText : (fullText.length > 100 ? fullText : (bodyText.length > 200 ? bodyText : '')),
                                             employment_type: workTypeEl ? workTypeEl.textContent.trim() : '',
                                             industry_category: classEl ? classEl.textContent.trim() : '',
                                             application_volume: volEl ? volEl.textContent.trim() : '',
+                                            employer_questions: questions,
                                         };
                                     }""")
                                     jd_full = panel_data.get("jd_text", "")
@@ -254,6 +302,7 @@ async def search_jobsdb(page, keyword, max_pages=3):
                                         "employment_type": panel_data.get("employment_type", ""),
                                         "industry_category": panel_data.get("industry_category", ""),
                                         "application_volume": panel_data.get("application_volume", ""),
+                                        "employer_questions": panel_data.get("employer_questions", []),
                                     }
                                 except:
                                     pass
@@ -294,7 +343,9 @@ async def search_jobsdb(page, keyword, max_pages=3):
                         "employment_type": extra_info.get("employment_type") or j.get("employment_type", ""),
                         "industry_category": extra_info.get("industry_category", ""),
                         "application_volume": extra_info.get("application_volume", ""),
+                        "employer_questions": extra_info.get("employer_questions", []),
                     }
+                    parse_job_fields(job_entry)
                     if is_ins:
                         print(f"        ⚠ 疑似保险销售: 得分={ins_score} {ins_reasons[:2]}")
                     jobs.append(job_entry)
@@ -459,6 +510,12 @@ async def main():
             total_new += new_count
 
             if jj_new:
+                # 将相对时间和 JD 增强字段补齐后再落盘/导出。
+                from datetime import datetime
+                crawl_time = datetime.now()
+                for j in jj_new:
+                    parse_job_fields(j, crawl_time=crawl_time)
+
                 # 将新增岗位的去重键加入 existing_keys，避免下次重复
                 for j in jj_new:
                     existing_keys.add(build_dedup_key(j))

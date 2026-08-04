@@ -2,6 +2,8 @@
   <el-menu
     :default-active="route.path"
     router
+    :collapse="collapse"
+    class="app-sidebar-menu"
     style="border: none"
     background-color="#f5f7fa"
   >
@@ -12,6 +14,14 @@
     <el-menu-item index="/jobs">
       <el-icon><Document /></el-icon>
       <span>崗位瀏覽</span>
+    </el-menu-item>
+    <el-menu-item index="/resume">
+      <el-icon><DocumentChecked /></el-icon>
+      <span>簡歷潤色</span>
+    </el-menu-item>
+    <el-menu-item index="/resume-generate">
+      <el-icon><Tickets /></el-icon>
+      <span>簡歷生成</span>
     </el-menu-item>
     <el-menu-item index="/tech-trends">
       <el-icon><TrendCharts /></el-icon>
@@ -28,6 +38,10 @@
     <el-menu-item index="/role-classify">
       <el-icon><Aim /></el-icon>
       <span>角色分類</span>
+    </el-menu-item>
+    <el-menu-item index="/taxonomy-review">
+      <el-icon><Filter /></el-icon>
+      <span>詞庫審核</span>
     </el-menu-item>
     <el-menu-item-group title="知識庫">
       <el-menu-item index="/knowledge">
@@ -63,4 +77,21 @@
 <script lang="ts" setup>
 import { useRoute } from 'vue-router'
 const route = useRoute()
+defineProps<{ collapse?: boolean }>()
 </script>
+
+<style scoped>
+/* 折叠状态下隐藏分组标题文字 */
+.app-sidebar-menu.el-menu--collapse :deep(.el-menu-item-group__title) {
+  display: none;
+}
+/* 折叠状态下菜单不显示文字 */
+.app-sidebar-menu.el-menu--collapse :deep(.el-menu-item span) {
+  display: none;
+}
+/* 确保折叠菜单宽度 */
+.app-sidebar-menu.el-menu--collapse {
+  width: 64px;
+}
+</style>
+

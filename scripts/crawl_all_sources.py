@@ -11,6 +11,7 @@ from src.cleaner.pipeline import CleaningPipeline
 from src.analyzer.rule_engine import RuleBasedSkillExtractor
 from src.storage.csv_exporter import CSVExporter
 from src.logger import setup_logger, get_logger
+from scripts.crawl_utils import is_insurance_sales, parse_job_fields
 
 setup_logger(level="INFO")
 logger = get_logger("crawl_all")
@@ -161,6 +162,16 @@ def deduplicate(jobs: list[dict]) -> list[dict]:
     return unique
 
 
+def enrich_raw_jobs(jobs: list[dict]) -> list[dict]:
+    for job in jobs:
+        if "is_insurance_sales" not in job or "insurance_score" not in job:
+            is_ins, score, _ = is_insurance_sales(job)
+            job["is_insurance_sales"] = is_ins
+            job["insurance_score"] = score
+        parse_job_fields(job)
+    return jobs
+
+
 def main():
     logger.info("Proxy: %s", PROXY)
 
@@ -179,6 +190,7 @@ def main():
             logger.info("%s: no jobs in quick test, skipping", name)
 
     all_jobs = deduplicate(all_jobs)
+    all_jobs = enrich_raw_jobs(all_jobs)
     logger.info("Total unique jobs: %d", len(all_jobs))
 
     if not all_jobs:

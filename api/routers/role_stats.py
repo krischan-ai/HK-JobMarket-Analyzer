@@ -28,17 +28,158 @@ _classify_last_at: Optional[str] = None  # 最近一次分类完成时间
 _classify_thread: Optional[threading.Thread] = None
 
 
+def _empty_soft_skills() -> dict[str, list[str]]:
+    return {
+        "education": [],
+        "language": [],
+        "soft_skill": [],
+        "domain_knowledge": [],
+        "certification": [],
+        "business_skill": [],
+    }
+
+
+def _normalize_soft_skills(value) -> dict[str, list[str]]:
+    if isinstance(value, dict):
+        result = _empty_soft_skills()
+        for key in result:
+            result[key] = [str(x).strip() for x in value.get(key, []) if str(x).strip()]
+        return result
+    return _empty_soft_skills()
+
+
+def _empty_tag_profile() -> dict[str, list[dict]]:
+    return {"technical": [], "non_technical": []}
+
+
+def _normalize_tag_profile(value) -> dict[str, list[dict]]:
+    result = _empty_tag_profile()
+    if isinstance(value, dict):
+        for bucket in result:
+            items = value.get(bucket, [])
+            if isinstance(items, list):
+                result[bucket] = [item for item in items if isinstance(item, dict) and item.get("name")]
+    return result
+
+
+_CROSS_INDUSTRY_DIMENSIONS = (
+    "industry_context", "business_scenario", "solution_domain",
+    "delivery_motion", "compliance_standard", "system_or_asset",
+)
+
+
+def _empty_cross_industry_profile() -> dict[str, list[dict]]:
+    return {dim: [] for dim in _CROSS_INDUSTRY_DIMENSIONS}
+
+
+def _normalize_cross_industry_profile(value) -> dict[str, list[dict]]:
+    result = _empty_cross_industry_profile()
+    if isinstance(value, dict):
+        for dim in result:
+            items = value.get(dim, [])
+            if isinstance(items, list):
+                result[dim] = [item for item in items if isinstance(item, dict) and item.get("name")]
+    return result
+
+
+def _empty_job_context_profile() -> dict[str, list[dict]]:
+    return {"summary_tags": []}
+
+
+def _normalize_job_context_profile(value) -> dict[str, list[dict]]:
+    result = _empty_job_context_profile()
+    if isinstance(value, dict) and isinstance(value.get("summary_tags"), list):
+        result["summary_tags"] = [t for t in value["summary_tags"] if isinstance(t, dict) and t.get("name")]
+    return result
+
+
+def _normalize_taxonomy_candidates(value) -> list[dict]:
+    if isinstance(value, list):
+        return [c for c in value if isinstance(c, dict) and str(c.get("name", "")).strip()]
+    return []
+
+
 def _get_classifier() -> RoleClassifier:
-    return RoleClassifier()
+    # 较长超时：deepseek-v4-flash 单次结构化分类约 15-30s，并发下更慢；
+    # 30s 默认会在批量并发时大面积 Read timeout 并静默降级到规则引擎。
+    return RoleClassifier(timeout=90)
+
+
+def _safe_role_text(row) -> str:
+    parts = [
+        str(row.get("title", "") or ""),
+        str(row.get("jd_text", "") or ""),
+        str(row.get("jd_raw", "") or ""),
+    ]
+    return " ".join(part for part in parts if part and part != "nan").strip()
+
+
+def _role_from_cache_or_rules(classifier: RoleClassifier, row) -> RoleResult:
+    job_id = str(row.get("job_id", "") or "")
+
+    for entry in classifier._cache.values():
+        if entry.get("_job_id") == job_id:
+            role_id = entry.get("role_id", "other")
+            if role_id not in ROLE_DEFS:
+                role_id = "other"
+            return RoleResult(
+                role_id=role_id,
+                role_name=ROLE_DEFS.get(role_id, {}).get("name", "其他"),
+                confidence=entry.get("confidence", "low"),
+                soft_skills=_normalize_soft_skills(entry.get("soft_skills")),
+            )
+
+    for text in (
+        str(row.get("jd_raw", "") or ""),
+        str(row.get("jd_text", "") or ""),
+        _safe_role_text(row),
+    ):
+        if not text or text == "nan":
+            continue
+        cached = classifier._cache.get(classifier._make_cache_key(text))
+        if cached:
+            role_id = cached.get("role_id", "other")
+            if role_id not in ROLE_DEFS:
+                role_id = "other"
+            return RoleResult(
+                role_id=role_id,
+                role_name=ROLE_DEFS.get(role_id, {}).get("name", "其他"),
+                confidence=cached.get("confidence", "low"),
+                soft_skills=_normalize_soft_skills(cached.get("soft_skills")),
+            )
+
+    text = _safe_role_text(row)
+    if not text:
+        return RoleResult(role_id="other", role_name="其他", confidence="low")
+    return classifier._classify_with_rules(text)
 
 
 @router.get("/role-distribution")
 def role_distribution():
     classifier = _get_classifier()
-    stats = classifier.get_statistics()
-    # 排除「其他」类别，未分类的岗位不显示在分布图中
-    filtered = [item for item in stats["distribution"] if item["role_id"] != "other"]
-    return filtered
+    df = load_jobs_df()
+    if df.empty:
+        return []
+
+    distribution: dict[str, dict] = {}
+    total = 0
+    for _, row in df.iterrows():
+        role_result = _role_from_cache_or_rules(classifier, row)
+        if role_result.role_id == "other":
+            continue
+        total += 1
+        if role_result.role_id not in distribution:
+            distribution[role_result.role_id] = {
+                "role_id": role_result.role_id,
+                "role_name": ROLE_DEFS.get(role_result.role_id, {}).get("name", role_result.role_name),
+                "count": 0,
+            }
+        distribution[role_result.role_id]["count"] += 1
+
+    result = sorted(distribution.values(), key=lambda x: x["count"], reverse=True)
+    for item in result:
+        item["percentage"] = round(item["count"] / total * 100, 1) if total > 0 else 0.0
+    return result
 
 
 @router.get("/role-salary")
@@ -49,29 +190,24 @@ def role_salary():
     if df.empty:
         return []
 
-    cache_entries = classifier._cache
-
     groups: dict[str, dict] = {}
     for _, row in df.iterrows():
-        job_id = str(row.get("job_id", ""))
-        role_id = "other"
-
-        for cache_key, entry in cache_entries.items():
-            if entry.get("_job_id") == job_id:
-                role_id = entry.get("role_id", "other")
-                break
-
-        if role_id not in ROLE_DEFS:
-            role_id = "other"
+        role_result = _role_from_cache_or_rules(classifier, row)
+        role_id = role_result.role_id
 
         salary_min = row.get("salary_min")
         salary_max = row.get("salary_max")
         if salary_min is None or (isinstance(salary_min, float) and salary_min != salary_min):
             continue
         salary_val = float(salary_min)
+        if salary_val <= 0:
+            continue
+
+        if role_id == "other":
+            continue
 
         if role_id not in groups:
-            groups[role_id] = {"role_id": role_id, "role_name": ROLE_DEFS.get(role_id, {}).get("name", "其他"), "values": []}
+            groups[role_id] = {"role_id": role_id, "role_name": ROLE_DEFS.get(role_id, {}).get("name", role_result.role_name), "values": []}
         groups[role_id]["values"].append(salary_val)
 
     result = []
@@ -125,7 +261,10 @@ def run_classification(req: RunClassificationRequest = RunClassificationRequest(
     classifier = _get_classifier()
 
     if req.mode == "full":
-        classifier.clear_cache()
+        # 不删除磁盘缓存，仅标记强制重新分类（分类期间保留旧缓存供其他页面读取）
+        classifier._force_reclassify = True
+    else:
+        classifier._force_reclassify = False
 
     # 安全转换 NaN 值
     def _safe_str(v) -> str:
@@ -183,10 +322,13 @@ def _run_classify_in_background(req: RunClassificationRequest):
     logger.info("Classify-bg: LLM=%s, total=%d, use_llm=%s", llm_mode, len(df), req.use_llm)
 
     _classify_progress = {"running": True, "progress": 0, "total": len(df), "done": 0, "message": "正在初始化分類...", "llm_mode": llm_mode}
-    _classify_result = []
+    # 4.6b：不在分类启动时清空 _classify_result，保留上一次完整结果供前端展示
 
     if req.mode == "full":
-        classifier.clear_cache()
+        # 不删除磁盘缓存，仅标记强制重新分类（分类期间保留旧缓存供其他页面读取）
+        classifier._force_reclassify = True
+    else:
+        classifier._force_reclassify = False
 
     skill_extractor = RuleBasedSkillExtractor()
     skill_extractor.clear_cache()
@@ -194,6 +336,45 @@ def _run_classify_in_background(req: RunClassificationRequest):
     jobs = df.to_dict(orient="records")
     total = len(jobs)
     start = time.time()
+    industry_by_idx: dict[int, str] = {}
+    try:
+        from api.routers.stats import _call_llm_for_industry_batch, _infer_industry_with_rules, _job_industry_record
+        industry_records = [_job_industry_record(row, idx) for idx, (_, row) in enumerate(df.iterrows())]
+        # 全量分批 LLM 行业归类，每批 50 条（4.6a：去除原 [:50] 限制）
+        batch_size = 50
+        for batch_start in range(0, len(industry_records), batch_size):
+            batch = industry_records[batch_start:batch_start + batch_size]
+            try:
+                llm_industry = _call_llm_for_industry_batch(batch)
+            except Exception as batch_err:
+                logger.warning("Industry LLM batch %d-%d failed, fallback to rules: %s",
+                               batch_start, batch_start + len(batch), batch_err)
+                llm_industry = {}
+            for record in batch:
+                idx = int(record["idx"])
+                industry_by_idx[idx] = llm_industry.get(idx) or _infer_industry_with_rules(record)
+            # 更新进度（行业归类阶段约占 0-8%）
+            _classify_progress = {
+                "running": True, "progress": min(8, int(8 * (batch_start + len(batch)) / max(1, len(industry_records)))),
+                "total": len(df), "done": 0,
+                "message": f"正在歸類行業... {batch_start + len(batch)}/{len(industry_records)}",
+                "llm_mode": llm_mode,
+            }
+    except Exception as e:
+        logger.warning("Industry classification fallback to rules: %s", e)
+        try:
+            from api.routers.stats import _infer_industry_with_rules, _job_industry_record
+            for idx, (_, row) in enumerate(df.iterrows()):
+                industry_by_idx[idx] = _infer_industry_with_rules(_job_industry_record(row, idx))
+        except Exception:
+            industry_by_idx = {}
+
+    # 提前调用 LLM 统一翻译地名，写入磁盘缓存供后续统计复用
+    try:
+        from api.routers.stats import _precompute_location_normalization
+        _precompute_location_normalization(df)
+    except Exception as e:
+        logger.warning("Location normalization precompute failed: %s", e)
 
     cache_lock = Lock()
     classified_count = [0]
@@ -223,36 +404,49 @@ def _run_classify_in_background(req: RunClassificationRequest):
         if isinstance(v, float) and v != v: return ""
         return str(v)
 
-    def _classify_one(job: dict) -> dict:
+    def _classify_one(job: dict, idx: int) -> dict:
         try:
-            return _do_classify(job)
+            return _do_classify(job, idx)
         except Exception as e:
             logger.exception("Failed to classify job %s: %s", job.get("job_id", "?"), e)
             return {
                 "job_id": _safe_str(job.get("job_id")),
                 "title": _safe_str(job.get("title")),
                 "company": _safe_str(job.get("company")),
-                "location": _safe_str(job.get("location")),
+                "location": location_to_zh(_safe_str(job.get("location"))),
                 "source": _safe_str(job.get("source")),
+                "industry_category": industry_by_idx.get(idx) or _safe_str(job.get("industry_category")),
                 "role_id": "other", "role_name": "其他", "role_confidence": "low",
                 "salary_min": _safe_float(job.get("salary_min")),
                 "salary_max": _safe_float(job.get("salary_max")),
                 "skills": [], "is_insurance_sales": False, "insurance_score": 0,
+                "soft_skills": _empty_soft_skills(),
+                "tag_profile": _empty_tag_profile(),
+                "cross_industry_profile": _empty_cross_industry_profile(),
+                "job_context_profile": _empty_job_context_profile(),
                 "llm_is_insurance": False, "llm_confidence": "", "llm_explanation": "",
             }
 
-    def _do_classify(job: dict) -> dict:
+    def _do_classify(job: dict, idx: int) -> dict:
         jd_text = str(job.get("jd_raw", "") or "")
         classify_text = jd_text if len(jd_text) > 20 else str(job.get("title", ""))
         cache_key = classifier._make_cache_key(classify_text)
 
         with cache_lock:
-            if cache_key in classifier._cache:
+            # full 模式（_force_reclassify=True）跳过缓存命中，强制用 LLM 重算；
+            # 但不删除旧缓存——每条结果在算完后原地覆盖写回，其他页面读到的始终是
+            # 旧值或新值，不会出现空缓存/加载中状态。
+            if not classifier._force_reclassify and cache_key in classifier._cache:
                 cached = classifier._cache[cache_key]
                 cls_result = RoleResult(
                     role_id=cached.get("role_id", "other"),
                     role_name=cached.get("role_name", "其他"),
                     confidence=cached.get("confidence", "low"),
+                    soft_skills=_normalize_soft_skills(cached.get("soft_skills")),
+                    tag_profile=_normalize_tag_profile(cached.get("tag_profile")),
+                    cross_industry_profile=_normalize_cross_industry_profile(cached.get("cross_industry_profile")),
+                    job_context_profile=_normalize_job_context_profile(cached.get("job_context_profile")),
+                    taxonomy_candidates=_normalize_taxonomy_candidates(cached.get("taxonomy_candidates")),
                 )
                 from_cache = True
             else:
@@ -272,6 +466,11 @@ def _run_classify_in_background(req: RunClassificationRequest):
                     "role_id": cls_result.role_id,
                     "role_name": cls_result.role_name,
                     "confidence": cls_result.confidence,
+                    "soft_skills": cls_result.soft_skills,
+                    "tag_profile": cls_result.tag_profile,
+                    "cross_industry_profile": cls_result.cross_industry_profile,
+                    "job_context_profile": cls_result.job_context_profile,
+                    "taxonomy_candidates": cls_result.taxonomy_candidates,
                 }
                 classifier._save_cache()
 
@@ -295,12 +494,17 @@ def _run_classify_in_background(req: RunClassificationRequest):
             "company": _safe_str(job.get("company")),
             "location": _safe_str(job.get("location")),
             "source": _safe_str(job.get("source")),
+            "industry_category": industry_by_idx.get(idx) or _safe_str(job.get("industry_category")),
             "role_id": cls_result.role_id,
             "role_name": cls_result.role_name,
             "role_confidence": cls_result.confidence,
             "salary_min": _safe_float(job.get("salary_min")),
             "salary_max": _safe_float(job.get("salary_max")),
             "skills": flat_skills,
+            "soft_skills": cls_result.soft_skills,
+            "tag_profile": cls_result.tag_profile,
+            "cross_industry_profile": cls_result.cross_industry_profile,
+            "job_context_profile": cls_result.job_context_profile,
             "is_insurance_sales": is_ins,
             "insurance_score": ins_score,
             "llm_is_insurance": _safe_bool(job.get("llm_is_insurance")),
@@ -309,10 +513,12 @@ def _run_classify_in_background(req: RunClassificationRequest):
         }
 
     # 并发分类
-    workers = min(8, total)
+    # LLM 模式下降低并发，避免供应商端排队导致整批超时降级到规则引擎；
+    # 规则模式无网络瓶颈，可保持高并发。
+    workers = min(4 if llm_mode else 8, total)
     results_map: dict[int, dict] = {}
     with ThreadPoolExecutor(max_workers=workers) as pool:
-        futures = {pool.submit(_classify_one, job): idx for idx, job in enumerate(jobs)}
+        futures = {pool.submit(_classify_one, job, idx): idx for idx, job in enumerate(jobs)}
         for future in as_completed(futures):
             idx = futures[future]
             try:
@@ -322,18 +528,21 @@ def _run_classify_in_background(req: RunClassificationRequest):
                     "job_id": _safe_str(jobs[idx].get("job_id")),
                     "role_id": "other", "role_name": "其他", "role_confidence": "low",
                     "salary_min": 0.0, "salary_max": 0.0, "skills": [],
+                    "soft_skills": _empty_soft_skills(),
+                    "tag_profile": _empty_tag_profile(),
+                    "cross_industry_profile": _empty_cross_industry_profile(),
+                    "job_context_profile": _empty_job_context_profile(),
                 }
             done_count = len(results_map)
-            pct = round(done_count / total * 100, 0)
+            pct = 8 + round(done_count / total * 82, 0)
             _classify_progress = {
                 "running": True, "progress": int(pct), "total": total,
                 "done": done_count,
-                "message": f"正在分類... {done_count}/{total} ({int(pct)}%)",
+                "message": f"正在分類... {done_count}/{total}",
                 "llm_mode": llm_mode,
             }
 
     results = [results_map[i] for i in range(total) if i in results_map]
-    elapsed = (time.time() - start) * 1000
 
     # Save cache
     for job in jobs:
@@ -341,16 +550,53 @@ def _run_classify_in_background(req: RunClassificationRequest):
         if cache_key in classifier._cache:
             classifier._cache[cache_key]["_job_id"] = str(job.get("job_id", ""))
     classifier._save_cache()
+    # 重置强制重新分类标志，后续单岗位分类可正常命中缓存
+    classifier._force_reclassify = False
+
+    # v1.5 第一期：汇总各岗位发现的候选标签到候选词库（仅主线程，并发安全）
+    try:
+        from src.analyzer.taxonomy_discovery_agent import TaxonomyDiscoveryAgent
+        summary = TaxonomyDiscoveryAgent().consolidate_candidates(classifier._cache)
+        logger.info("Taxonomy candidates consolidated: %s", summary)
+    except Exception as e:
+        logger.warning("Taxonomy consolidation failed: %s", e)  # 不阻断分类完成
 
     now_ts = datetime.now(timezone.utc).isoformat()
     _classify_result = results
     _classify_last_at = now_ts
+
+    analysis_completed = False
+    _classify_progress = {
+        "running": True, "progress": 90, "total": total, "done": total,
+        "message": "正在生成技術趨勢分析...",
+        "llm_mode": llm_mode,
+    }
+    try:
+        from api.routers.stats import _generate_salary_analysis, _generate_trend_analysis
+
+        _generate_trend_analysis(df)
+        _classify_progress = {
+            "running": True, "progress": 95, "total": total, "done": total,
+            "message": "正在生成薪資分析...",
+            "llm_mode": llm_mode,
+        }
+        _generate_salary_analysis(df)
+        analysis_completed = True
+    except Exception as e:
+        logger.warning("Post-classification analysis failed: %s", e)
+
+    elapsed = (time.time() - start) * 1000
     _classify_progress = {
         "running": False, "progress": 100, "total": total, "done": total,
-        "message": f"分類完成：{classified_count[0]}/{total} ({ 'LLM' if llm_mode else '規則' } 模式)",
+        "message": (
+            f"全部分析完成：{classified_count[0]}/{total} ({ 'LLM' if llm_mode else '規則' } 模式)"
+            if analysis_completed
+            else f"分類完成：{classified_count[0]}/{total} ({ 'LLM' if llm_mode else '規則' } 模式)，趨勢/薪資分析可稍後重試"
+        ),
         "llm_mode": llm_mode,
         "duration_ms": round(elapsed, 0),
         "classified": classified_count[0],
+        "analysis_completed": analysis_completed,
     }
     _classify_thread = None
     logger.info("Classify-bg done: %d/%d in %.1fs", classified_count[0], total, elapsed / 1000)
@@ -369,8 +615,7 @@ def classify_jobs(req: RunClassificationRequest = RunClassificationRequest()):
     if df.empty:
         raise HTTPException(status_code=400, detail="No job data available")
 
-    # 重置状态
-    _classify_result = []
+    # 重置状态（4.6b：不清空 _classify_result，保留旧结果供前端展示）
     _classify_progress = {"running": True, "progress": 0, "total": len(df), "done": 0, "message": "正在啟動...", "llm_mode": False}
 
     # 启动后台线程
@@ -445,4 +690,12 @@ def review_insurance(req: InsuranceReviewRequest):
         "duration_ms": round(elapsed, 0),
         "message": f"LLM 复审完成: {insurance_count}/{len(results)} 确认为保险销售 ({elapsed/1000:.1f}s)",
         "items": results,
+    }
+
+
+def classified_industry_map() -> dict[str, str]:
+    return {
+        str(item.get("job_id")): str(item.get("industry_category") or "")
+        for item in _classify_result
+        if item.get("job_id") and item.get("industry_category")
     }

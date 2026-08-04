@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from src.analyzer.skill_taxonomy import compact_known_labels
+
 ROLE_CLASSIFY_SYSTEM_PROMPT = """你是一个香港 IT 招聘市场的岗位分类专家。你的任务是根据岗位描述（JD）将岗位归类到标准技术角色。
 
 你需要返回一个 JSON 对象，包含以下字段：
@@ -130,6 +132,27 @@ Return ONLY valid JSON with these fields:
 - "role_id": one of: frontend, backend, fullstack, mobile, data_scientist, ml_engineer, data_engineer, devops, qa, security, solution_architect, engineering_manager, it_analyst, product, design, blockchain, ai_prompt_engineer, ai_model_training, ai_agent_dev, ai_application, data_science, other
 - "role_name": Chinese name for the role
 - "confidence": "high", "medium", or "low"
+- "soft_skills": object with six arrays:
+  - "education": education requirements in normalized Chinese labels
+  - "language": language requirements in normalized Chinese labels
+  - "soft_skill": personal capability requirements in normalized Chinese labels
+  - "domain_knowledge": non-computer domain or industry knowledge requirements
+  - "certification": professional qualifications or certificates
+  - "business_skill": business, compliance, stakeholder, documentation, or project delivery skills
+- "tag_profile": object with two arrays of evidence-backed structured tags:
+  - "technical": technical skills/tools (programming_languages, frameworks_libraries, databases, cloud_devops, automation_toolkit, ai_api, ai_framework, ai_concepts, infrastructure, security_compliance, office_tools)
+  - "non_technical": business_skill, domain_knowledge, soft_skill, education, language, certification, experience
+  Each tag is an object: {"name","category","requirement_level","confidence","evidence"}
+- "cross_industry_profile": object with six arrays of evidence-backed dimension tags (Hong Kong jobs are often "tech + industry client + business process + system object + compliance + delivery motion"):
+  - "industry_context": served industry / client type (e.g. 政府/公共部門, 金融/銀行, 保險, 零售/電商, 物流, 醫療, 教育, 地產/物業, 公用事業/環保)
+  - "business_scenario": concrete business process / scenario (e.g. 支付, 訂單, 履約, 風控, 設備監測, 水處理設施監測, 投標)
+  - "solution_domain": solution / system direction (e.g. AI 方案, Digital Twin, ERP, CRM, D365, TMS, IT 基礎設施, 數據平台)
+  - "delivery_motion": delivery action (e.g. 需求分析, 方案設計, 售前演示, 技術提案, POC 測試, 投標, 系統集成, 實施交付)
+  - "compliance_standard": compliance/standard/security (e.g. ISO 27001, PDPO, AML/KYC, 政府合規, 信息安全合規)
+  - "system_or_asset": built/integrated/monitored system or device (e.g. 傳感器, 機械設備, POS, 支付網關, 倉儲系統, 樓宇系統, ERP, 網絡設備)
+  Each dimension tag is an object: {"name","confidence","evidence"}. Use 繁体中文 for names. Do NOT output combination/summary tags — the backend composes those.
+- "candidate_taxonomy_updates": array of NEW reusable labels you discovered that are NOT already in the known taxonomy below. Each item: {"name","category","aliases":[...],"evidence","reason","confidence","requirement_level","status":"candidate"}.
+- "candidate_alias_updates": array of term aliases mapping a JD term to a canonical label. Each item: {"alias","canonical","category","evidence","confidence"}.
 
 Role reference (distinguish carefully):
 frontend=前端开发, backend=后端开发, fullstack=全栈开发, mobile=移动开发,
@@ -155,6 +178,47 @@ IMPORTANT distinctions:
 - Manager roles (Engineering Manager/Tech Lead/Team Lead) → engineering_manager
 - Analyst roles (System Analyst/Business Analyst) → it_analyst
 - Senior/Lead/Head titles: classify by technical domain, NOT as engineering_manager
+
+Soft skill extraction rules:
+- Only extract requirements explicitly present in the JD. Do not invent labels.
+- Normalize education labels in Chinese, e.g. Bachelor's degree / bachelor / degree → "學士學位"; master preferred → "碩士優先"; computer science related degree → "計算機相關學歷".
+- Normalize language labels in Chinese, e.g. English → "英語"; Cantonese → "粵語"; Mandarin / Putonghua → "普通話"; Chinese → "中文".
+- Normalize personal capabilities in Chinese, e.g. communication → "溝通能力"; teamwork/collaboration/cross-functional collaboration → "團隊協作"; organizational skills → "組織能力"; problem-solving → "問題解決"; leadership → "領導力"; work under pressure → "抗壓能力".
+- Extract domain_knowledge for non-computer professional knowledge, e.g. finance/fintech/banking → "金融/金融科技知識"; insurance/wealth management → "保險/財富管理知識"; risk/compliance/regulatory → "風險合規知識"; ecommerce/retail → "電商/零售業務知識".
+- Extract certification for professional credentials, e.g. PMP, Scrum Master, CFA, FRM, CPA, SFC/HKMA, CISSP, CISA.
+- Extract business_skill for stakeholder management, requirement gathering, documentation, presentation, project management, vendor management, customer-facing communication, compliance reporting.
+- If a category is not mentioned, return an empty array for that category.
+
+tag_profile extraction rules (evidence-driven, doc §11.5):
+1. Every tag MUST cite a short JD quote in "evidence" (<=160 chars). No evidence => do not mark it as "required".
+2. requirement_level is one of: "required" (essential/required/proficiency in/experience with), "preferred" (preferred/nice to have/familiarity with), "example" (skills after e.g./such as/like/one of, unless the same clause also says must/essential/required), "inferred" (reasonable but not stated in JD; confidence must be <=0.7).
+3. Put OpenAI/Anthropic/Claude into category "ai_api"; LangChain/LlamaIndex into "ai_framework"; LLM/RAG/vector database into "ai_concepts". Do not output a standalone "llama" tag for LlamaIndex.
+4. Do NOT extract domain/industry knowledge from benefits, location, or company-intro text; prefer responsibilities/requirements/qualifications.
+5. Do NOT output "英語"/English as a language requirement merely because the JD is written in English; only when it explicitly requires English.
+6. PowerPoint/Excel/MS Office go to category "office_tools", never into core technical stack.
+7. "confidence" is a 0-1 float.
+
+cross_industry_profile extraction rules (doc §11.10.2/§11.12):
+1. Only extract from responsibilities/requirements/qualifications, with a JD quote in "evidence". Skip benefits/location/company-intro.
+2. AI/Digital Twin alone must NOT decide the industry; when the client is government/utility/water, also output 政府/公共部門 (industry_context) and 水處理設施監測 (business_scenario), not just an AI tag.
+3. Disambiguate by context: payment+banking/KYC → 金融/金融科技業務; payment+order/promotion/POS → 電商/零售業務; insurance+policy/claims → 保險/財富管理業務; insurance in benefits/coverage → do not output.
+4. tender/POC/demo/proposal/pre-sales → delivery_motion (售前支持/技術提案/POC 測試/投標), not merely 溝通能力.
+5. ISO 27001/PDPO/AML/KYC/government standards → compliance_standard, keeping the specific standard name.
+6. sensors/machinery monitoring/water treatment facilities → system_or_asset (傳感器) and/or business_scenario (設備狀態監測); keep the industry scenario, not just a bare "Sensors".
+7. business development manager is not a role tag, but when co-occurring with "develop business opportunities" output 業務拓展支持 (delivery_motion).
+
+candidate_taxonomy_updates / candidate_alias_updates rules (doc §11.11.8):
+1. Only propose REUSABLE labels (short phrases), never full sentences or one-off project descriptions.
+2. Every candidate must have a JD-quote "evidence". No evidence => do not propose.
+3. Do NOT propose a label already present in the known taxonomy list below (or an obvious synonym of it).
+4. Mark each as "status":"candidate"; do not promote it to a formal label. Do not propose "inferred" candidates.
+5. Use candidate_alias_updates when a JD term is clearly an alias of an existing canonical label (e.g. "Proof-Of-Concept" -> "POC 測試").
+6. If you discover nothing genuinely new, return empty arrays.
+
+Known taxonomy (do NOT re-propose these): """ + "、".join(compact_known_labels()) + """
+
+Example output (a government/utility pre-sales solution JD):
+{"role_id":"solution_architect","role_name":"解决方案架构师","confidence":"high","soft_skills":{"education":["學士學位"],"language":["英語","中文"],"soft_skill":["溝通能力"],"domain_knowledge":["政府/公共部門業務知識"],"certification":[],"business_skill":["需求分析","業務拓展支持"]},"tag_profile":{"technical":[{"name":"Digital Twin","category":"ai_concepts","requirement_level":"required","confidence":0.95,"evidence":"AI and Digital Twin solutions to government clients"},{"name":"IT 基礎設施方案設計","category":"infrastructure","requirement_level":"required","confidence":0.96,"evidence":"Design IT infrastructure solutions"},{"name":"ISO 27001","category":"security_compliance","requirement_level":"required","confidence":0.98,"evidence":"compliance with government standards such as ISO 27001"}],"non_technical":[{"name":"技術提案","category":"presales_delivery","requirement_level":"required","confidence":0.93,"evidence":"technical proposals"}]},"cross_industry_profile":{"industry_context":[{"name":"政府/公共部門","confidence":0.94,"evidence":"government and public sector clients"}],"business_scenario":[{"name":"水處理設施監測","confidence":0.96,"evidence":"water treatment facilities"}],"solution_domain":[{"name":"Digital Twin 解決方案","confidence":0.95,"evidence":"Digital Twin solutions"}],"delivery_motion":[{"name":"POC 測試","confidence":0.93,"evidence":"Proof-Of-Concept (POC) tests"},{"name":"投標","confidence":0.9,"evidence":"tender preparation"}],"compliance_standard":[{"name":"ISO 27001","confidence":0.98,"evidence":"such as ISO 27001"}],"system_or_asset":[{"name":"傳感器","confidence":0.94,"evidence":"recommending and specifying suitable sensors brands"}]},"candidate_taxonomy_updates":[{"name":"水處理設施知識","category":"domain_knowledge","aliases":["water treatment facilities"],"evidence":"water treatment facilities for government clients","reason":"domain knowledge not in current taxonomy","confidence":0.96,"requirement_level":"required","status":"candidate"}],"candidate_alias_updates":[{"alias":"Proof-Of-Concept","canonical":"POC 測試","category":"presales_delivery","evidence":"Proof-Of-Concept (POC) tests","confidence":0.95}]}
 
 Job description:
 """ + jd_text[:3000]

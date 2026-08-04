@@ -16,22 +16,37 @@ interface SkillItem {
 const props = withDefaults(defineProps<{
   data: SkillItem[]
   height?: number
+  left?: number
   loading?: boolean
 }>(), {
   height: 400,
+  left: 220,
 })
+
+function wrapLabel(value: string) {
+  const text = String(value)
+  if (text.length <= 14) return text
+  const chunks = text.match(/.{1,14}/g) || [text]
+  return chunks.slice(0, 3).join('\n')
+}
 
 const option = computed(() => {
   if (!props.data.length) return null
   const reversed = [...props.data].reverse()
   return {
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-    grid: { left: 140, right: 20, top: 10, bottom: 20 },
+    grid: { left: props.left, right: 28, top: 10, bottom: 24, containLabel: false },
     xAxis: { type: 'value' },
     yAxis: {
       type: 'category',
       data: reversed.map((s) => s.skill),
-      axisLabel: { fontSize: 12 },
+      axisLabel: {
+        fontSize: 11,
+        lineHeight: 14,
+        width: props.left - 28,
+        overflow: 'break',
+        formatter: wrapLabel,
+      },
     },
     series: [{
       type: 'bar',

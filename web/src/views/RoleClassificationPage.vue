@@ -187,6 +187,7 @@
       >
         <el-table-column prop="title" label="崗位名稱" min-width="200" show-overflow-tooltip />
         <el-table-column prop="company" label="公司" width="140" show-overflow-tooltip />
+        <el-table-column prop="industry_category" label="行业" width="150" show-overflow-tooltip />
         <el-table-column label="角色" width="150">
           <template #default="{ row }">
             <div style="display: flex; flex-direction: column; gap: 2px">

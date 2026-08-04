@@ -21,6 +21,9 @@ config/llm_config.json
 
 # Vite cache
 .vite/
+*.tsbuildinfo
+web/vite.config.d.ts
+web/vite.config.js
 
 # Node
 node_modules/
@@ -36,9 +39,15 @@ Thumbs.db
 # Data (crawler raw & cleaned data should be tracked)
 data/auth/
 
+# ChromaDB vector store (regenerable, large binary)
+data/chromadb/
+
 # Cookies / Auth tokens
 indeed_auth.json
 data/role_cache.json
+
+# Taxonomy discovery candidate pool & log (runtime-generated, v1.5)
+data/taxonomy/
 
 # Debug scripts
 scripts/_debug_*.py

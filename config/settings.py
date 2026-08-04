@@ -17,6 +17,15 @@ class Settings:
     llm_base_url: str = field(default="https://api.deepseek.com/v1")
     llm_model: str = field(default="deepseek-chat")
 
+    siliconflow_api_key: Optional[str] = field(default=None)
+    siliconflow_base_url: str = field(default="https://api.siliconflow.cn/v1")
+    embedding_model: str = field(default="Qwen/Qwen3-Embedding-8B")
+    embedding_dimensions: Optional[int] = field(default=None)
+    embedding_batch_size: int = field(default=32)
+    rerank_model: str = field(default="Qwen/Qwen3-Reranker-8B")
+    hybrid_semantic_weight: float = field(default=0.7)
+    hybrid_keyword_weight: float = field(default=0.3)
+
     mongodb_uri: str = field(default="mongodb://localhost:27017")
     mongodb_db_name: str = field(default="hk_job_market")
 

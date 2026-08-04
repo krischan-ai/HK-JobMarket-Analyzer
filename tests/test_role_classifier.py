@@ -71,6 +71,33 @@ class TestRoleClassifierRules:
         assert result.role_id == "solution_architect"
         assert result.role_name == "解决方案架构师"
 
+    def test_classify_presales_solution_jd_with_structured_fallback(self):
+        jd = """
+        Understand client requirement and analyze their pain points by using a solution-based technical approach.
+        Partner with the business development manager through persuasive presentations, solution designs,
+        technical proposals, solution demonstrations, and Proof-Of-Concept (POC) tests.
+        Design IT infrastructure solutions covering hardware, software, and security.
+        Provide customized AI and Digital Twin solutions to government and public sector clients.
+        Responsible for tender preparation & submission for tender bidding.
+        At least 4 years of relevant working experience in the IT industry, with pre-sales or engineering
+        background being preferred. Proven ability in recommending suitable sensors brands for monitoring
+        the physical condition of machinery in water treatment facilities. Network security and ISO 27001.
+        Good command of spoken & written English and Chinese. Ability to work independently as well as part of a team.
+        Proficiency in PowerPoint, Excel & other MS Office software.
+        """
+        result = self.c.classify(jd)
+
+        assert result.role_id == "solution_architect"
+        assert result.confidence in ("medium", "high")
+        tech_names = {t["name"] for t in result.tag_profile["technical"]}
+        nontech_names = {t["name"] for t in result.tag_profile["non_technical"]}
+        assert {"AI", "Digital Twin", "IT Infrastructure", "ISO 27001"}.issubset(tech_names)
+        assert {"需求分析", "技术提案", "POC 测试", "投标准备"}.issubset(nontech_names)
+        assert result.cross_industry_profile["industry_context"]
+        assert result.cross_industry_profile["business_scenario"]
+        assert result.cross_industry_profile["compliance_standard"]
+        assert result.taxonomy_candidates
+
     def test_classify_engineering_manager_rule(self):
         result = self.c.classify("Engineering Manager: lead team of 10 engineers, technical management")
         assert result.role_id == "engineering_manager"

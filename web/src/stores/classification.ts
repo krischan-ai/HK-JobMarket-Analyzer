@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import api from '@/api'
+import type { CrossIndustryProfile, JobContextProfile, SoftSkillTags, TagProfile } from '@/types'
 
 export interface ClassifiedJob {
   job_id: string
@@ -8,12 +9,17 @@ export interface ClassifiedJob {
   company: string
   location: string
   source: string
+  industry_category?: string
   role_id: string
   role_name: string
   role_confidence: string
   salary_min: number
   salary_max: number
   skills: Array<{ name: string; category: string }>
+  soft_skills?: SoftSkillTags
+  tag_profile?: TagProfile
+  cross_industry_profile?: CrossIndustryProfile
+  job_context_profile?: JobContextProfile
   is_insurance_sales: boolean
   insurance_score: number
   llm_is_insurance: boolean
@@ -145,7 +151,7 @@ export const useClassificationStore = defineStore('classification', () => {
       }
       message.value = data.message
     } catch (e: unknown) {
-      const err = e as { response?: { data?: { detail?: string } }; message?: string }
+      const err = e as { response?: { status?: number; data?: { detail?: string } }; message?: string }
       message.value = err?.response?.data?.detail || err?.message || 'LLM 復審失敗'
     } finally {
       reviewing.value = false
@@ -178,7 +184,7 @@ export const useClassificationStore = defineStore('classification', () => {
     total.value = 0
     classified.value = 0
     duration.value = 0
-    results.value = []
+    // 4.6d：不清空 results，保留旧结果供分类期间展示
     message.value = '正在啟動分類任務...'
 
     try {
@@ -192,7 +198,7 @@ export const useClassificationStore = defineStore('classification', () => {
       message.value = '分類中...'
       _startPolling()
     } catch (e: unknown) {
-      const err = e as { response?: { data?: { detail?: string } }; message?: string }
+      const err = e as { response?: { status?: number; data?: { detail?: string } }; message?: string }
       if (err?.response?.status === 409) {
         message.value = '已有任務正在運行，正在恢復監聽...'
         _startPolling()

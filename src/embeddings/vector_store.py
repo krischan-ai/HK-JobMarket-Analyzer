@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import hashlib
-import json
 from typing import Optional
 
 import chromadb
@@ -13,12 +12,12 @@ from src.logger import get_logger
 
 
 class VectorStore:
-    """ChromaDB 向量存储 — 语义搜索与索引管理"""
+    """ChromaDB vector store for semantic job retrieval."""
 
     _COLLECTION_NAME = "job_descriptions"
 
     def __init__(self, persist_path: Optional[str] = None, config_manager: Optional[LLMConfigManager] = None):
-        self.persist_path = persist_path or (settings.data_dir / "chromadb").as_posix()
+        self.persist_path = persist_path or settings.vector_db_path.as_posix()
         self.config = config_manager or LLMConfigManager()
         self.logger = get_logger(self.__class__.__name__)
         self._client: Optional[chromadb.PersistentClient] = None
@@ -51,71 +50,80 @@ class VectorStore:
         return self._collection.count()
 
     def _embed(self, texts: list[str]) -> list[list[float]]:
-        """调用 OpenAI/DeepSeek 兼容 Embedding API"""
+        """Call an OpenAI-compatible embedding API."""
         cfg = self.config.load()
-        api_key = cfg.get("api_key") or settings.llm_api_key
-        base_url = cfg.get("base_url") or settings.llm_base_url
+        api_key = (
+            settings.siliconflow_api_key
+            or cfg.get("embedding_api_key")
+            or cfg.get("api_key")
+            or settings.llm_api_key
+        )
+        base_url = (
+            settings.siliconflow_base_url
+            or cfg.get("embedding_base_url")
+            or cfg.get("base_url")
+            or settings.llm_base_url
+        )
+        model = cfg.get("embedding_model") or settings.embedding_model
         if not api_key:
             raise RuntimeError("No API key configured for embeddings")
 
         import openai
+
         client = openai.OpenAI(api_key=api_key, base_url=base_url, timeout=30)
-        resp = client.embeddings.create(
-            model="text-embedding-ada-002",
-            input=texts,
-        )
+        kwargs = {"model": model, "input": texts}
+        if settings.embedding_dimensions:
+            kwargs["dimensions"] = settings.embedding_dimensions
+        resp = client.embeddings.create(**kwargs)
         return [d.embedding for d in resp.data]
 
     def _make_doc_id(self, job_id: str) -> str:
         return hashlib.md5(job_id.encode()).hexdigest()[:16]
 
     def add_documents(self, documents: list[dict], text_field: str = "jd_text"):
-        """批量添加文档到向量索引"""
         if not self.available:
             return
 
         ids = []
         texts = []
         metadatas = []
-        embeddings = []
 
         for doc in documents:
             text = doc.get(text_field, "")
-            if not text or len(text.strip()) < 20:
+            if not isinstance(text, str) or len(text.strip()) < 20:
                 continue
 
-            job_id = doc.get("job_id", hashlib.md5(text.encode()).hexdigest()[:12])
-            doc_id = self._make_doc_id(job_id)
-            ids.append(doc_id)
-
-            # 截断长文本
+            job_id = str(doc.get("job_id") or hashlib.md5(text.encode()).hexdigest()[:12])
+            ids.append(self._make_doc_id(job_id))
             texts.append(text[:8000])
-
             metadatas.append({
                 "job_id": job_id,
                 "title": str(doc.get("title", ""))[:200],
                 "company": str(doc.get("company", ""))[:100],
                 "location": str(doc.get("location", ""))[:100],
                 "source": str(doc.get("source", ""))[:50],
+                "url": str(doc.get("url", ""))[:500],
             })
 
         if not texts:
             return
 
         try:
-            embeddings = self._embed(texts)
-            self._collection.add(
-                ids=ids,
-                embeddings=embeddings,
-                documents=texts,
-                metadatas=metadatas,
-            )
+            batch_size = max(1, int(settings.embedding_batch_size or 32))
+            for start in range(0, len(texts), batch_size):
+                end = start + batch_size
+                embeddings = self._embed(texts[start:end])
+                self._collection.upsert(
+                    ids=ids[start:end],
+                    embeddings=embeddings,
+                    documents=texts[start:end],
+                    metadatas=metadatas[start:end],
+                )
             self.logger.info("Added %d documents to vector store", len(ids))
         except Exception as e:
             self.logger.warning("Failed to add embeddings: %s", e)
 
     def search(self, query: str, top_k: int = 10) -> list[dict]:
-        """语义搜索 — 返回最相关的文档"""
         if not self.available:
             return []
 
@@ -137,8 +145,11 @@ class VectorStore:
                         "company": meta.get("company"),
                         "location": meta.get("location"),
                         "source": meta.get("source"),
+                        "url": meta.get("url"),
+                        "vector_score": round(1 - results["distances"][0][i], 4) if results["distances"] else None,
                         "score": round(1 - results["distances"][0][i], 4) if results["distances"] else None,
                         "snippet": (results["documents"][0][i][:300] if results["documents"] else ""),
+                        "document": (results["documents"][0][i] if results["documents"] else ""),
                     })
             return items
         except Exception as e:
@@ -146,32 +157,23 @@ class VectorStore:
             return []
 
     def rebuild_from_csv(self, csv_path: str):
-        """从 CSV 全量重建向量索引"""
         import pandas as pd
+
         df = pd.read_csv(csv_path, encoding="utf-8-sig")
         docs = df.to_dict(orient="records")
-
-        if self.available:
-            try:
-                self._client.delete_collection(self._COLLECTION_NAME)
-                self._collection = self._client.create_collection(
-                    name=self._COLLECTION_NAME,
-                    metadata={"hnsw:space": "cosine"},
-                )
-            except Exception:
-                pass
-
-        self.add_documents(docs)
+        self.clear()
+        text_field = "kb_document_text" if "kb_document_text" in df.columns else "jd_text"
+        self.add_documents(docs, text_field=text_field)
         self.logger.info("Vector store rebuilt: %d documents", self.count())
 
     def clear(self):
-        """清空向量索引"""
-        if self.available:
-            try:
-                self._client.delete_collection(self._COLLECTION_NAME)
-                self._collection = self._client.create_collection(
-                    name=self._COLLECTION_NAME,
-                    metadata={"hnsw:space": "cosine"},
-                )
-            except Exception:
-                pass
+        if not self.available:
+            return
+        try:
+            self._client.delete_collection(self._COLLECTION_NAME)
+        except Exception:
+            pass
+        self._collection = self._client.get_or_create_collection(
+            name=self._COLLECTION_NAME,
+            metadata={"hnsw:space": "cosine"},
+        )

@@ -1,12 +1,216 @@
 from fastapi import APIRouter, Query
 from api.dependencies import load_jobs_df, load_skills_df
-from api.routers.stats import location_to_zh
+from api.routers.stats import (
+    _NON_TECH_CATEGORY_LIMITS,
+    _add_label,
+    _infer_industry_with_rules,
+    _job_industry_record,
+    _scan_non_tech_labels_from_text,
+    location_to_zh,
+)
 import pandas as pd
 import math
 from pathlib import Path
 from datetime import datetime
+import ast
+import json
 
 router = APIRouter(prefix="/api/jobs", tags=["jobs"])
+
+_EMPTY_DOMAIN_LABELS = {"其他", "other", "Others", "未知", "N/A", "na", "none"}
+
+
+def _safe_str(row, field: str) -> str:
+    value = row.get(field, "")
+    return str(value) if pd.notna(value) else ""
+
+
+def _safe_int(row, field: str):
+    value = row.get(field, None)
+    return int(value) if pd.notna(value) else None
+
+
+def _safe_bool(row, field: str) -> bool:
+    value = row.get(field, False)
+    if pd.isna(value):
+        return False
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() in {"true", "1", "yes"}
+
+
+def _safe_list(row, field: str) -> list[str]:
+    value = row.get(field, [])
+    if isinstance(value, list):
+        return value
+    if pd.isna(value):
+        return []
+    if isinstance(value, str):
+        text = value.strip()
+        if not text:
+            return []
+        try:
+            parsed = ast.literal_eval(text)
+            if isinstance(parsed, list):
+                return [str(item) for item in parsed]
+        except (ValueError, SyntaxError):
+            return [part.strip() for part in text.split(";") if part.strip()]
+    return []
+
+
+def _empty_soft_skills() -> dict[str, list[str]]:
+    return {
+        "education": [],
+        "language": [],
+        "soft_skill": [],
+        "domain_knowledge": [],
+        "certification": [],
+        "business_skill": [],
+    }
+
+
+def _normalize_soft_skills(value) -> dict[str, list[str]]:
+    if not isinstance(value, dict):
+        return _empty_soft_skills()
+    result = _empty_soft_skills()
+    for key in result:
+        result[key] = [str(x).strip() for x in value.get(key, []) if str(x).strip()]
+    return result
+
+
+def _merge_soft_skills_for_row(row, cached_soft_skills, industry_category: str) -> dict[str, list[str]]:
+    bucket: dict[str, set[str]] = {category: set() for category in _NON_TECH_CATEGORY_LIMITS}
+    normalized = _normalize_soft_skills(cached_soft_skills)
+
+    for category in _NON_TECH_CATEGORY_LIMITS:
+        for item in normalized.get(category, []):
+            _add_label(bucket, category, item)
+
+    for item in _safe_list(row, "languages_required"):
+        _add_label(bucket, "language", item)
+
+    education = _safe_str(row, "education_required")
+    if education:
+        _add_label(bucket, "education", education)
+
+    jd_text = " ".join([
+        _safe_str(row, "title"),
+        _safe_str(row, "company"),
+        industry_category or _safe_str(row, "industry_category"),
+        _safe_str(row, "jd_text"),
+        _safe_str(row, "jd_raw"),
+        _safe_str(row, "kb_document_text"),
+    ])
+    scanned = _scan_non_tech_labels_from_text(jd_text)
+    for category, labels in scanned.items():
+        for label in labels:
+            _add_label(bucket, category, label)
+
+    try:
+        industry = industry_category or _infer_industry_with_rules(_job_industry_record(row, 0))
+        if industry and industry.strip() not in _EMPTY_DOMAIN_LABELS:
+            _add_label(bucket, "domain_knowledge", industry)
+    except Exception:
+        pass
+
+    result = _empty_soft_skills()
+    bucket.get("domain_knowledge", set()).difference_update(_EMPTY_DOMAIN_LABELS)
+    for category in result:
+        result[category] = sorted(bucket.get(category, set()))
+    return result
+
+
+def _soft_skills_by_job_id() -> dict[str, dict[str, list[str]]]:
+    try:
+        from src.analyzer.role_classifier import CACHE_PATH
+        if not CACHE_PATH.exists():
+            return {}
+        with open(CACHE_PATH, "r", encoding="utf-8") as f:
+            cache_data = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+    result: dict[str, dict[str, list[str]]] = {}
+    if not isinstance(cache_data, dict):
+        return result
+    for entry in cache_data.values():
+        if not isinstance(entry, dict):
+            continue
+        job_id = str(entry.get("_job_id") or "").strip()
+        if job_id:
+            result[job_id] = _normalize_soft_skills(entry.get("soft_skills"))
+    return result
+
+
+def _tag_profile_by_job_id() -> dict[str, dict]:
+    """从 role_cache.json 读取 _job_id -> tag_profile（v1.2 结构化标签）。"""
+    try:
+        from src.analyzer.role_classifier import CACHE_PATH
+        if not CACHE_PATH.exists():
+            return {}
+        with open(CACHE_PATH, "r", encoding="utf-8") as f:
+            cache_data = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+    result: dict[str, dict] = {}
+    if not isinstance(cache_data, dict):
+        return result
+    for entry in cache_data.values():
+        if not isinstance(entry, dict):
+            continue
+        job_id = str(entry.get("_job_id") or "").strip()
+        tp = entry.get("tag_profile")
+        if job_id and isinstance(tp, dict):
+            result[job_id] = {
+                "technical": [t for t in tp.get("technical", []) if isinstance(t, dict) and t.get("name")],
+                "non_technical": [t for t in tp.get("non_technical", []) if isinstance(t, dict) and t.get("name")],
+            }
+    return result
+
+
+_CROSS_INDUSTRY_DIMENSIONS = (
+    "industry_context", "business_scenario", "solution_domain",
+    "delivery_motion", "compliance_standard", "system_or_asset",
+)
+
+
+def _cross_industry_by_job_id() -> dict[str, dict]:
+    """从 role_cache.json 读取 _job_id -> (cross_industry_profile, job_context_profile)。"""
+    try:
+        from src.analyzer.role_classifier import CACHE_PATH
+        if not CACHE_PATH.exists():
+            return {}
+        with open(CACHE_PATH, "r", encoding="utf-8") as f:
+            cache_data = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+    result: dict[str, dict] = {}
+    if not isinstance(cache_data, dict):
+        return result
+    for entry in cache_data.values():
+        if not isinstance(entry, dict):
+            continue
+        job_id = str(entry.get("_job_id") or "").strip()
+        if not job_id:
+            continue
+        cip = entry.get("cross_industry_profile")
+        jcp = entry.get("job_context_profile")
+        cross = {dim: [] for dim in _CROSS_INDUSTRY_DIMENSIONS}
+        if isinstance(cip, dict):
+            for dim in cross:
+                items = cip.get(dim, [])
+                if isinstance(items, list):
+                    cross[dim] = [t for t in items if isinstance(t, dict) and t.get("name")]
+        summary = []
+        if isinstance(jcp, dict) and isinstance(jcp.get("summary_tags"), list):
+            summary = [t for t in jcp["summary_tags"] if isinstance(t, dict) and t.get("name")]
+        result[job_id] = {
+            "cross_industry_profile": cross,
+            "job_context_profile": {"summary_tags": summary},
+        }
+    return result
 
 
 @router.get("")
@@ -50,6 +254,15 @@ def list_jobs(
             src_time = datetime.fromtimestamp(f.stat().st_mtime).strftime("%Y-%m-%d %H:%M")
             source_times[src_name] = src_time
 
+    try:
+        from api.routers.role_stats import classified_industry_map
+        classified_industries = classified_industry_map()
+    except Exception:
+        classified_industries = {}
+    soft_skills_by_job = _soft_skills_by_job_id()
+    tag_profile_by_job = _tag_profile_by_job_id()
+    cross_industry_by_job = _cross_industry_by_job_id()
+
     items = []
     for _, row in df_page.iterrows():
         skills = None
@@ -57,8 +270,11 @@ def list_jobs(
             skills = row["skills"]
         src = str(row.get("source", "")).lower().strip()
         import_time = source_times.get(src, None)
+        job_id = str(row.get("job_id", ""))
+        industry_category = classified_industries.get(job_id) or (str(row.get("industry_category", "")) if pd.notna(row.get("industry_category")) else "")
+        soft_skills = _merge_soft_skills_for_row(row, soft_skills_by_job.get(job_id), industry_category)
         items.append({
-            "job_id": str(row.get("job_id", "")),
+            "job_id": job_id,
             "title": str(row.get("title", "")),
             "company": str(row.get("company", "")),
             "location": location_to_zh(str(row.get("location", ""))),
@@ -71,8 +287,27 @@ def list_jobs(
             "url": str(row.get("url", "")) if pd.notna(row.get("url")) else "",
             "posted_at": str(row.get("posted_at", "")) if pd.notna(row.get("posted_at")) else "",
             "employment_type": str(row.get("employment_type", "")) if pd.notna(row.get("employment_type")) else "",
-            "industry_category": str(row.get("industry_category", "")) if pd.notna(row.get("industry_category")) else "",
+            "industry_category": industry_category,
             "application_volume": str(row.get("application_volume", "")) if pd.notna(row.get("application_volume")) else "",
+            "employer_questions": _safe_list(row, "employer_questions"),
+            "is_insurance_sales": _safe_bool(row, "is_insurance_sales"),
+            "insurance_score": _safe_int(row, "insurance_score"),
+            "insurance_reasons": _safe_list(row, "insurance_reasons"),
+            "work_mode": _safe_str(row, "work_mode"),
+            "posted_days_ago": _safe_int(row, "posted_days_ago"),
+            "company_size": _safe_str(row, "company_size"),
+            "education_required": _safe_str(row, "education_required"),
+            "languages_required": _safe_list(row, "languages_required"),
+            "tech_stack": _safe_list(row, "tech_stack"),
+            "soft_skills": soft_skills,
+            "tag_profile": tag_profile_by_job.get(job_id, {"technical": [], "non_technical": []}),
+            "cross_industry_profile": cross_industry_by_job.get(job_id, {}).get(
+                "cross_industry_profile", {dim: [] for dim in _CROSS_INDUSTRY_DIMENSIONS}
+            ),
+            "job_context_profile": cross_industry_by_job.get(job_id, {}).get(
+                "job_context_profile", {"summary_tags": []}
+            ),
+            "job_type": _safe_str(row, "job_type"),
             "import_time": import_time,
         })
 
@@ -92,7 +327,7 @@ def list_locations():
     df = load_jobs_df()
     if df.empty or "location" not in df.columns:
         return []
-    locs = df["location"].dropna().value_counts().reset_index()
+    # 先翻译再计数，合并同名地区
+    locs = df["location"].apply(location_to_zh).value_counts().reset_index()
     locs.columns = ["name", "count"]
-    locs["name"] = locs["name"].apply(location_to_zh)
     return locs.to_dict(orient="records")

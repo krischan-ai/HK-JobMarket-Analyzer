@@ -8,6 +8,7 @@ from typing import Optional
 from src.cleaner.text import JDTextCleaner
 from src.cleaner.salary import SalaryParser
 from src.logger import get_logger
+from scripts.crawl_utils import parse_job_fields
 
 
 _ZH_LOCATION_MAP: dict[str, str] | None = None
@@ -79,6 +80,7 @@ class CleaningPipeline:
         cleaned["salary_currency"] = "HKD"
         if "location" in cleaned:
             cleaned["location"] = normalize_location(cleaned["location"])
+        parse_job_fields(cleaned)
         return cleaned
 
     def clean_batch(self, jobs: list[dict]) -> list[dict]:

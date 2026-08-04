@@ -1,7 +1,18 @@
-services:
+﻿services:
+  mongo:
+    image: mongo:7
+    container_name: hk-job-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+
   app:
     build: .
     container_name: hk-job-analyzer
+    depends_on:
+      - mongo
     ports:
       - "80:80"
       - "8501:8501"
@@ -12,6 +23,8 @@ services:
     environment:
       - PYTHONPATH=/app
       - PYTHONUNBUFFERED=1
+      - MONGODB_URI=mongodb://mongo:27017
+      - MONGODB_DB_NAME=hk_job_market
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/api/system/health"]
@@ -19,3 +32,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 15s
+
+volumes:
+  mongo_data:
